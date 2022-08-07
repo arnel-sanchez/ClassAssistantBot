@@ -1,0 +1,88 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/arnel-macbook/Desktop/ClassAssitantBot/ClassAssistantBot/ClassAssistantBot.csproj": {}
+  },
+  "projects": {
+    "/Users/arnel-macbook/Desktop/ClassAssitantBot/ClassAssistantBot/ClassAssistantBot.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/arnel-macbook/Desktop/ClassAssitantBot/ClassAssistantBot/ClassAssistantBot.csproj",
+        "projectName": "ClassAssistantBot",
+        "projectPath": "/Users/arnel-macbook/Desktop/ClassAssitantBot/ClassAssistantBot/ClassAssistantBot.csproj",
+        "packagesPath": "/Users/arnel-macbook/.nuget/packages/",
+        "outputPath": "/Users/arnel-macbook/Desktop/ClassAssitantBot/ClassAssistantBot/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/arnel-macbook/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[6.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.Abstractions": {
+              "target": "Package",
+              "version": "[6.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.Relational": {
+              "target": "Package",
+              "version": "[6.0.7, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[6.0.6, )"
+            },
+            "Telegram.BotAPI": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.302/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
