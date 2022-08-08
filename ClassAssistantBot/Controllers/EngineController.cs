@@ -53,6 +53,11 @@ namespace ClassAssistantBot.Services
 
         protected override void OnMessage(Message message)
         {
+            if (commandControler == null)
+            {
+                Logger.Error($"Error: Control de comandos nulo, problemas en el servidor");
+                return;
+            }
             commandControler.ProcessCommand(message);
         }
 

@@ -42,6 +42,13 @@ namespace ClassAssistantBot.Controllers
 
         public void ProcessCommand(Message message)
         {
+            if (message.From == null)
+            {
+                Logger.Error($"Error: Mensaje con usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             // Ignore user 777000 (Telegram)s
             if (message.From.Id == 777000)
             {
@@ -245,6 +252,9 @@ namespace ClassAssistantBot.Controllers
                 case "configuration":
                     ConfigurationCommand(user);
                     break;
+                case "poll":
+                    PollCommand(user);
+                    break;
                 default:
                     DefaultCommand(user);
                     break;
@@ -252,7 +262,7 @@ namespace ClassAssistantBot.Controllers
         }
 
         #region Comandos
-        private void StartCommand(ClassAssistantBot.Models.User user)
+        private void StartCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -270,8 +280,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void StudentCommand(ClassAssistantBot.Models.User user)
+        private void StudentCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Verified)
             {
                 Logger.Error($"Error: El estudiante {user.Username} está intentando unirse a un aula sin estar verificado.");
@@ -285,8 +302,15 @@ namespace ClassAssistantBot.Controllers
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void TeacherCommand(ClassAssistantBot.Models.User user)
+        private void TeacherCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Verified)
             {
                 Logger.Error($"Error: El usuario {user.Username} está intentando convertirse en profesor sin estar verificado.");
@@ -310,8 +334,15 @@ namespace ClassAssistantBot.Controllers
                             replyMarkup: keyboard);
         }
 
-        private void CreateCommand(ClassAssistantBot.Models.User user)
+        private void CreateCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.CreatingTecaher)
             {
                 Logger.Error($"Error: El profesor {user.Username} está intentando crear un aula sin haber creado el profesor.");
@@ -325,8 +356,15 @@ namespace ClassAssistantBot.Controllers
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void EnterCommand(ClassAssistantBot.Models.User user)
+        private void EnterCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.CreatingTecaher)
             {
                 Logger.Error($"Error: El profesor {user.Username} está intentando entrar a un aula sin creado el profesor.");
@@ -340,8 +378,15 @@ namespace ClassAssistantBot.Controllers
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void StudentsCommand(ClassAssistantBot.Models.User user)
+        private void StudentsCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con los comandos avanzados");
@@ -363,8 +408,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void CreaditsCommand(ClassAssistantBot.Models.User user)
+        private void CreaditsCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -387,8 +439,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void PendingsCommand(ClassAssistantBot.Models.User user)
+        private void PendingsCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -402,8 +461,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void AllPendingsCommand(ClassAssistantBot.Models.User user)
+        private void AllPendingsCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -417,8 +483,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void StudentAccessKeyCommand(ClassAssistantBot.Models.User user)
+        private void StudentAccessKeyCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -433,8 +506,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void ConfigurationCommand(ClassAssistantBot.Models.User user)
+        private void ConfigurationCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para solicitar la configuración de su cuenta");
@@ -453,8 +533,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void ClassTitleCommand(ClassAssistantBot.Models.User user)
+        private void ClassTitleCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -468,8 +555,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void DefaultCommand(ClassAssistantBot.Models.User user)
+        private void DefaultCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (!user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} está interactuando con un comando que no existe");
@@ -484,8 +578,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void StatusPhraseCommand(ClassAssistantBot.Models.User user)
+        private void StatusPhraseCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -505,8 +606,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void DailyCommand(ClassAssistantBot.Models.User user)
+        private void DailyCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -523,8 +631,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void RectificationToTheTeacherCommand(ClassAssistantBot.Models.User user)
+        private void RectificationToTheTeacherCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -538,8 +653,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void JokeCommand(ClassAssistantBot.Models.User user)
+        private void JokeCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -556,8 +678,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void MemeCommand(ClassAssistantBot.Models.User user)
+        private void MemeCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -574,8 +703,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void ClassInterventionCommand(ClassAssistantBot.Models.User user)
+        private void ClassInterventionCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -589,8 +725,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void RemoveStudentFromClassRoomCommand(ClassAssistantBot.Models.User user)
+        private void RemoveStudentFromClassRoomCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -605,8 +748,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void CancelCommand(ClassAssistantBot.Models.User user)
+        private void CancelCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             userDataHandler.CancelAction(user);
             if (user.IsTecaher)
                 Menu.TeacherMenu(bot, message);
@@ -614,8 +764,15 @@ namespace ClassAssistantBot.Controllers
                 Menu.StudentMenu(bot, message);
         }
 
-        private void ChangeClassRoomCommand(ClassAssistantBot.Models.User user)
+        private void ChangeClassRoomCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -630,8 +787,15 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void TeacherAccessKeyCommand(ClassAssistantBot.Models.User user)
+        private void TeacherAccessKeyCommand(Models.User? user)
         {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
@@ -645,10 +809,22 @@ namespace ClassAssistantBot.Controllers
                 Menu.TeacherConfigurationMenu(bot, message, $"La clave de acceso para sus profesores es {accessKey}.");
             }
         }
+
+        private void PollCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region Procesos que completan comandos de varias operaciones
-        private void OnRegister(ClassAssistantBot.Models.User user, string text)
+        private void OnRegister(Models.User user, string text)
         {
             var list = text.Split(' ');
             var name = "";
