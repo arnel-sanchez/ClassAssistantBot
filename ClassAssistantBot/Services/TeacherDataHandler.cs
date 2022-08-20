@@ -87,6 +87,23 @@ namespace ClassAssistantBot.Services
         {
             var user = dataAccess.Users.Where(x => x.Id == id).First();
             return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().TeacherAccessKey;
-        }        
+        }
+
+        public List<Teacher> GetTeachers(User user)
+        {
+            var teacherByClassRoom = dataAccess.TeachersByClassRooms
+                .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
+                .Include(x => x.ClassRoom)
+                .Include(x => x.Teacher)
+                .ThenInclude(x => x.User)
+                .ToList();
+            var res = new List<Teacher>();
+            foreach (var item in teacherByClassRoom)
+            {
+                res.Add(item.Teacher);
+            }
+
+            return res;
+        }
     }
 }

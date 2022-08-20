@@ -1,4 +1,4 @@
-﻿using System;
+﻿using ClassAssistantBot.Models;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableTypes;
@@ -42,6 +42,10 @@ namespace ClassAssistantBot.Services
                     new KeyboardButton[]
                     {
                         new KeyboardButton("*Pendings*"),
+                        new KeyboardButton("*Start Class*")
+                    },
+                    new KeyboardButton[]
+                    {
                         new KeyboardButton("*Configuration*")
                     }
                 },
@@ -136,6 +140,55 @@ namespace ClassAssistantBot.Services
                             text: text,
                             replyMarkup: keyboard);
         }
+
+        public static void TeachersList(BotClient bot, Message message,List<Teacher> teachers, string text = "")
+        {
+            var listButton = new KeyboardButton[teachers.Count][];
+
+            for (int i = 0; i < teachers.Count; i++)
+            {
+                listButton[i] = new KeyboardButton[]
+                {
+                    new KeyboardButton($"*{teachers[i].User.FirstName}*//*{teachers[i].User.Username}*")
+                };
+            }
+            var keyboard = new ReplyKeyboardMarkup
+            {
+                Keyboard = listButton,
+                ResizeKeyboard = true
+            };
+            if (string.IsNullOrEmpty(text)) text = "Lista de Profesores:";
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: text,
+                            replyMarkup: keyboard);
+        }
+
+        public static void ClassesList(BotClient bot, Message message, List<Class> classes, string text = "")
+        {
+            if (string.IsNullOrEmpty(text)) text = "Lista de Clases:";
+            var listButton = new KeyboardButton[classes.Count][];
+
+            for (int i = 0; i < classes.Count; i++)
+            {
+                listButton[i] = new KeyboardButton[]
+                {
+                    new KeyboardButton($"*{classes[i].Id}*//*{classes[i].Title}*")
+                };
+            }
+            if (string.IsNullOrEmpty(text)) text = "Lista de Clases:";
+            if (classes.Count == 0)
+            {
+                CancelMenu(bot, message, text);
+                return;
+            }
+            var keyboard = new ReplyKeyboardMarkup
+            {
+                Keyboard = listButton,
+                ResizeKeyboard = true
+            };
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: text,
+                            replyMarkup: keyboard);
+        }
     }
 }
-

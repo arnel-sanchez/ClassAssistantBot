@@ -10,6 +10,10 @@ namespace ClassAssistantBot.Models
     {
         public string Id { get; set; }
 
+        public long ClassId { get; set; }
+
+        public Class Class { get; set; }
+
         public string Title { get; set; }
 
         public DateTime DateTime { get; set; }

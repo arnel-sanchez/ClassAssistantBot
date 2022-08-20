@@ -35,7 +35,7 @@ namespace ClassAssistantBot.Services
 
         public User GetUser(long id)
         {
-            return dataAccess.Users.Where(x => x.TelegramId == id).First();
+            return dataAccess.Users.Where(x => x.TelegramId == id).FirstOrDefault();
         }
 
         public void VerifyUser(User user)

@@ -27,14 +27,22 @@ namespace ClassAssistantBot.Services
             dataAccess.Users.Update(user);
             var joke = new Joke
             {
-                DateTime = DateTime.Now,
+                DateTime = DateTime.UtcNow,
                 Id = Guid.NewGuid().ToString(),
                 Text = message,
                 UserId = user.Id
             };
             dataAccess.Jokes.Add(joke);
+            var pending = new Pending
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = InteractionType.Joke,
+                ClassRoomId = user.ClassRoomActiveId,
+                ObjectId = joke.Id,
+                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id
+            };
+            dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
-            Console.WriteLine($"The student {user.Username} did a Joke");
         }
     }
 }

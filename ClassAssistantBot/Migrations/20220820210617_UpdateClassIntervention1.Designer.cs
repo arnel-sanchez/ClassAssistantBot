@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClassAssistantBot.Migrations
 {
     [DbContext(typeof(DataAccess))]
-    [Migration("20220807164104_InitMigrations")]
-    partial class InitMigrations
+    [Migration("20220820210617_UpdateClassIntervention1")]
+    partial class UpdateClassIntervention1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,17 +24,44 @@ namespace ClassAssistantBot.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("ClassAssistantBot.Models.Class", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ClassRoomId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassRoomId");
+
+                    b.ToTable("Classes");
+                });
+
             modelBuilder.Entity("ClassAssistantBot.Models.ClassIntervention", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<long>("ClassId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("TeacherId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<bool>("Finished")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -45,7 +72,7 @@ namespace ClassAssistantBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TeacherId");
+                    b.HasIndex("ClassId");
 
                     b.HasIndex("UserId");
 
@@ -80,6 +107,9 @@ namespace ClassAssistantBot.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<long>("ClassId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -91,6 +121,8 @@ namespace ClassAssistantBot.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
 
                     b.HasIndex("UserId");
 
@@ -212,6 +244,34 @@ namespace ClassAssistantBot.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Memes");
+                });
+
+            modelBuilder.Entity("ClassAssistantBot.Models.Pending", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<long>("ClassRoomId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ObjectId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("StudentId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassRoomId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Pendings");
                 });
 
             modelBuilder.Entity("ClassAssistantBot.Models.RectificationToTheTeacher", b =>
@@ -389,11 +449,22 @@ namespace ClassAssistantBot.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("ClassAssistantBot.Models.Class", b =>
+                {
+                    b.HasOne("ClassAssistantBot.Models.ClassRoom", "ClassRoom")
+                        .WithMany()
+                        .HasForeignKey("ClassRoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassRoom");
+                });
+
             modelBuilder.Entity("ClassAssistantBot.Models.ClassIntervention", b =>
                 {
-                    b.HasOne("ClassAssistantBot.Models.Teacher", "Teacher")
+                    b.HasOne("ClassAssistantBot.Models.Class", "Class")
                         .WithMany()
-                        .HasForeignKey("TeacherId")
+                        .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -403,18 +474,26 @@ namespace ClassAssistantBot.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Teacher");
+                    b.Navigation("Class");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("ClassAssistantBot.Models.ClassTitle", b =>
                 {
+                    b.HasOne("ClassAssistantBot.Models.Class", "Class")
+                        .WithMany()
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ClassAssistantBot.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Class");
 
                     b.Navigation("User");
                 });
@@ -469,6 +548,25 @@ namespace ClassAssistantBot.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ClassAssistantBot.Models.Pending", b =>
+                {
+                    b.HasOne("ClassAssistantBot.Models.ClassRoom", "ClassRoom")
+                        .WithMany()
+                        .HasForeignKey("ClassRoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ClassAssistantBot.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassRoom");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("ClassAssistantBot.Models.RectificationToTheTeacher", b =>

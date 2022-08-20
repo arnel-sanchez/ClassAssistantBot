@@ -10,16 +10,18 @@ namespace ClassAssistantBot.Models
     {
         public string Id { get; set; }
 
-        public string Text { get; set; }
+        public bool Finished { get; set; }
 
         public DateTime DateTime { get; set; }
+
+        public string Text { get; set; }
 
         public long UserId { get; set; }
 
         public User User { get; set; }
 
-        public Teacher Teacher { get; set; }
+        public Class Class { get; set; }
 
-        public string TeacherId { get; set; }
+        public long ClassId { get; set; }
     }
 }

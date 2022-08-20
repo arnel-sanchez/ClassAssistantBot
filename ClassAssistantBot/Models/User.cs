@@ -14,12 +14,16 @@ namespace ClassAssistantBot.Models
         Ready,
         Credits,
         ClassIntervention,
+        ClassInterventionSelect,
         RectificationAtTeacher,
+        RectificationToTheTeacherUserName,
         Daily,
         StatusPhrase,
         Meme,
         Joke,
         ClassTitle,
+        ClassTitleSelect,
+        CreateClass,
         ChangeClassRoom,
         RemoveStudentFromClassRoom
     }

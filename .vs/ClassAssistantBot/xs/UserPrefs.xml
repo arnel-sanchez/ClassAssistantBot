@@ -1,12 +1,24 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Services/Menu.cs">
+    <Files>
+      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="606" Column="22" />
+      <File FileName="ClassAssistantBot/Services/ClassTitleDataHandler.cs" Line="81" Column="2" />
+      <File FileName="ClassAssistantBot/Models/Class.cs" Line="6" Column="37" />
+      <File FileName="ClassAssistantBot/Models/ClassTitle.cs" Line="15" Column="41" />
+      <File FileName="ClassAssistantBot/Services/Menu.cs" Line="161" Column="72" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="ClassAssistantBot" expanded="True">
             <Node name="ClassAssistantBot" expanded="True">
+              <Node name="Controllers" expanded="True" />
               <Node name="Services" expanded="True">
                 <Node name="Menu.cs" selected="True" />
               </Node>
@@ -20,9 +32,5 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
 </Properties>

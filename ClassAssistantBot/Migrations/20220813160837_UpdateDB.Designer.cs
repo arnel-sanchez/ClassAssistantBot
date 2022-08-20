@@ -3,6 +3,7 @@ using System;
 using ClassAssistantBot.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClassAssistantBot.Migrations
 {
     [DbContext(typeof(DataAccess))]
-    partial class DataAccessModelSnapshot : ModelSnapshot
+    [Migration("20220813160837_UpdateDB")]
+    partial class UpdateDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,44 +24,16 @@ namespace ClassAssistantBot.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ClassAssistantBot.Models.Class", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("ClassRoomId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassRoomId");
-
-                    b.ToTable("Classes");
-                });
-
             modelBuilder.Entity("ClassAssistantBot.Models.ClassIntervention", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
-                    b.Property<long>("ClassId")
+                    b.Property<long>("ClassRoomId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("Finished")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -70,7 +44,7 @@ namespace ClassAssistantBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClassId");
+                    b.HasIndex("ClassRoomId");
 
                     b.HasIndex("UserId");
 
@@ -105,9 +79,6 @@ namespace ClassAssistantBot.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
-                    b.Property<long>("ClassId")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -119,8 +90,6 @@ namespace ClassAssistantBot.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
 
                     b.HasIndex("UserId");
 
@@ -447,7 +416,7 @@ namespace ClassAssistantBot.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ClassAssistantBot.Models.Class", b =>
+            modelBuilder.Entity("ClassAssistantBot.Models.ClassIntervention", b =>
                 {
                     b.HasOne("ClassAssistantBot.Models.ClassRoom", "ClassRoom")
                         .WithMany()
@@ -455,43 +424,24 @@ namespace ClassAssistantBot.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ClassRoom");
-                });
-
-            modelBuilder.Entity("ClassAssistantBot.Models.ClassIntervention", b =>
-                {
-                    b.HasOne("ClassAssistantBot.Models.Class", "Class")
-                        .WithMany()
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ClassAssistantBot.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Class");
+                    b.Navigation("ClassRoom");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("ClassAssistantBot.Models.ClassTitle", b =>
                 {
-                    b.HasOne("ClassAssistantBot.Models.Class", "Class")
-                        .WithMany()
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ClassAssistantBot.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Class");
 
                     b.Navigation("User");
                 });

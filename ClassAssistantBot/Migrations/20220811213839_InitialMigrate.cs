@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ClassAssistantBot.Migrations
 {
-    public partial class InitMigrations : Migration
+    public partial class InitialMigrate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -220,6 +220,33 @@ namespace ClassAssistantBot.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Pendings",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    StudentId = table.Column<string>(type: "text", nullable: false),
+                    ClassRoomId = table.Column<long>(type: "bigint", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    ObjectId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pendings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Pendings_ClassRooms_ClassRoomId",
+                        column: x => x.ClassRoomId,
+                        principalTable: "ClassRooms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Pendings_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StudentsByClassRooms",
                 columns: table => new
                 {
@@ -364,6 +391,16 @@ namespace ClassAssistantBot.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Pendings_ClassRoomId",
+                table: "Pendings",
+                column: "ClassRoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pendings_StudentId",
+                table: "Pendings",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RectificationToTheTeachers_TeacherId",
                 table: "RectificationToTheTeachers",
                 column: "TeacherId");
@@ -428,6 +465,9 @@ namespace ClassAssistantBot.Migrations
 
             migrationBuilder.DropTable(
                 name: "Memes");
+
+            migrationBuilder.DropTable(
+                name: "Pendings");
 
             migrationBuilder.DropTable(
                 name: "RectificationToTheTeachers");

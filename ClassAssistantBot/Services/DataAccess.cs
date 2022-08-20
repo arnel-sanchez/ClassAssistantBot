@@ -17,6 +17,10 @@ namespace ClassAssistantBot.Services
             options.UseNpgsql(ConnectionString);
         }
 
+        public DbSet<Class> Classes { get; set; }
+
+        public DbSet<Pending> Pendings { get; set; }
+
         public DbSet<Student> Students { get; set; }
 
         public DbSet<ClassRoom> ClassRooms { get; set; }

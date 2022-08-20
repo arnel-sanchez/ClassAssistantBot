@@ -17,7 +17,6 @@ namespace ClassAssistantBot.Services
             user.Status = UserStatus.StatusPhrase;
             dataAccess.Users.Update(user);
             dataAccess.SaveChanges();
-            Console.WriteLine($"The student {user.Username} is redy to change the Status Phrase");
             var res = dataAccess.StatusPhrases.Where(x => x.UserId == user.Id).ToList().MaxBy(x => x.DateTime);
             if (res == null)
                 return "";
@@ -38,8 +37,16 @@ namespace ClassAssistantBot.Services
                 UserId = user.Id
             };
             dataAccess.StatusPhrases.Add(statusPhrase);
+            var pending = new Pending
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = InteractionType.StatusPhrase,
+                ClassRoomId = user.ClassRoomActiveId,
+                ObjectId = statusPhrase.Id,
+                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id
+            };
+            dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
-            Console.WriteLine($"The student {user.Username} changed the StatusPhrase");
         }
     }
 }

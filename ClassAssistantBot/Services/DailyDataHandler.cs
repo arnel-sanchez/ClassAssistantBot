@@ -17,7 +17,7 @@ namespace ClassAssistantBot.Services
             user.Status = UserStatus.Daily;
             dataAccess.Users.Update(user);
             dataAccess.SaveChanges();
-            Console.WriteLine($"The student {user.Username} is redy to update Daily");
+            Console.WriteLine($"The student {user.Username} is ready to update Daily");
         }
 
         public void UpdateDaily(long id, string message)
@@ -27,14 +27,22 @@ namespace ClassAssistantBot.Services
             dataAccess.Users.Update(user);
             var daily = new Daily
             {
-                DateTime = DateTime.Now,
+                DateTime = DateTime.UtcNow,
                 Id = Guid.NewGuid().ToString(),
                 Text = message,
                 UserId = user.Id
             };
             dataAccess.Dailies.Add(daily);
+            var pending = new Pending
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = InteractionType.Daily,
+                ClassRoomId = user.ClassRoomActiveId,
+                ObjectId = daily.Id,
+                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id
+            };
+            dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
-            Console.WriteLine($"The student {user.Username} update Daily");
         }
     }
 }

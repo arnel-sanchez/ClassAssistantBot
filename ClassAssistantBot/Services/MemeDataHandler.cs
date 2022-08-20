@@ -17,7 +17,6 @@ namespace ClassAssistantBot.Services
             user.Status = UserStatus.Meme;
             dataAccess.Users.Update(user);
             dataAccess.SaveChanges();
-            Console.WriteLine($"The student {user.Username} is redy to send a Meme");
         }
 
         public void SendMeme(long id, Telegram.BotAPI.AvailableTypes.Document document)
@@ -39,8 +38,47 @@ namespace ClassAssistantBot.Services
                 Width = document.Thumb.Width,
             };
             dataAccess.Memes.Add(meme);
+            var pending = new Pending
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = InteractionType.Meme,
+                ClassRoomId = user.ClassRoomActiveId,
+                ObjectId = meme.Id,
+                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id
+            };
+            dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
-            Console.WriteLine($"The student {user.Username} sent a Meme");
+        }
+
+        public void SendMeme(long id, Telegram.BotAPI.AvailableTypes.PhotoSize photo)
+        {
+            var user = dataAccess.Users.First(x => x.Id == id);
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            var meme = new Meme
+            {
+                DateTime = DateTime.UtcNow,
+                Id = Guid.NewGuid().ToString(),
+                FileId = photo.FileId,
+                FieldUniqueId = photo.FileUniqueId,
+                UserId = user.Id,
+                FileSize = photo.FileSize,
+                MimeType = "",
+                FileName = "",
+                Height = photo.Height,
+                Width = photo.Width,
+            };
+            dataAccess.Memes.Add(meme);
+            var pending = new Pending
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = InteractionType.Meme,
+                ClassRoomId = user.ClassRoomActiveId,
+                ObjectId = meme.Id,
+                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id
+            };
+            dataAccess.Pendings.Add(pending);
+            dataAccess.SaveChanges();
         }
     }
 }

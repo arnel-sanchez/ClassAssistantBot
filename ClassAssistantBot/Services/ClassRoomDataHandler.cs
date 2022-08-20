@@ -19,7 +19,6 @@ namespace ClassAssistantBot.Services
             user.Status = UserStatus.TeacherCreatingClass;
             dataAccess.Users.Update(user);
             dataAccess.SaveChanges();
-            Console.WriteLine($"The teacher {user.Username} is creating a classroom");
         }
 
         public string CreateClassRoom(long id, string name)

@@ -19,6 +19,10 @@ namespace ClassAssistantBot.Controllers
         private StatusPhraseDataHandler statusPhraseDataHandler;
         private ClassRoomDataHandler classRoomDataHandler;
         private UserDataHandler userDataHandler;
+        private PendingDataHandler pendingDataHandler;
+        private ClassInterventionDataHandler classInterventionDataHandler;
+        private RectificationToTheTeacherDataHandler rectificationToTheTeacherDataHandler;
+        private ClassTitleDataHandler classTitleDataHandler;
         private BotClient bot;
         private Message message;
         private bool hasText = false;
@@ -35,6 +39,10 @@ namespace ClassAssistantBot.Controllers
             this.statusPhraseDataHandler = new StatusPhraseDataHandler(dataAccess);
             this.classRoomDataHandler = new ClassRoomDataHandler(dataAccess);
             this.userDataHandler = new UserDataHandler(dataAccess);
+            this.pendingDataHandler = new PendingDataHandler(dataAccess);
+            this.classInterventionDataHandler = new ClassInterventionDataHandler(dataAccess);
+            this.rectificationToTheTeacherDataHandler = new RectificationToTheTeacherDataHandler(dataAccess);
+            this.classTitleDataHandler = new ClassTitleDataHandler(dataAccess);
             this.bot = bot;
             this.message = new Message();
             this.appUser = new Telegram.BotAPI.AvailableTypes.User();
@@ -80,7 +88,7 @@ namespace ClassAssistantBot.Controllers
                         OnCommand(command, parameters, user);
                     }
                 }
-                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*"))
+                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && !message.Text.Contains("*//*"))
                 {
                     var commands = message.Text.Substring(1, message.Text.Length - 2).ToLower().Split(' ');
                     var command = new StringBuilder();
@@ -92,6 +100,36 @@ namespace ClassAssistantBot.Controllers
 
                     Logger.Warning($"New command: {command}");
                     OnCommand(command.ToString(), new string[0], user);
+                }
+                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && message.Text.ToString().Contains("*//*"))
+                {
+                    var commands = message.Text.Substring(1, message.Text.Length - 2).Split(' ');
+                    var command = new StringBuilder();
+
+                    foreach (var item in commands)
+                    {
+                        command.Append(item);
+                    }
+
+                    Logger.Warning($"New command: {command}");
+                    if (user.Status == UserStatus.RectificationAtTeacher)
+                    {
+                        OnRectificationToTheTeacherAtTeacherUserName(user, command.ToString().Split("*//*")[1]);
+                    }
+                    else if(user.Status == UserStatus.ClassIntervention)
+                    {
+                        OnClassIntervention(user, long.Parse(command.ToString().Split("*//*")[0]));
+                    }
+                    else if(user.Status == UserStatus.ClassTitle)
+                    {
+                        OnChangeClassTitle(user, long.Parse(command.ToString().Split("*//*")[0]));
+                    }
+                    else
+                    {
+                        Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
+                        bot.SendMessage(chatId: message.Chat.Id,
+                                        text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
+                    }
                 }
                 else
                 {
@@ -132,6 +170,26 @@ namespace ClassAssistantBot.Controllers
                             var res = studentDataHandler.RemoveStudentFromClassRoom(user.Id, message.Text);
                             Menu.TeacherMenu(bot, message, res);
                             return;
+                        case UserStatus.ClassIntervention:
+                            classInterventionDataHandler.CreateIntervention(user, message.Text);
+                            Menu.StudentMenu(bot, message);
+                            return;
+                        case UserStatus.RectificationToTheTeacherUserName:
+                            OnRectificationToTheTeacherAtText(user, message.Text);
+                            Menu.StudentMenu(bot, message);
+                            return;
+                        case UserStatus.CreateClass:
+                            OnStartClass(user, message.Text);
+                            Menu.TeacherMenu(bot, message);
+                            return;
+                        case UserStatus.ClassTitleSelect:
+                            OnChangeClassTitle(user, message.Text);
+                            Menu.StudentMenu(bot, message);
+                            return;
+                        case UserStatus.ClassInterventionSelect:
+                            OnClassIntervention(user, message.Text);
+                            Menu.StudentMenu(bot, message);
+                            return;
                         case UserStatus.ChangeClassRoom:
                             var outPut = 0;
                             var canParser = int.TryParse(message.Text, out outPut);
@@ -167,6 +225,20 @@ namespace ClassAssistantBot.Controllers
                                 text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
                 }
             }
+            else if(message.Photo != null)
+            {
+                if (user.Status == UserStatus.Meme)
+                {
+                    memeDataHandler.SendMeme(user.Id, message.Photo[0]);
+                    Menu.StudentMenu(bot, message);
+                }
+                else
+                {
+                    Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
+                    bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
+                }
+            }
             else
             {
                 Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
@@ -178,12 +250,6 @@ namespace ClassAssistantBot.Controllers
         private void OnCommand(string cmd, string[] args, ClassAssistantBot.Models.User user)
         {
             Logger.Warning($"Params: {args.Length}");
-            if (user != null && user.ClassRoomActiveId == 0)
-            {
-                Logger.Error($"Error: El usuario {user.Username} está accediendo a una clase a la que no tiene privilegios.");
-                Menu.RegisterMenu(bot, message, "No se encuentra registrado en ninguna clase.");
-                return;
-            }
             switch (cmd)
             {
                 case "start":
@@ -222,6 +288,9 @@ namespace ClassAssistantBot.Controllers
                 case "changeclassroom":
                     ChangeClassRoomCommand(user);
                     break;
+                case "rectificationatteacher":
+                    RectificationToTheTeacherCommand(user);
+                    break;
                 case "removestudentfromclassroom":
                     RemoveStudentFromClassRoomCommand(user);
                     break;
@@ -254,6 +323,9 @@ namespace ClassAssistantBot.Controllers
                     break;
                 case "poll":
                     PollCommand(user);
+                    break;
+                case "startclass":
+                    StartClassCommand(user);
                     break;
                 default:
                     DefaultCommand(user);
@@ -457,7 +529,10 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-
+                var pendings = pendingDataHandler.GetPendings(user);
+                bot.SendMessage(chatId: message.Chat.Id,
+                            text: $"Su lista de pendientes es:\n{pendings}",
+                            replyMarkup: new ReplyKeyboardRemove());
             }
         }
 
@@ -551,7 +626,9 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-
+                var classes = classTitleDataHandler.GetClasses(user);
+                classTitleDataHandler.ChangeClassTitle(user);
+                Menu.ClassesList(bot, message, classes);
             }
         }
 
@@ -649,7 +726,9 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-
+                rectificationToTheTeacherDataHandler.DoRectificationToTheTaecher(user);
+                var teachers = teacherDataHandler.GetTeachers(user);
+                Menu.TeachersList(bot, message, teachers, "Seleccione el profesor al que desea rectificar:");
             }
         }
 
@@ -721,7 +800,9 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-
+                classInterventionDataHandler.CreateIntervention(user);
+                var classes = classTitleDataHandler.GetClasses(user);
+                Menu.ClassesList(bot, message, classes);
             }
         }
 
@@ -821,6 +902,31 @@ namespace ClassAssistantBot.Controllers
             }
             throw new NotImplementedException();
         }
+
+        private void StartClassCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready && !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                classTitleDataHandler.CreateClass(user);
+                bot.SendMessage(chatId: message.Chat.Id,
+                            text: "Inserte el título de la clase:",
+                            replyMarkup: new ReplyKeyboardRemove());
+            }
+        }
         #endregion
 
         #region Procesos que completan comandos de varias operaciones
@@ -883,6 +989,67 @@ namespace ClassAssistantBot.Controllers
             bot.SendMessage(chatId: message.Chat.Id,
                             text: res,
                             replyMarkup: new ReplyKeyboardRemove());
+        }
+
+        private void OnRectificationToTheTeacherAtTeacherUserName(Models.User user, string teacherUserName)
+        {
+            rectificationToTheTeacherDataHandler.DoRectificationToTheTaecherUserName(user, teacherUserName);
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: "Explique a groso modo en qué se equivocó el profesor y su correción:",
+                            replyMarkup: new ReplyKeyboardRemove());
+        }
+
+        private void OnRectificationToTheTeacherAtText(Models.User user, string text)
+        {
+            var res = rectificationToTheTeacherDataHandler.DoRectificationToTheTaecherText(user, text);
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: res,
+                            replyMarkup: new ReplyKeyboardRemove());
+        }
+
+        private void OnStartClass(Models.User user, string classTitle)
+        {
+            classTitleDataHandler.CreateClass(user, classTitle);
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: "Clase creada satisfactoriamente.",
+                            replyMarkup: new ReplyKeyboardRemove());
+        }
+
+        private void OnChangeClassTitle(Models.User user, long classId)
+        {
+            classTitleDataHandler.ChangeClassTitle(user, classId);
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: "Inserte el nombre la clase:",
+                            replyMarkup: new ReplyKeyboardRemove());
+        }
+
+        private void OnChangeClassTitle(Models.User user, string classTitle)
+        {
+            classTitleDataHandler.ChangeClassTitle(user, classTitle);
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: "Título propuesto satisfactoriamente.",
+                            replyMarkup: new ReplyKeyboardRemove());
+        }
+
+        private void OnClassIntervention(Models.User user, long classId)
+        {
+            classInterventionDataHandler.CreateIntervention(user, classId);
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: "Inserte su intervención:",
+                            replyMarkup: new ReplyKeyboardRemove());
+        }
+
+        private void OnClassIntervention(Models.User user, string classIntervention)
+        {
+            classInterventionDataHandler.CreateIntervention(user, classIntervention);
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: "Intervención hecha satisfactoriamente.",
+                            replyMarkup: new ReplyKeyboardRemove());
+        }
+
+        private void OnPendings(Models.User user, long username)
+        {
+
         }
         #endregion
     }

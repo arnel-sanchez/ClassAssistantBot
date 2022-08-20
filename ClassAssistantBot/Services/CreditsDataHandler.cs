@@ -49,7 +49,6 @@ namespace ClassAssistantBot.Services
             user.Status = UserStatus.Credits;
             dataAccess.Users.Update(user);
             dataAccess.SaveChanges();
-            Console.WriteLine($"The teacher {user.Username} is redy to get the credits of a user");
         }
 
         public string GetCreditsById(long id)
