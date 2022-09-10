@@ -1,0 +1,42 @@
+version: '3.4'
+
+services:
+  api:
+    build:
+      context: .
+    image: class-assistant-api
+    container_name: class-assistant-api
+    volumes:
+      - .:/app
+    ports:
+      - '25000:25000'
+    environment:
+      PostgreSqlConnectionString: "Host=${DB_HOST};Port=5432;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB};"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:25000/ || exit 1"]
+      start_period: 60s
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    links:
+      - db
+    depends_on:
+      - db
+
+  db:
+    image: postgres:12.4-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - ./db-init/:/docker-entrypoint-initdb.d:ro
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
