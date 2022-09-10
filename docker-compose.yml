@@ -18,10 +18,10 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
-    links:
-      - db
+    #links:
+    #  - db
     #depends_on:
-      - db
+    #  - db
 
   #db:
     image: postgres:12.4-alpine
