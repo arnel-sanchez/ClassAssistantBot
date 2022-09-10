@@ -33,16 +33,23 @@ namespace ClassAssistantBot.Services
                 UserId = user.Id
             };
             dataAccess.Dailies.Add(daily);
+            var random = new Random();
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
                 Type = InteractionType.Daily,
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = daily.Id,
-                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id
+                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id,
+                Code = random.Next(1000, 9999).ToString()
             };
             dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
+        }
+
+        public Daily GetDaily(string dailyId)
+        {
+            return dataAccess.Dailies.First(x => x.Id == dailyId);
         }
     }
 }

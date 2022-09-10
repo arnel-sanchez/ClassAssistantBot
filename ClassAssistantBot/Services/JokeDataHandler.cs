@@ -33,16 +33,23 @@ namespace ClassAssistantBot.Services
                 UserId = user.Id
             };
             dataAccess.Jokes.Add(joke);
+            var random = new Random();
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
                 Type = InteractionType.Joke,
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = joke.Id,
-                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id
+                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id,
+                Code = random.Next(1000, 9999).ToString()
             };
             dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
+        }
+
+        public Joke GetJoke(string id)
+        {
+            return dataAccess.Jokes.First(x => x.Id == id);
         }
     }
 }

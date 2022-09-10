@@ -142,6 +142,9 @@ namespace ClassAssistantBot.Controllers
                             OnAssignStudentAtClass(appUser.Id, message.Text);
                             Menu.StudentMenu(bot, message);
                             return;
+                        case UserStatus.Pending:
+                            OnPendings(user, message);
+                            return;
                         case UserStatus.TeacherEnteringClass:
                             OnAssignTeacherAtClass(appUser.Id, message.Text);
                             Menu.TeacherMenu(bot, message);
@@ -328,7 +331,7 @@ namespace ClassAssistantBot.Controllers
                     StartClassCommand(user);
                     break;
                 default:
-                    DefaultCommand(user);
+                    DefaultCommand(user, cmd);
                     break;
             }
         }
@@ -530,9 +533,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 var pendings = pendingDataHandler.GetPendings(user);
-                bot.SendMessage(chatId: message.Chat.Id,
-                            text: $"Su lista de pendientes es:\n{pendings}",
-                            replyMarkup: new ReplyKeyboardRemove());
+                Menu.CancelMenu(bot, message, pendings);
             }
         }
 
@@ -632,7 +633,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void DefaultCommand(Models.User? user)
+        private void DefaultCommand(Models.User? user, string command)
         {
             if (user == null)
             {
@@ -649,6 +650,26 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
+                string file = "";
+                var pending = pendingDataHandler.GetPendingByCode(command, out file);
+                
+                if (!string.IsNullOrEmpty(pending))
+                {
+                    if (string.IsNullOrEmpty(file))
+                    {
+                        bot.SendMessage(chatId: message.Chat.Id,
+                            text: pending,
+                            replyMarkup: new ReplyKeyboardRemove());
+                    }
+                    else
+                    {
+                        bot.SendPhoto(chatId: message.Chat.Id,
+                            photo: file,
+                            caption: pending,
+                            replyMarkup: new ReplyKeyboardRemove());
+                    }
+                    return;
+                }
                 Logger.Error($"Error: El usuario {user.Username} está interactuando con un comando que no existe");
                 Menu.TeacherMenu(bot, message, "El comando insertado no existe, por favor, no me haga perder tiempo.");
                 return;
@@ -1047,8 +1068,57 @@ namespace ClassAssistantBot.Controllers
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void OnPendings(Models.User user, long username)
+        private void OnPendings(Models.User user, Message message)
         {
+            var response = message.Text.Split(' ');
+            var credits = long.Parse(response[0]);
+            var text = "";
+            var pendingCode = "";
+            if (!string.IsNullOrEmpty(message.ReplyToMessage.Text))
+                pendingCode = message.ReplyToMessage.Text.Split("/")[1];
+            else
+                pendingCode = message.ReplyToMessage.Caption.Split("/")[1];
+            var pending = pendingDataHandler.GetPending(pendingCode);
+            var comment = "";
+
+            if(pending.Type == InteractionType.ClassIntervention)
+            {
+                comment = classInterventionDataHandler.GetClassIntenvention(pending.ObjectId).Text;
+            }
+            else if(pending.Type == InteractionType.ClassTitle)
+            {
+                comment = classTitleDataHandler.GetClassTitle(pending.ObjectId).Title;
+            }
+            else if(pending.Type == InteractionType.Daily)
+            {
+                comment = dailyDataHandler.GetDaily(pending.ObjectId).Text;
+            }
+            else if(pending.Type == InteractionType.Joke)
+            {
+                comment = jokeDataHandler.GetJoke(pending.Id).Text;
+            }
+            else if(pending.Type == InteractionType.RectificationToTheTeacher)
+            {
+                comment = rectificationToTheTeacherDataHandler.GetRectificationToTheTeacher(pending.Id).Text;
+            }
+            else if(pending.Type == InteractionType.StatusPhrase)
+            {
+                comment = statusPhraseDataHandler.GetStatusPhrase(pending.Id).Phrase;
+            }
+
+            if (response.Length != 1 && !string.IsNullOrEmpty(comment))
+                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}) y su profesor le ha hecho la siguiente recomendación: \"{response[1]}\".";
+            else if(response.Length != 1 && string.IsNullOrEmpty(comment))
+                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()} y su profesor le ha hecho la siguiente recomendación: \"{response[1]}\".";
+            else if(response.Length == 1 && !string.IsNullOrEmpty(comment))
+                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}).";
+            else
+                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}.";
+            bot.SendMessage(chatId: pending.Student.User.ChatId,
+                            text: text);
+            creditsDataHandler.AddCredits(credits, user.Id, pending.ClassRoomId, response.Length!=1 ? response[1] : "");
+            pendingDataHandler.RemovePending(pending);
+            PendingsCommand(user);
 
         }
         #endregion

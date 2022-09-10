@@ -81,6 +81,21 @@ namespace ClassAssistantBot.Services
             }
             return res.ToString();
         }
+
+        public void AddCredits(long value, long userId, long classRoomId, string recomendation)
+        {
+            var credit = new Credits
+            {
+                DateTime = DateTime.UtcNow,
+                Id = Guid.NewGuid().ToString(),
+                Value = value,
+                UserId = userId,
+                ClassRoomId = classRoomId,
+                Text = recomendation
+            };
+            dataAccess.Credits.Add(credit);
+            dataAccess.SaveChanges();
+        }
     }
 }
 

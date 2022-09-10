@@ -32,6 +32,19 @@ namespace ClassAssistantBot.Services
                 User = user,
                 Teacher = teacher
             };
+
+            var random = new Random();
+            var pending = new Pending
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = InteractionType.RectificationToTheTeacher,
+                ClassRoomId = user.ClassRoomActiveId,
+                ObjectId = rectification.Id,
+                StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
+                Code = random.Next(1000, 9999).ToString()
+            };
+            dataAccess.Pendings.Add(pending);
+
             dataAccess.Users.Update(user);
             dataAccess.RectificationToTheTeachers.Add(rectification);
             dataAccess.SaveChanges();
@@ -46,6 +59,11 @@ namespace ClassAssistantBot.Services
             dataAccess.RectificationToTheTeachers.Update(rectification);
             dataAccess.SaveChanges();
             return "Rectificación al profesor hecha satisfactoriamente.";
+        }
+
+        public RectificationToTheTeacher GetRectificationToTheTeacher(string id)
+        {
+            return dataAccess.RectificationToTheTeachers.First(x => x.Id == id);
         }
     }
 }

@@ -45,16 +45,23 @@ namespace ClassAssistantBot.Services
             classIntervention.Finished = true;
             classIntervention.Text = intervention;
             dataAccess.ClassInterventions.Update(classIntervention);
+            var random = new Random();
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
                 Type = InteractionType.ClassIntervention,
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = classIntervention.Id,
-                StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id
+                StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
+                Code = random.Next(1000, 9999).ToString()
             };
             dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
+        }
+
+        public ClassIntervention GetClassIntenvention(string id)
+        {
+            return dataAccess.ClassInterventions.First(x => x.Id == id);
         }
     }
 }

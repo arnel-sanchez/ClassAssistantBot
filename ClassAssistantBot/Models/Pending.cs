@@ -27,6 +27,8 @@ namespace ClassAssistantBot.Models
         public InteractionType Type { get; set; }
 
         public string ObjectId { get; set; }
+
+        public string Code { get; set; }
     }
 }
 

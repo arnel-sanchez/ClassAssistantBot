@@ -24,6 +24,11 @@ namespace ClassAssistantBot.Services
             return res;
         }
 
+        public ClassTitle GetClassTitle(string classTitleId)
+        {
+            return dataAccess.ClassTitles.First(x => x.Id == classTitleId);
+        }
+
         public void ChangeClassTitle(User user)
         {
             user.Status = UserStatus.ClassTitle;
@@ -43,6 +48,18 @@ namespace ClassAssistantBot.Services
                 Title = "",
                 UserId = user.Id
             };
+
+            var random = new Random();
+            var pending = new Pending
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = InteractionType.ClassTitle,
+                ClassRoomId = user.ClassRoomActiveId,
+                ObjectId = classTitle.Id,
+                StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
+                Code = random.Next(1000, 9999).ToString()
+            };
+            dataAccess.Pendings.Add(pending);
 
             dataAccess.Users.Update(user);
             dataAccess.ClassTitles.Add(classTitle);

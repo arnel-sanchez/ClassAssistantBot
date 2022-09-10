@@ -38,13 +38,15 @@ namespace ClassAssistantBot.Services
                 Width = document.Thumb.Width,
             };
             dataAccess.Memes.Add(meme);
+            var random = new Random();
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
                 Type = InteractionType.Meme,
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = meme.Id,
-                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id
+                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id,
+                Code = random.Next(1000, 9999).ToString()
             };
             dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
@@ -69,13 +71,16 @@ namespace ClassAssistantBot.Services
                 Width = photo.Width,
             };
             dataAccess.Memes.Add(meme);
+
+            var random = new Random();
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
                 Type = InteractionType.Meme,
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = meme.Id,
-                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id
+                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id,
+                Code = random.Next(1000, 9999).ToString()
             };
             dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();

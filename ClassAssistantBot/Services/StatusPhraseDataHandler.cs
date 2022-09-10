@@ -37,16 +37,23 @@ namespace ClassAssistantBot.Services
                 UserId = user.Id
             };
             dataAccess.StatusPhrases.Add(statusPhrase);
+            var random = new Random();
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
                 Type = InteractionType.StatusPhrase,
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = statusPhrase.Id,
-                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id
+                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id,
+                Code = random.Next(1000, 9999).ToString()
             };
             dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
+        }
+
+        public StatusPhrase GetStatusPhrase(string id)
+        {
+            return dataAccess.StatusPhrases.First(x => x.Id == id);
         }
     }
 }
