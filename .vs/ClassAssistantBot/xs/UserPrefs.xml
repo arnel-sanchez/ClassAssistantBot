@@ -1,24 +1,11 @@
-﻿<Properties StartupConfiguration="{FE07AB7D-88D5-4100-8A14-FCBC1DC7BA70}|Default" GitUserInfo="UsingGIT">
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MultiItemStartupConfigurations />
-  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
-  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Services/MemeDataHandler.cs">
-    <Files>
-      <File FileName="ClassAssistantBot/Services/PendingDataHandler.cs" Line="55" Column="23" />
-      <File FileName="ClassAssistantBot/Services/MemeDataHandler.cs" Line="83" Column="58" />
-      <File FileName="ClassAssistantBot/Services/ClassTitleDataHandler.cs" Line="60" Column="17" />
-    </Files>
+﻿<Properties StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default" GitUserInfo="UsingGIT">
+  <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="ClassAssistantBot" expanded="True">
-            <Node name="ClassAssistantBot" expanded="True">
-              <Node name="Services" expanded="True">
-                <Node name="MemeDataHandler.cs" selected="True" />
-              </Node>
-            </Node>
+            <Node name="ClassAssistantBot" expanded="True" />
+            <Node name="docker-compose" expanded="True" />
           </Node>
         </State>
       </Pad>
@@ -27,6 +14,11 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
-  <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.DebuggingService.Breakpoints />
+  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
+  <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
 </Properties>
