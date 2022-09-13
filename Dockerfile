@@ -16,4 +16,4 @@ COPY ./ClassAssistantBot .
 
 RUN dotnet add package Microsoft.EntityFrameworkCore.Tools --version 6.0.7 \
     && dotnet dev-certs https
-ENTRYPOINT [ "dotnet", "watch", "run", "--no-restore", "--urls", "https://0.0.0.0:880"]
+ENTRYPOINT [ "dotnet", "watch", "run", "--no-restore", "--urls", "https://0.0.0.0:5000"]
