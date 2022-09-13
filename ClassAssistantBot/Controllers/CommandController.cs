@@ -888,6 +888,8 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 var res = classRoomDataHandler.ChangeClassRoom(user.Id);
+                user.Status = UserStatus.Verified;
+                userDataHandler.VerifyUser(user);
                 Menu.ChangeClassRoomMenu(bot, message, res);
             }
         }
