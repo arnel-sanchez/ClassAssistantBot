@@ -330,6 +330,9 @@ namespace ClassAssistantBot.Controllers
                 case "startclass":
                     StartClassCommand(user);
                     break;
+                case "register":
+                    Menu.RegisterMenu(bot, message);
+                    break;
                 default:
                     DefaultCommand(user, cmd);
                     break;

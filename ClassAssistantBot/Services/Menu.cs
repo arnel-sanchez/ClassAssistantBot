@@ -166,7 +166,7 @@ namespace ClassAssistantBot.Services
         public static void ClassesList(BotClient bot, Message message, List<Class> classes, string text = "")
         {
             if (string.IsNullOrEmpty(text)) text = "Lista de Clases:";
-            var listButton = new KeyboardButton[classes.Count][];
+            var listButton = new KeyboardButton[classes.Count + 1][];
 
             for (int i = 0; i < classes.Count; i++)
             {
@@ -175,6 +175,10 @@ namespace ClassAssistantBot.Services
                     new KeyboardButton($"*{classes[i].Id}*//*{classes[i].Title}*")
                 };
             }
+            listButton[listButton.Length - 1] = new KeyboardButton[]
+            {
+                new KeyboardButton("*Register*")
+            };
             if (string.IsNullOrEmpty(text)) text = "Lista de Clases:";
             if (classes.Count == 0)
             {
