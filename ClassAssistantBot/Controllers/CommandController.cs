@@ -888,7 +888,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 var res = classRoomDataHandler.ChangeClassRoom(user.Id);
-                Menu.CancelMenu(bot, message, res);
+                Menu.ChangeClassRoomMenu(bot, message, res);
             }
         }
 

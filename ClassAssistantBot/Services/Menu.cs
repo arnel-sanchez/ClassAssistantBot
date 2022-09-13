@@ -141,6 +141,26 @@ namespace ClassAssistantBot.Services
                             replyMarkup: keyboard);
         }
 
+        public static void ChangeClassRoomMenu(BotClient bot, Message message, string text)
+        {
+            var keyboard = new ReplyKeyboardMarkup
+            {
+                Keyboard = new KeyboardButton[][]{
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Register*")
+                    },
+                    new KeyboardButton[]{
+                        new KeyboardButton("*Cancel*")
+                    }
+                },
+                ResizeKeyboard = true
+            }; ;
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: text,
+                            replyMarkup: keyboard);
+        }
+
         public static void TeachersList(BotClient bot, Message message,List<Teacher> teachers, string text = "")
         {
             var listButton = new KeyboardButton[teachers.Count][];
@@ -166,7 +186,7 @@ namespace ClassAssistantBot.Services
         public static void ClassesList(BotClient bot, Message message, List<Class> classes, string text = "")
         {
             if (string.IsNullOrEmpty(text)) text = "Lista de Clases:";
-            var listButton = new KeyboardButton[classes.Count + 1][];
+            var listButton = new KeyboardButton[classes.Count][];
 
             for (int i = 0; i < classes.Count; i++)
             {
@@ -175,10 +195,6 @@ namespace ClassAssistantBot.Services
                     new KeyboardButton($"*{classes[i].Id}*//*{classes[i].Title}*")
                 };
             }
-            listButton[listButton.Length - 1] = new KeyboardButton[]
-            {
-                new KeyboardButton("*Register*")
-            };
             if (string.IsNullOrEmpty(text)) text = "Lista de Clases:";
             if (classes.Count == 0)
             {
