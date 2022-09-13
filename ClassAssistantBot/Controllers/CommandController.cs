@@ -943,9 +943,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 classTitleDataHandler.CreateClass(user);
-                bot.SendMessage(chatId: message.Chat.Id,
-                            text: "Inserte el título de la clase:",
-                            replyMarkup: new ReplyKeyboardRemove());
+                Menu.CancelMenu(bot, message, "Inserte el título de la clase:");
             }
         }
         #endregion
