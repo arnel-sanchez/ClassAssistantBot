@@ -52,7 +52,7 @@ namespace ClassAssistantBot.Services
             var credit = new Credits
             {
                 Id = Guid.NewGuid().ToString(),
-                DateTime = DateTime.Now,
+                DateTime = DateTime.UtcNow,
                 UserId = user.Id,
                 ClassRoomId = user.ClassRoomActiveId,
                 Value = count * 10000,
