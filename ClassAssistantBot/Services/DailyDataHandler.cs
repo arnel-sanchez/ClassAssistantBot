@@ -33,17 +33,32 @@ namespace ClassAssistantBot.Services
                 UserId = user.Id
             };
             dataAccess.Dailies.Add(daily);
-            var random = new Random();
-            var pending = new Pending
+            dataAccess.SaveChanges();
+            var dailies = dataAccess.Dailies.OrderByDescending(x => x.DateTime).ToList();
+            int count = 0;
+            DateTime dateTime = DateTime.Today;
+            foreach (var item in dailies)
+            {
+                if(item.DateTime.Date == dateTime)
+                {
+                    count++;
+                    dateTime.AddDays(-1);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            var credit = new Credits
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = InteractionType.Daily,
+                DateTime = DateTime.Now,
+                UserId = user.Id,
                 ClassRoomId = user.ClassRoomActiveId,
-                ObjectId = daily.Id,
-                StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id,
-                Code = random.Next(1000, 9999).ToString()
+                Value = count * 10000,
+                Text = $"Has recibido {count * 10000} créditos por haber actualizado tu diario {count} días seguidos."
             };
-            dataAccess.Pendings.Add(pending);
+            dataAccess.Credits.Add(credit);
             dataAccess.SaveChanges();
         }
 
