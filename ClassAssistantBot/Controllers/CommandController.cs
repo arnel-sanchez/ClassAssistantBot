@@ -312,7 +312,7 @@ namespace ClassAssistantBot.Controllers
                 case "rectificationtotheteacher":
                     RectificationToTheTeacherCommand(user);
                     break;
-                case "daily":
+                case "diary":
                     DailyCommand(user);
                     break;
                 case "statusphrase":
@@ -353,8 +353,14 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 Logger.Error($"Error: El usuario {user.Username} está intentando registrarse nuevamente en el bot.");
-                bot.SendMessage(chatId: message.Chat.Id,
-                                text: "Ya está registrado en el bot.");
+                if (user.IsTecaher)
+                {
+                    Menu.TeacherMenu(bot, message);
+                }
+                else
+                {
+                    Menu.StudentMenu(bot, message);
+                }
             }
         }
 
@@ -511,9 +517,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 creditsDataHandler.CreditByTeacher(user);
-                bot.SendMessage(chatId: message.Chat.Id,
-                                text: "Inserte el nombre de usuario del estudainte.",
-                                replyMarkup: new ReplyKeyboardRemove());
+                Menu.CancelMenu(bot, message, "Inserte el nombre de usuario del estudainte:");
             }
         }
 
@@ -701,9 +705,7 @@ namespace ClassAssistantBot.Controllers
                 bot.SendMessage(chatId: message.Chat.Id,
                             text: $"Su frase de estado actual es: {status}",
                             replyMarkup: new ReplyKeyboardRemove());
-                bot.SendMessage(chatId: message.Chat.Id,
-                            text: "Inserte la frase de estado:",
-                            replyMarkup: new ReplyKeyboardRemove());
+                Menu.CancelMenu(bot, message, "Inserte la nueva frase de estado:");
             }
         }
 
@@ -726,9 +728,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 dailyDataHandler.UpdateDaily(user);
-                bot.SendMessage(chatId: message.Chat.Id,
-                            text: "Inserte la actualización de su diario:",
-                            replyMarkup: new ReplyKeyboardRemove());
+                Menu.CancelMenu(bot, message, "Inserte la actualización de su diario:");
             }
         }
 
@@ -775,9 +775,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 jokeDataHandler.DoJoke(user);
-                bot.SendMessage(chatId: message.Chat.Id,
-                            text: "Haga el chiste:",
-                            replyMarkup: new ReplyKeyboardRemove());
+                Menu.CancelMenu(bot, message, "Haga el chiste:");
             }
         }
 
@@ -800,9 +798,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 memeDataHandler.SendMeme(user);
-                bot.SendMessage(chatId: message.Chat.Id,
-                            text: "Inserte un meme:",
-                            replyMarkup: new ReplyKeyboardRemove());
+                Menu.CancelMenu(bot, message, "Inserte un meme:");
             }
         }
 
@@ -1098,15 +1094,15 @@ namespace ClassAssistantBot.Controllers
             }
             else if(pending.Type == InteractionType.Joke)
             {
-                comment = jokeDataHandler.GetJoke(pending.Id).Text;
+                comment = jokeDataHandler.GetJoke(pending.ObjectId).Text;
             }
             else if(pending.Type == InteractionType.RectificationToTheTeacher)
             {
-                comment = rectificationToTheTeacherDataHandler.GetRectificationToTheTeacher(pending.Id).Text;
+                comment = rectificationToTheTeacherDataHandler.GetRectificationToTheTeacher(pending.ObjectId).Text;
             }
             else if(pending.Type == InteractionType.StatusPhrase)
             {
-                comment = statusPhraseDataHandler.GetStatusPhrase(pending.Id).Phrase;
+                comment = statusPhraseDataHandler.GetStatusPhrase(pending.ObjectId).Phrase;
             }
 
             if (response.Length != 1 && !string.IsNullOrEmpty(comment))
@@ -1119,7 +1115,7 @@ namespace ClassAssistantBot.Controllers
                 text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}.";
             bot.SendMessage(chatId: pending.Student.User.ChatId,
                             text: text);
-            creditsDataHandler.AddCredits(credits, user.Id, pending.ClassRoomId, response.Length!=1 ? response[1] : "");
+            creditsDataHandler.AddCredits(credits, pending.Student.User.Id, pending.ClassRoomId, response.Length!=1 ? response[1] : "");
             pendingDataHandler.RemovePending(pending);
             PendingsCommand(user);
 

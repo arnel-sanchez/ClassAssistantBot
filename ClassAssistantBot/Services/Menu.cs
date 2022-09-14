@@ -102,7 +102,7 @@ namespace ClassAssistantBot.Services
                         new KeyboardButton("*Joke*")
                         },
                     new KeyboardButton[]{
-                        new KeyboardButton("*Daily*"),
+                        new KeyboardButton("*Diary*"),
                         new KeyboardButton("*Credits*"),
                         },
                     new KeyboardButton[]{

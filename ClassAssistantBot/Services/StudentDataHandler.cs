@@ -104,7 +104,7 @@ namespace ClassAssistantBot.Services
                 dataAccess.StudentsByClassRooms.Add(studentByClassRoom);
                 dataAccess.SaveChanges();
                 Console.WriteLine($"The teacher {user.Username} has entered class");
-                return $"Ha entrado en el aula satiscatoriamente";
+                return $"Ha entrado en el aula satisfactoriamente";
             }
         }
 
