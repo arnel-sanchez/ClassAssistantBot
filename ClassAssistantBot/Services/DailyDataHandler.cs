@@ -1,5 +1,6 @@
 ﻿using System;
 using ClassAssistantBot.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClassAssistantBot.Services
 {
@@ -34,15 +35,15 @@ namespace ClassAssistantBot.Services
             };
             dataAccess.Dailies.Add(daily);
             dataAccess.SaveChanges();
-            var dailies = dataAccess.Dailies.OrderByDescending(x => x.DateTime).ToList();
+            var dailies = dataAccess.Dailies.Where(x => x.UserId == user.Id).OrderByDescending(x => x.DateTime).ToList();
             int count = 0;
-            DateTime dateTime = DateTime.Today;
+            DateTime dateTime = DateTime.UtcNow;
             foreach (var item in dailies)
             {
-                if(item.DateTime.Date == dateTime)
+                if(item.DateTime.Date == dateTime.Date)
                 {
                     count++;
-                    dateTime.AddDays(-1);
+                    dateTime = dateTime.AddDays(-1);
                 }
                 else
                 {
@@ -56,7 +57,8 @@ namespace ClassAssistantBot.Services
                 UserId = user.Id,
                 ClassRoomId = user.ClassRoomActiveId,
                 Value = count * 10000,
-                Text = $"Has recibido {count * 10000} créditos por haber actualizado tu diario {count} días seguidos."
+                Text = $"Has recibido {count * 10000} créditos por haber actualizado tu diario {count} días seguidos.",
+                TeacherId = dataAccess.TeachersByClassRooms.Include(x=>x.Teacher).Where(x=>x.ClassRoomId==user.ClassRoomActiveId).First().Teacher.UserId
             };
             dataAccess.Credits.Add(credit);
             dataAccess.SaveChanges();

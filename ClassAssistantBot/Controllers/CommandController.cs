@@ -154,7 +154,7 @@ namespace ClassAssistantBot.Controllers
                             Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.Credits:
-                            var res1 = creditsDataHandler.GetCreditsByUserName(user.Id, message.Text);
+                            var res1 = creditsDataHandler.GetCreditsByUserName(user.Id, message.Text, false, true);
                             Menu.TeacherMenu(bot, message, res1);
                             return;
                         case UserStatus.StatusPhrase:
