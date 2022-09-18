@@ -28,7 +28,7 @@ namespace ClassAssistantBot.Controllers
         private bool hasText = false;
         private Telegram.BotAPI.AvailableTypes.User appUser;
 
-        public CommandController(BotClient bot, DataAccess dataAccess)
+        public CommandController(BotClient bot, DataAccess dataAccess) 
         {
             this.teacherDataHandler = new TeacherDataHandler(dataAccess);
             this.studentDataHandler = new StudentDataHandler(dataAccess);
@@ -88,7 +88,7 @@ namespace ClassAssistantBot.Controllers
                         OnCommand(command, parameters, user);
                     }
                 }
-                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && !message.Text.Contains("*//*"))
+                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && message.Text.Length >= 8 && !message.Text.Contains("*//*"))
                 {
                     var commands = message.Text.Substring(1, message.Text.Length - 2).ToLower().Split(' ');
                     var command = new StringBuilder();
@@ -101,7 +101,7 @@ namespace ClassAssistantBot.Controllers
                     Logger.Warning($"New command: {command}");
                     OnCommand(command.ToString(), new string[0], user);
                 }
-                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && message.Text.ToString().Contains("*//*"))
+                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && message.Text.Length >= 8 && message.Text.ToString().Contains("*//*"))
                 {
                     var commands = message.Text.Substring(1, message.Text.Length - 2).Split(' ');
                     var command = new StringBuilder();
@@ -193,6 +193,13 @@ namespace ClassAssistantBot.Controllers
                             OnClassIntervention(user, message.Text);
                             Menu.StudentMenu(bot, message);
                             return;
+                        case UserStatus.AssignCreditsStudent:
+                            OnAssignCredits(user, message.Text);
+                            return;
+                        case UserStatus.AssignCredits:
+                            OnAssignCreditsMessage(user, message.Text);
+                            Menu.TeacherMenu(bot, message);
+                            return;
                         case UserStatus.ChangeClassRoom:
                             var outPut = 0;
                             var canParser = int.TryParse(message.Text, out outPut);
@@ -258,79 +265,79 @@ namespace ClassAssistantBot.Controllers
                 case "start":
                     StartCommand(user);
                     break;
-                case "student":
+                case "estudiante":
                     StudentCommand(user);
                     break;
-                case "teacher":
+                case "profesor":
                     TeacherCommand(user);
                     break;
-                case "create":
+                case "crear":
                     CreateCommand(user);
                     break;
-                case "enter":
+                case "entrar":
                     EnterCommand(user);
                     break;
-                case "students":
+                case "estudiantes":
                     StudentsCommand(user);
                     break;
-                case "credits":
-                    CreaditsCommand(user);
+                case "créditos":
+                    CreditsCommand(user);
                     break;
-                case "pendings":
+                case "pendientes":
                     PendingsCommand(user);
                     break;
-                case "allpendings":
+                case "todoslospendientes":
                     AllPendingsCommand(user);
                     break;
-                case "studentaccesskey":
+                case "llavedelestudiante":
                     StudentAccessKeyCommand(user);
                     break;
-                case "teacheraccesskey":
+                case "llavedelprofesor":
                     TeacherAccessKeyCommand(user);
                     break;
-                case "changeclassroom":
+                case "cambiardeaula":
                     ChangeClassRoomCommand(user);
                     break;
-                case "rectificationatteacher":
+                case "rectificaralprofesor":
                     RectificationToTheTeacherCommand(user);
                     break;
-                case "removestudentfromclassroom":
+                case "asignarcréditos":
+                    AssignCreditsCommand(user);
+                    break;
+                case "eliminarestudiantedelaula":
                     RemoveStudentFromClassRoomCommand(user);
                     break;
-                case "cancel":
+                case "cancelar":
                     CancelCommand(user);
                     break;
-                case "classintervention":
+                case "intervenciònenclase":
                     ClassInterventionCommand(user);
                     break;
                 case "meme":
                     MemeCommand(user);
                     break;
-                case "joke":
+                case "chiste":
                     JokeCommand(user);
                     break;
-                case "rectificationtotheteacher":
-                    RectificationToTheTeacherCommand(user);
-                    break;
-                case "diary":
+                case "diario":
                     DailyCommand(user);
                     break;
-                case "statusphrase":
+                case "frasedeestado":
                     StatusPhraseCommand(user);
                     break;
-                case "classtitle":
+                case "cambiartítulodeclase":
                     ClassTitleCommand(user);
                     break;
-                case "configuration":
+                case "configuración":
                     ConfigurationCommand(user);
                     break;
                 case "poll":
                     PollCommand(user);
                     break;
-                case "startclass":
+                case "iniciarclase":
                     StartClassCommand(user);
                     break;
-                case "register":
+                case "registrar":
                     Menu.RegisterMenu(bot, message);
                     break;
                 default:
@@ -492,7 +499,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void CreaditsCommand(Models.User? user)
+        private void CreditsCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -676,6 +683,15 @@ namespace ClassAssistantBot.Controllers
                             replyMarkup: new ReplyKeyboardRemove());
                     }
                     return;
+                }
+
+                var student = creditsDataHandler.GetCreditsByUserName(user.Id, command, true);
+                if (!string.IsNullOrEmpty(student))
+                {
+                    bot.SendMessage(chatId: message.Chat.Id,
+                                text: student);
+                    var res = studentDataHandler.GetStudentsOnClassByTeacherId(user.Id);
+                    Menu.TeacherMenu(bot, message, res);
                 }
                 Logger.Error($"Error: El usuario {user.Username} está interactuando con un comando que no existe");
                 Menu.TeacherMenu(bot, message, "El comando insertado no existe, por favor, no me haga perder tiempo.");
@@ -947,6 +963,38 @@ namespace ClassAssistantBot.Controllers
                 Menu.CancelMenu(bot, message, "Inserte el título de la clase:");
             }
         }
+
+        private void AssignCreditsCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else if (user.IsTecaher)
+            {
+                creditsDataHandler.AssignCredit(user);
+                Menu.CancelMenu(bot, message, "Inserte el nombre de usuario del estudiante:");
+                return;
+            }
+            else
+            {
+                Logger.Error($"Error: El usuario {user.Username} está intentando intentando registrar su nombre y apellidos en formato incorrecto.");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Por favor, no me haga perder el tiempo, inserte su nombre y sus 2 apellidos.",
+                                replyMarkup: new ReplyKeyboardRemove());
+                return;
+            }
+        }
         #endregion
 
         #region Procesos que completan comandos de varias operaciones
@@ -1014,9 +1062,7 @@ namespace ClassAssistantBot.Controllers
         private void OnRectificationToTheTeacherAtTeacherUserName(Models.User user, string teacherUserName)
         {
             rectificationToTheTeacherDataHandler.DoRectificationToTheTaecherUserName(user, teacherUserName);
-            bot.SendMessage(chatId: message.Chat.Id,
-                            text: "Explique a groso modo en qué se equivocó el profesor y su correción:",
-                            replyMarkup: new ReplyKeyboardRemove());
+            Menu.CancelMenu(bot, message, "Explique a groso modo en qué se equivocó el profesor y su correción:");
         }
 
         private void OnRectificationToTheTeacherAtText(Models.User user, string text)
@@ -1038,9 +1084,7 @@ namespace ClassAssistantBot.Controllers
         private void OnChangeClassTitle(Models.User user, long classId)
         {
             classTitleDataHandler.ChangeClassTitle(user, classId);
-            bot.SendMessage(chatId: message.Chat.Id,
-                            text: "Inserte el nombre la clase:",
-                            replyMarkup: new ReplyKeyboardRemove());
+            Menu.CancelMenu(bot, message, "Inserte el nombre la clase:");
         }
 
         private void OnChangeClassTitle(Models.User user, string classTitle)
@@ -1054,9 +1098,7 @@ namespace ClassAssistantBot.Controllers
         private void OnClassIntervention(Models.User user, long classId)
         {
             classInterventionDataHandler.CreateIntervention(user, classId);
-            bot.SendMessage(chatId: message.Chat.Id,
-                            text: "Inserte su intervención:",
-                            replyMarkup: new ReplyKeyboardRemove());
+            Menu.CancelMenu(bot, message, "Inserte su intervención:");
         }
 
         private void OnClassIntervention(Models.User user, string classIntervention)
@@ -1106,19 +1148,61 @@ namespace ClassAssistantBot.Controllers
             }
 
             if (response.Length != 1 && !string.IsNullOrEmpty(comment))
-                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}) y su profesor le ha hecho la siguiente recomendación: \"{response[1]}\".";
-            else if(response.Length != 1 && string.IsNullOrEmpty(comment))
-                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()} y su profesor le ha hecho la siguiente recomendación: \"{response[1]}\".";
-            else if(response.Length == 1 && !string.IsNullOrEmpty(comment))
+            {
+                var res = "";
+                for (int i = 1; i < response.Length; i++)
+                {
+                    res += response[i];
+                }
+                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}) y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
+            }
+            else if (response.Length != 1 && string.IsNullOrEmpty(comment))
+            {
+                var res = "";
+                for (int i = 1; i < response.Length; i++)
+                {
+                    res += response[i];
+                }
+                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()} y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
+            }
+            else if (response.Length == 1 && !string.IsNullOrEmpty(comment))
                 text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}).";
             else
                 text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}.";
             bot.SendMessage(chatId: pending.Student.User.ChatId,
                             text: text);
-            creditsDataHandler.AddCredits(credits, pending.Student.User.Id, pending.ClassRoomId, response.Length!=1 ? response[1] : "");
+            string credit_information = "";
+            if(response.Length != 1)
+            {
+                for (int i = 1; i < response.Length; i++)
+                {
+                    credit_information += response[i] + " ";
+                }
+            }
+            creditsDataHandler.AddCredits(credits, user.Id, pending.Student.User.Id, pending.ClassRoomId, credit_information);
             pendingDataHandler.RemovePending(pending);
             PendingsCommand(user);
 
+        }
+
+        private void OnAssignCredits(Models.User user, string username)
+        {
+            if(!creditsDataHandler.AssignCredit(user, username))
+            {
+                Menu.TeacherMenu(bot, message);
+            }
+            else
+                Menu.CancelMenu(bot, message, "Inserte los créditos y su mensaje:");
+        }
+
+        private void OnAssignCreditsMessage(Models.User user, string text)
+        {
+            var res = creditsDataHandler.AssignCreditMessage(user, text);
+            bot.SendMessage(chatId: res.Item2,
+                            text: $"Ha recibido {res.Item3} créditos y su profesor le dijo \"{res.Item1}\".");
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: "Créditos asignados satisfactoriamente.",
+                            replyMarkup: new ReplyKeyboardRemove());
         }
         #endregion
     }

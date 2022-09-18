@@ -46,6 +46,31 @@ namespace ClassAssistantBot.Services
 
         public void CancelAction(User user)
         {
+            if(user.Status == UserStatus.AssignCredits)
+            {
+                var credit = dataAccess.Credits.Where(x => x.TeacherId == user.Id && string.IsNullOrEmpty(x.Text)).First();
+                dataAccess.Remove(credit);
+            }
+            else if(user.Status == UserStatus.ClassTitleSelect)
+            {
+                var classTitle = dataAccess.ClassTitles.Where(x => x.UserId == user.Id && string.IsNullOrEmpty(x.Title)).First();
+                dataAccess.Remove(classTitle);
+            }
+            else if (user.Status == UserStatus.ClassInterventionSelect)
+            {
+                var classIntervention = dataAccess.ClassInterventions
+                .Where(x => x.UserId == user.Id && !x.Finished)
+                .First();
+                dataAccess.ClassInterventions.Remove(classIntervention);
+            }
+            else if(user.Status == UserStatus.RectificationToTheTeacherUserName)
+            {
+                var rectification = dataAccess.RectificationToTheTeachers
+                    .Where(x => x.UserId == user.Id)
+                    .OrderByDescending(x => x.DateTime)
+                    .First();
+                dataAccess.RectificationToTheTeachers.Remove(rectification);
+            }
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
             dataAccess.SaveChanges();

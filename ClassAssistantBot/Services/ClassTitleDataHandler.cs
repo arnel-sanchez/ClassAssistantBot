@@ -45,21 +45,9 @@ namespace ClassAssistantBot.Services
                 ClassId = classID,
                 DateTime = DateTime.UtcNow,
                 Id = Guid.NewGuid().ToString(),
-                Title = "",
+                Title = String.Empty,
                 UserId = user.Id
             };
-
-            var random = new Random();
-            var pending = new Pending
-            {
-                Id = Guid.NewGuid().ToString(),
-                Type = InteractionType.ClassTitle,
-                ClassRoomId = user.ClassRoomActiveId,
-                ObjectId = classTitle.Id,
-                StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
-                Code = random.Next(1000, 9999).ToString()
-            };
-            dataAccess.Pendings.Add(pending);
 
             dataAccess.Users.Update(user);
             dataAccess.ClassTitles.Add(classTitle);
@@ -73,6 +61,18 @@ namespace ClassAssistantBot.Services
             var classTitle = dataAccess.ClassTitles.OrderByDescending(x => x.DateTime).First();
 
             classTitle.Title = newTitle;
+
+            var random = new Random();
+            var pending = new Pending
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = InteractionType.ClassTitle,
+                ClassRoomId = user.ClassRoomActiveId,
+                ObjectId = classTitle.Id,
+                StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
+                Code = random.Next(1000, 9999).ToString()
+            };
+            dataAccess.Pendings.Add(pending);
 
             dataAccess.Users.Update(user);
             dataAccess.ClassTitles.Update(classTitle);

@@ -16,8 +16,8 @@ namespace ClassAssistantBot.Services
             {
                 Keyboard = new KeyboardButton[][]{
                                             new KeyboardButton[]{
-                                                new KeyboardButton("*Student*"),
-                                                new KeyboardButton("*Teacher*")
+                                                new KeyboardButton("*Estudiante*"),
+                                                new KeyboardButton("*Profesor*")
                                                 },
                                         },
                 ResizeKeyboard = true
@@ -36,17 +36,18 @@ namespace ClassAssistantBot.Services
                 Keyboard = new KeyboardButton[][]{
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Students*"),
-                        new KeyboardButton("*Credits*")
+                        new KeyboardButton("*Estudiantes*"),
+                        new KeyboardButton("*Créditos*")
                     },
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Pendings*"),
-                        new KeyboardButton("*Start Class*")
+                        new KeyboardButton("*Pendientes*"),
+                        new KeyboardButton("*Iniciar Clase*")
                     },
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Configuration*")
+                        new KeyboardButton("*Asignar Créditos*"),
+                        new KeyboardButton("*Configuración*")
                     }
                 },
                 ResizeKeyboard = true
@@ -65,18 +66,18 @@ namespace ClassAssistantBot.Services
                 Keyboard = new KeyboardButton[][]{
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*All Pendings*"),
-                        new KeyboardButton("*Teacher Access Key*")
+                        new KeyboardButton("*Todos Los Pendientes*"),
+                        new KeyboardButton("*Llave del Profesor*")
                     },
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Student Access Key*"),
-                        new KeyboardButton("*Change Classroom*")
+                        new KeyboardButton("*Llave del Estudiante*"),
+                        new KeyboardButton("*Cambiar de Aula*")
                     },
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Remove Student From Classroom*"),
-                        new KeyboardButton("*Cancel*")
+                        new KeyboardButton("*Eliminar Estudiante del Aula*"),
+                        new KeyboardButton("*Cancelar*")
                     },
                 },
                 ResizeKeyboard = true
@@ -94,23 +95,23 @@ namespace ClassAssistantBot.Services
             {
                 Keyboard = new KeyboardButton[][]{
                     new KeyboardButton[]{
-                        new KeyboardButton("*Class Intervention*"),
+                        new KeyboardButton("*Intervenciòn en Clase*"),
                         new KeyboardButton("*Meme*"),
                         },
                     new KeyboardButton[]{
-                        new KeyboardButton("*Rectification At Teacher*"),
-                        new KeyboardButton("*Joke*")
+                        new KeyboardButton("*Rectificar al Profesor*"),
+                        new KeyboardButton("*Chiste*")
                         },
                     new KeyboardButton[]{
-                        new KeyboardButton("*Diary*"),
-                        new KeyboardButton("*Credits*"),
+                        new KeyboardButton("*Diario*"),
+                        new KeyboardButton("*Créditos*"),
                         },
                     new KeyboardButton[]{
-                        new KeyboardButton("*Status Phrase*"),
-                        new KeyboardButton("*Class Title*")
+                        new KeyboardButton("*Frase de Estado*"),
+                        new KeyboardButton("*Cambiar Título de Clase*")
                         },
                     new KeyboardButton[]{
-                        new KeyboardButton("*Configuration*"),
+                        new KeyboardButton("*Configuración*"),
                         },
                 },
                 ResizeKeyboard = true
@@ -131,7 +132,7 @@ namespace ClassAssistantBot.Services
             {
                 Keyboard = new KeyboardButton[][]{
                     new KeyboardButton[]{
-                        new KeyboardButton("*Cancel*")
+                        new KeyboardButton("*Cancelar*")
                     }
                 },
                 ResizeKeyboard = true
@@ -148,10 +149,10 @@ namespace ClassAssistantBot.Services
                 Keyboard = new KeyboardButton[][]{
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Register*")
+                        new KeyboardButton("*Registrar*")
                     },
                     new KeyboardButton[]{
-                        new KeyboardButton("*Cancel*")
+                        new KeyboardButton("*Cancelar*")
                     }
                 },
                 ResizeKeyboard = true
@@ -163,7 +164,7 @@ namespace ClassAssistantBot.Services
 
         public static void TeachersList(BotClient bot, Message message,List<Teacher> teachers, string text = "")
         {
-            var listButton = new KeyboardButton[teachers.Count][];
+            var listButton = new KeyboardButton[teachers.Count+1][];
 
             for (int i = 0; i < teachers.Count; i++)
             {
@@ -172,6 +173,10 @@ namespace ClassAssistantBot.Services
                     new KeyboardButton($"*{teachers[i].User.FirstName}*//*{teachers[i].User.Username}*")
                 };
             }
+            listButton[teachers.Count] = new KeyboardButton[]
+            {
+                new KeyboardButton("*Cancelar*")
+            };
             var keyboard = new ReplyKeyboardMarkup
             {
                 Keyboard = listButton,
@@ -186,7 +191,7 @@ namespace ClassAssistantBot.Services
         public static void ClassesList(BotClient bot, Message message, List<Class> classes, string text = "")
         {
             if (string.IsNullOrEmpty(text)) text = "Lista de Clases:";
-            var listButton = new KeyboardButton[classes.Count][];
+            var listButton = new KeyboardButton[classes.Count+1][];
 
             for (int i = 0; i < classes.Count; i++)
             {
@@ -195,12 +200,11 @@ namespace ClassAssistantBot.Services
                     new KeyboardButton($"*{classes[i].Id}*//*{classes[i].Title}*")
                 };
             }
-            if (string.IsNullOrEmpty(text)) text = "Lista de Clases:";
-            if (classes.Count == 0)
+            listButton[classes.Count] = new KeyboardButton[]
             {
-                CancelMenu(bot, message, text);
-                return;
-            }
+                new KeyboardButton("*Cancelar*")
+            };
+            if (string.IsNullOrEmpty(text)) text = "Lista de Clases:";
             var keyboard = new ReplyKeyboardMarkup
             {
                 Keyboard = listButton,

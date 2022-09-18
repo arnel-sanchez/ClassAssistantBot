@@ -51,8 +51,10 @@ namespace ClassAssistantBot.Services
             var res = new StringBuilder();
             var pending = dataAccess.Pendings
                 .Where(x => x.Code == code)
-                .First();
+                .FirstOrDefault();
             pend = "";
+            if (pending == null)
+                return pend;
             if (pending.Type == InteractionType.ClassIntervention)
             {
                 var classIntervention = dataAccess.ClassInterventions
@@ -106,8 +108,10 @@ namespace ClassAssistantBot.Services
             {
                 var rectificationToTheTeacher = dataAccess.RectificationToTheTeachers
                     .Include(x => x.Teacher.User)
+                    .Include(x => x.User)
                     .First(x => x.Id == pending.ObjectId);
                 res.Append($"RectificationToTheTeachers de {rectificationToTheTeacher.User.Username}\n");
+                res.Append($"Profesor: {rectificationToTheTeacher.Teacher.User.Username}\n");
                 res.Append($"Texto: {rectificationToTheTeacher.Text}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
             }

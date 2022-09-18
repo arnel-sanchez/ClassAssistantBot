@@ -5,6 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassAssistantBot.Services
 {
+    public class StudentResult
+    {
+        public long Credits { get; set; }
+
+        public string Username { get; set; }
+    }
+
     public class StudentDataHandler
     {
         private DataAccess dataAccess { get; set; }
@@ -119,15 +126,25 @@ namespace ClassAssistantBot.Services
                 .ThenInclude(x => x.User)
                 .ToList();
 
+            List<StudentResult> studentResults = new List<StudentResult>();
+
+            foreach (var student in students)
+            {
+                studentResults.Add(new StudentResult
+                {
+                    Credits = dataAccess.Credits.Where(x => x.UserId == student.Student.UserId && x.ClassRoomId == student.Student.User.ClassRoomActiveId).Sum(x => x.Value),
+                    Username = student.Student.User.Username
+                });
+            }
+
             var res = new StringBuilder($"Estudantes inscritos en el aula {classRoom.Name}:\n");
-            for (int i = 0; i < students.Count; i++)
+            for (int i = 0; i < studentResults.Count; i++)
             {
                 res.Append(i + 1);
-                res.Append(": @");
-                res.Append(students[i].Student.User.Username);
-                res.Append(" -> ");
-                var credit = dataAccess.Credits.Where(x => x.UserId == students[i].Student.UserId && x.ClassRoomId == students[i].Student.User.ClassRoomActiveId).Sum(x => x.Value);
-                res.Append(credit);
+                res.Append(": ");
+                res.Append(studentResults[i].Credits);
+                res.Append(" -> /");
+                res.Append(studentResults[i].Username);
                 res.Append("\n");
             }
             return res.ToString();

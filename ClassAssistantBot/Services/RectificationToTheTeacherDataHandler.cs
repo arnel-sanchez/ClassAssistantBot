@@ -27,11 +27,22 @@ namespace ClassAssistantBot.Services
                 Id = Guid.NewGuid().ToString(),
                 DateTime = DateTime.UtcNow,
                 UserId = user.Id,
-                Text = "",
+                Text = String.Empty,
                 TeacherId = teacher.Id,
                 User = user,
                 Teacher = teacher
             };
+
+            dataAccess.Users.Update(user);
+            dataAccess.RectificationToTheTeachers.Add(rectification);
+            dataAccess.SaveChanges();
+        }
+
+        public string DoRectificationToTheTaecherText(User user, string text)
+        {
+            user.Status = UserStatus.Ready;
+            var rectification = dataAccess.RectificationToTheTeachers.Where(x => x.UserId == user.Id).OrderByDescending(x => x.DateTime).First();
+            rectification.Text = text;
 
             var random = new Random();
             var pending = new Pending
@@ -45,16 +56,6 @@ namespace ClassAssistantBot.Services
             };
             dataAccess.Pendings.Add(pending);
 
-            dataAccess.Users.Update(user);
-            dataAccess.RectificationToTheTeachers.Add(rectification);
-            dataAccess.SaveChanges();
-        }
-
-        public string DoRectificationToTheTaecherText(User user, string text)
-        {
-            user.Status = UserStatus.Ready;
-            var rectification = dataAccess.RectificationToTheTeachers.OrderByDescending(x => x.DateTime).First();
-            rectification.Text = text;
             dataAccess.Users.Update(user);
             dataAccess.RectificationToTheTeachers.Update(rectification);
             dataAccess.SaveChanges();
