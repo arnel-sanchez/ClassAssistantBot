@@ -457,7 +457,7 @@ namespace ClassAssistantBot.Controllers
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
-            if (user.Status != UserStatus.CreatingTecaher)
+            if (user.Status != UserStatus.CreatingTecaher && user.Status != UserStatus.ChangeClassRoom)
             {
                 Logger.Error($"Error: El profesor {user.Username} está intentando entrar a un aula sin creado el profesor.");
                 bot.SendMessage(chatId: message.Chat.Id,
