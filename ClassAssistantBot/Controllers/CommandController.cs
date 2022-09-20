@@ -402,14 +402,15 @@ namespace ClassAssistantBot.Controllers
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
-            if (user.Status != UserStatus.Verified)
+            if (user.Status != UserStatus.Verified && user.Status != UserStatus.ChangeClassRoom)
             {
                 Logger.Error($"Error: El usuario {user.Username} está intentando convertirse en profesor sin estar verificado.");
                 bot.SendMessage(chatId: message.Chat.Id,
                             text: "Por favor, atienda lo que hace, no me haga perder tiempo, inserte su nombre y 2 apellidos.");
                 return;
             }
-            teacherDataHandler.CreateTeacher(user);
+            if(user.Status == UserStatus.Verified)
+                teacherDataHandler.CreateTeacher(user);
             var keyboard = new ReplyKeyboardMarkup
             {
                 Keyboard = new KeyboardButton[][]{
@@ -434,7 +435,7 @@ namespace ClassAssistantBot.Controllers
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
-            if (user.Status != UserStatus.CreatingTecaher)
+            if (user.Status != UserStatus.CreatingTecaher && user.Status != UserStatus.ChangeClassRoom)
             {
                 Logger.Error($"Error: El profesor {user.Username} está intentando crear un aula sin haber creado el profesor.");
                 bot.SendMessage(chatId: message.Chat.Id,
