@@ -49,6 +49,8 @@ namespace ClassAssistantBot.Models
 
         public bool IsBot { get; set; }
 
+        public string Name { get; set; }
+
         public string FirstName { get; set; }
 
         public string LastName { get; set; }

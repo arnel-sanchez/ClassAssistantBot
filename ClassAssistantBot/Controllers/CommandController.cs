@@ -1062,35 +1062,14 @@ namespace ClassAssistantBot.Controllers
         private void OnRegister(Models.User user, string text)
         {
             var list = text.Split(' ');
-            var name = "";
-            var lastName = "";
-            if (list.Length == 3)
-            {
-                name = list[0];
-                lastName = list[1] + " " + list[2];
-            }
-            else if (list.Length == 4)
-            {
-                name = list[0] + " " + list[1];
-                lastName = list[2] + " " + list[3];
-            }
-            else
-            {
-                Logger.Error($"Error: El usuario {user.Username} está intentando intentando registrar su nombre y apellidos en formato incorrecto.");
-                bot.SendMessage(chatId: message.Chat.Id,
-                                text: "Por favor, no me haga perder el tiempo, inserte su nombre y sus 2 apellidos.",
-                                replyMarkup: new ReplyKeyboardRemove());
-                return;
-            }
 
-            user.FirstName = name;
-            user.LastName = lastName;
+            user.Name = text;
             user.Status = UserStatus.Verified;
             userDataHandler.VerifyUser(user);
             Logger.Success($"Verifying the user {user.Username}");
 
             bot.SendMessage(chatId: message.Chat.Id,
-                            text: "Bienvenido " + user.FirstName + " " + user.LastName,
+                            text: "Bienvenido " + text,
                             replyMarkup: new ReplyKeyboardRemove());
 
             Menu.RegisterMenu(bot, message);
