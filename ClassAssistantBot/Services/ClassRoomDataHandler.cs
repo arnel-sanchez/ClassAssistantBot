@@ -113,6 +113,26 @@ namespace ClassAssistantBot.Services
                 dataAccess.SaveChanges();
             }
         }
+
+        public string SeeClassRoomActive(User user)
+        {
+            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().Name;
+        }
+
+        public string GetClassesCreated(User user)
+        {
+            var classes = dataAccess.Classes.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            int k = 1;
+            foreach (var @class in classes)
+            {
+                stringBuilder.Append($"{k}: {@class.Title}\n");
+            }
+
+            return stringBuilder.ToString();
+        }
     }
 }
 

@@ -340,6 +340,12 @@ namespace ClassAssistantBot.Controllers
                 case "registrar":
                     Menu.RegisterMenu(bot, message);
                     break;
+                case "veraulaactual":
+                    SeeClassRoomActiveCommand(user);
+                    break;
+                case "verclasesinscritas":
+                    SeeListClass(user);
+                    break;
                 default:
                     DefaultCommand(user, cmd);
                     break;
@@ -991,8 +997,62 @@ namespace ClassAssistantBot.Controllers
             {
                 Logger.Error($"Error: El usuario {user.Username} está intentando intentando registrar su nombre y apellidos en formato incorrecto.");
                 bot.SendMessage(chatId: message.Chat.Id,
-                                text: "Por favor, no me haga perder el tiempo, inserte su nombre y sus 2 apellidos.",
-                                replyMarkup: new ReplyKeyboardRemove());
+                                text: "Por favor, no me haga perder el tiempo, inserte su nombre y sus 2 apellidos.");
+                return;
+            }
+        }
+
+        private void SeeClassRoomActiveCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var res = classRoomDataHandler.SeeClassRoomActive(user);
+                if (user.IsTecaher)
+                    Menu.TeacherMenu(bot, message, "Se encuentra en el aula: " + res);
+                else
+                    Menu.StudentMenu(bot, message, "Se encuentra en el aula: " + res);
+                return;
+            }
+        }
+
+        private void SeeListClass(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var res = classRoomDataHandler.GetClassesCreated(user);
+                var classRoom = classRoomDataHandler.SeeClassRoomActive(user);
+                if (user.IsTecaher)
+                    Menu.TeacherMenu(bot, message, $"El aula {classRoom} tiene creadas las clases:\n{res}");
+                else
+                    Menu.StudentMenu(bot, message, $"El aula {classRoom} tiene creadas las clases:\n{res}");
                 return;
             }
         }
