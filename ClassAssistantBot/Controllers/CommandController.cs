@@ -88,7 +88,7 @@ namespace ClassAssistantBot.Controllers
                         OnCommand(command, parameters, user);
                     }
                 }
-                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && message.Text.Length >= 8 && !message.Text.Contains("*//*"))
+                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && message.Text.Length >= 4 && !message.Text.Contains("*//*"))
                 {
                     var commands = message.Text.Substring(1, message.Text.Length - 2).ToLower().Split(' ');
                     var command = new StringBuilder();
@@ -101,7 +101,7 @@ namespace ClassAssistantBot.Controllers
                     Logger.Warning($"New command: {command}");
                     OnCommand(command.ToString(), new string[0], user);
                 }
-                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && message.Text.Length >= 8 && message.Text.ToString().Contains("*//*"))
+                else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && message.Text.Length >= 4 && message.Text.ToString().Contains("*//*"))
                 {
                     var commands = message.Text.Substring(1, message.Text.Length - 2).Split(' ');
                     var command = new StringBuilder();
@@ -414,8 +414,8 @@ namespace ClassAssistantBot.Controllers
             {
                 Keyboard = new KeyboardButton[][]{
                                             new KeyboardButton[]{
-                                                new KeyboardButton("*Create*"),
-                                                new KeyboardButton("*Enter*")
+                                                new KeyboardButton("*Crear*"),
+                                                new KeyboardButton("*Entrar*")
                                                 },
                                         },
                 ResizeKeyboard = true
@@ -900,7 +900,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 var res = classRoomDataHandler.ChangeClassRoom(user.Id);
-                user.Status = UserStatus.Verified;
+                user.Status = UserStatus.ChangeClassRoom;
                 userDataHandler.VerifyUser(user);
                 Menu.ChangeClassRoomMenu(bot, message, res);
             }
