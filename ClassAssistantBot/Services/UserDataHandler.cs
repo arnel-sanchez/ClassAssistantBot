@@ -20,6 +20,7 @@ namespace ClassAssistantBot.Services
                 Created = DateTime.UtcNow,
                 FirstName = "",
                 LastName = "",
+                Name="",
                 IsBot = appUser.IsBot,
                 LanguageCode = appUser.LanguageCode,
                 Username = appUser.Username,

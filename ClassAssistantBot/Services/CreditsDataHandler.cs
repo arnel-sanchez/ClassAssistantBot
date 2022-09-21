@@ -30,7 +30,11 @@ namespace ClassAssistantBot.Services
                 return "";
             if (student == null)
                 return $"No existe usuario con el username {userName}";
-            var res = new StringBuilder($"{student.Student.User.FirstName} {student.Student.User.LastName}(@{student.Student.User.Username}):\n");
+            var res = new StringBuilder();
+            if (string.IsNullOrEmpty(user.Name))
+                res = new StringBuilder($"{student.Student.User.FirstName} {student.Student.User.LastName}(@{student.Student.User.Username}):\n");
+            else
+                res = new StringBuilder($"{student.Student.User.Name}(@{student.Student.User.Username}):\n");
             var credits = dataAccess.Credits
                 .Include(x => x.Teacher)
                 .Where(x => x.UserId == student.Student.UserId && x.ClassRoomId == student.Student.User.ClassRoomActiveId)
