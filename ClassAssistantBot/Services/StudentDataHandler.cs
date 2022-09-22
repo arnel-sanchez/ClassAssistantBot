@@ -33,6 +33,7 @@ namespace ClassAssistantBot.Services
                 teacher.Status = UserStatus.Ready;
                 var userByClassRoom = dataAccess.StudentsByClassRooms.Where(x => x.Student.UserId == user.Id && teacher.ClassRoomActiveId == x.ClassRoomId);
                 user.ClassRoomActiveId = 0;
+                user.Status = UserStatus.Ready;
                 dataAccess.Users.Update(user);
                 dataAccess.StudentsByClassRooms.RemoveRange(userByClassRoom);
                 dataAccess.Users.Update(teacher);

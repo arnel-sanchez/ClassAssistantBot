@@ -71,12 +71,12 @@ namespace ClassAssistantBot.Controllers
             Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
             var user = userDataHandler.GetUser(appUser.Id);
 
-            /*if(user.ClassRoomActiveId == 0)
+            if(user.ClassRoomActiveId == 0)
             {
                 Console.WriteLine("Entro sin problemas");
                 ChangeClassRoomCommand(user);
                 return;
-            }*/
+            }
 
             if (hasText)
             {
