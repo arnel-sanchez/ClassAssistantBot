@@ -71,11 +71,12 @@ namespace ClassAssistantBot.Controllers
             Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
             var user = userDataHandler.GetUser(appUser.Id);
 
-            if(user.ClassRoomActiveId == 0)
+            /*if(user.ClassRoomActiveId == 0)
             {
+                Console.WriteLine("Entro sin problemas");
                 ChangeClassRoomCommand(user);
                 return;
-            }
+            }*/
 
             if (hasText)
             {
@@ -905,7 +906,7 @@ namespace ClassAssistantBot.Controllers
             }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando changeclass");
                 bot.SendMessage(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
