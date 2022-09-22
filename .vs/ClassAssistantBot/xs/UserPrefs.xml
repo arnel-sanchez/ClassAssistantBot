@@ -1,26 +1,19 @@
 ﻿<Properties StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default" GitUserInfo="UsingGIT">
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
-  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
-  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
-  <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Services/CreditsDataHandler.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Services/StudentDataHandler.cs">
     <Files>
-      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="1066" Column="13" />
-      <File FileName="ClassAssistantBot/Services/Logger.cs" Line="28" Column="1" />
-      <File FileName="ClassAssistantBot/Services/Menu.cs" Line="95" Column="89" />
-      <File FileName="ClassAssistantBot/Services/ClassRoomDataHandler.cs" Line="122" Column="51" />
+      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="396" Column="32" />
       <File FileName="ClassAssistantBot/Services/CreditsDataHandler.cs" Line="41" Column="27" />
+      <File FileName="ClassAssistantBot/Services/UserDataHandler.cs" Line="33" Column="1" />
+      <File FileName="ClassAssistantBot/Services/StudentDataHandler.cs" Line="108" Column="40" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="ClassAssistantBot" expanded="True">
-            <Node name="ClassAssistantBot" expanded="True" />
+            <Node name="ClassAssistantBot" expanded="True">
+              <Node name="Services" expanded="True" />
+            </Node>
           </Node>
         </State>
       </Pad>
@@ -29,4 +22,12 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
+  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
 </Properties>

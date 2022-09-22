@@ -105,12 +105,13 @@ namespace ClassAssistantBot.Services
                 };
 
                 user.Status = UserStatus.Ready;
+                user.IsTecaher = false;
                 user.ClassRoomActiveId = classRoom.Id;
 
                 dataAccess.Users.Update(user);
                 dataAccess.StudentsByClassRooms.Add(studentByClassRoom);
                 dataAccess.SaveChanges();
-                Console.WriteLine($"The teacher {user.Username} has entered class");
+                Console.WriteLine($"The student {user.Username} has entered class");
                 return $"Ha entrado en el aula satisfactoriamente";
             }
         }
