@@ -71,7 +71,7 @@ namespace ClassAssistantBot.Controllers
             Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
             var user = userDataHandler.GetUser(appUser.Id);
 
-            if(user.ClassRoomActiveId == 0)
+            if(user != null && user.ClassRoomActiveId == 0 && user.Status == UserStatus.Ready)
             {
                 Console.WriteLine("Entro sin problemas");
                 ChangeClassRoomCommand(user);
