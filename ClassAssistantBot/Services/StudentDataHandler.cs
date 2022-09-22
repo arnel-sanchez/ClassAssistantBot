@@ -54,9 +54,16 @@ namespace ClassAssistantBot.Services
             var res = new StringBuilder();
             foreach (var item in list)
             {
-                res.Append(item.Student.User.FirstName);
-                res.Append(" ");
-                res.Append(item.Student.User.LastName);
+                if (string.IsNullOrEmpty(item.Student.User.Name))
+                {
+                    res.Append(item.Student.User.FirstName);
+                    res.Append(" ");
+                    res.Append(item.Student.User.LastName);
+                }
+                else
+                {
+                    res.Append(item.Student.User.Name);
+                }
                 res.Append(": @");
                 res.Append(item.Student.User.Username);
                 res.Append("\n");
@@ -140,6 +147,7 @@ namespace ClassAssistantBot.Services
             }
 
             var res = new StringBuilder($"Estudantes inscritos en el aula {classRoom.Name}:\n");
+            studentResults.OrderByDescending(x => x.Credits);
             for (int i = 0; i < studentResults.Count; i++)
             {
                 res.Append(i + 1);

@@ -73,7 +73,6 @@ namespace ClassAssistantBot.Controllers
 
             if(user != null && user.ClassRoomActiveId == 0 && user.Status == UserStatus.Ready)
             {
-                Console.WriteLine("Entro sin problemas");
                 ChangeClassRoomCommand(user);
                 return;
             }

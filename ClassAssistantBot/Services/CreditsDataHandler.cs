@@ -38,34 +38,30 @@ namespace ClassAssistantBot.Services
             var credits = dataAccess.Credits
                 .Include(x => x.Teacher)
                 .Where(x => x.UserId == student.Student.UserId && x.ClassRoomId == student.Student.User.ClassRoomActiveId)
-                .ToList();
-            if (showTeacher)
+                .GroupBy(x => x.DateTime.Date);
+
+            foreach (var item in credits)
             {
-                for (int i = 0; i < credits.Count; i++)
+                int i = 1;
+                res.Append(item.Key.Date);
+                foreach (var credit in item)
                 {
-                    res.Append(i + 1);
+                    res.Append("  ");
+                    res.Append(i);
                     res.Append(": ");
-                    res.Append(credits[i].Value);
+                    res.Append(credit.Value);
                     res.Append(" -> ");
-                    res.Append(credits[i].Text);
-                    res.Append(" -> ");
-                    res.Append($"@{credits[i].Teacher.Username}");
-                    res.Append("\n");
+                    res.Append(credit.Text);
+                    if (showTeacher)
+                    {
+                        res.Append(" -> ");
+                        res.Append($"@{credit.Teacher.Username}");
+                    }
+                    res.Append(":\n");
+                    i++;
                 }
             }
-            else
-            {
-                for (int i = 0; i < credits.Count; i++)
-                {
-                    res.Append(i + 1);
-                    res.Append(": ");
-                    res.Append(credits[i].Value);
-                    res.Append(" -> ");
-                    res.Append(credits[i].Text);
-                    res.Append("\n");
-                }
-            }
-            if (credits.Count == 0)
+            if (credits.Count() == 0)
                 res.Append("No tiene créditos registrados todavía.");
             return res.ToString();
         }

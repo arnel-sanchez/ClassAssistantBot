@@ -100,7 +100,7 @@ namespace ClassAssistantBot.Services
             {
                 Keyboard = new KeyboardButton[][]{
                     new KeyboardButton[]{
-                        new KeyboardButton("*Intervenciòn en Clase*"),
+                        new KeyboardButton("*Intervención en Clase*"),
                         new KeyboardButton("*Meme*"),
                         },
                     new KeyboardButton[]{
