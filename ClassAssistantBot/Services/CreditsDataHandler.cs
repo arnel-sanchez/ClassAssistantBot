@@ -38,27 +38,39 @@ namespace ClassAssistantBot.Services
             var credits = dataAccess.Credits
                 .Include(x => x.Teacher)
                 .Where(x => x.UserId == student.Student.UserId && x.ClassRoomId == student.Student.User.ClassRoomActiveId)
+                .ToList()
                 .GroupBy(x => x.DateTime.Date);
 
             foreach (var item in credits)
             {
+                if (item.Count() == 1 && item.First().Value == 0)
+                    continue;
                 int i = 1;
-                res.Append(item.Key.Date);
+                res.Append("\n");
+                res.Append(item.Key.Day);
+                res.Append("/");
+                res.Append(item.Key.Month);
+                res.Append("/");
+                res.Append(item.Key.Year);
+                res.Append(":\n");
                 foreach (var credit in item)
                 {
-                    res.Append("  ");
-                    res.Append(i);
-                    res.Append(": ");
-                    res.Append(credit.Value);
-                    res.Append(" -> ");
-                    res.Append(credit.Text);
-                    if (showTeacher)
+                    if(credit.Value != 0)
                     {
+                        res.Append("    ");
+                        res.Append(i);
+                        res.Append(": ");
+                        res.Append(credit.Value);
                         res.Append(" -> ");
-                        res.Append($"@{credit.Teacher.Username}");
+                        res.Append(credit.Text);
+                        if (showTeacher)
+                        {
+                            res.Append(" -> ");
+                            res.Append($"@{credit.Teacher.Username}");
+                        }
+                        res.Append(":\n");
+                        i++;
                     }
-                    res.Append(":\n");
-                    i++;
                 }
             }
             if (credits.Count() == 0)

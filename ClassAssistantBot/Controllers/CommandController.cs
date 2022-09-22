@@ -316,7 +316,7 @@ namespace ClassAssistantBot.Controllers
                 case "cancelar":
                     CancelCommand(user);
                     break;
-                case "intervenciònenclase":
+                case "intervenciónenclase":
                     ClassInterventionCommand(user);
                     break;
                 case "meme":

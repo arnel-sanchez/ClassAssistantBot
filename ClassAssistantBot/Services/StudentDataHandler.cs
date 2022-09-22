@@ -147,7 +147,7 @@ namespace ClassAssistantBot.Services
             }
 
             var res = new StringBuilder($"Estudantes inscritos en el aula {classRoom.Name}:\n");
-            studentResults.OrderByDescending(x => x.Credits);
+            studentResults = studentResults.OrderByDescending(x => x.Credits).ToList();
             for (int i = 0; i < studentResults.Count; i++)
             {
                 res.Append(i + 1);
