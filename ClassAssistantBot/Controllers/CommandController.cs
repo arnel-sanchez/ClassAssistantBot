@@ -71,6 +71,12 @@ namespace ClassAssistantBot.Controllers
             Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
             var user = userDataHandler.GetUser(appUser.Id);
 
+            if(user.ClassRoomActiveId == 0)
+            {
+                ChangeClassRoomCommand(user);
+                return;
+            }
+
             if (hasText)
             {
                 if (message.Text.StartsWith('/')) // New commands
@@ -531,7 +537,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 creditsDataHandler.CreditByTeacher(user);
-                Menu.CancelMenu(bot, message, "Inserte el nombre de usuario del estudainte:");
+                Menu.CancelMenu(bot, message, "Inserte el nombre de usuario del estudiante:");
             }
         }
 
