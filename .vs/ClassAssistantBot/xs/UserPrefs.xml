@@ -1,23 +1,26 @@
 ﻿<Properties StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default" GitUserInfo="UsingGIT">
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
+  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
   <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Migrations/20220920214135_UpdateName.cs">
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Services/CreditsDataHandler.cs">
     <Files>
-      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="1072" Column="56" />
+      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="1066" Column="13" />
       <File FileName="ClassAssistantBot/Services/Logger.cs" Line="28" Column="1" />
       <File FileName="ClassAssistantBot/Services/Menu.cs" Line="95" Column="89" />
       <File FileName="ClassAssistantBot/Services/ClassRoomDataHandler.cs" Line="122" Column="51" />
-      <File FileName="ClassAssistantBot/Models/User.cs" Line="56" Column="45" />
-      <File FileName="ClassAssistantBot/Migrations/DataAccessModelSnapshot.cs" Line="1" Column="1" />
-      <File FileName="ClassAssistantBot/Migrations/20220920214135_UpdateName.cs" Line="16" Column="35" />
+      <File FileName="ClassAssistantBot/Services/CreditsDataHandler.cs" Line="41" Column="27" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="ClassAssistantBot" expanded="True">
-            <Node name="ClassAssistantBot" expanded="True">
-              <Node name="Migrations" expanded="True" />
-            </Node>
+            <Node name="ClassAssistantBot" expanded="True" />
           </Node>
         </State>
       </Pad>
@@ -26,11 +29,4 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

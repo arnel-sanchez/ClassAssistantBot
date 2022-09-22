@@ -386,7 +386,7 @@ namespace ClassAssistantBot.Controllers
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
-            if (user.Status != UserStatus.Verified)
+            if (user.Status != UserStatus.Verified && user.Status != UserStatus.ChangeClassRoom)
             {
                 Logger.Error($"Error: El estudiante {user.Username} está intentando unirse a un aula sin estar verificado.");
                 bot.SendMessage(chatId: message.Chat.Id,
