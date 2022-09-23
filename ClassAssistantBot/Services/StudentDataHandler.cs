@@ -10,6 +10,8 @@ namespace ClassAssistantBot.Services
         public long Credits { get; set; }
 
         public string Username { get; set; }
+
+        public string Name { get; set; }
     }
 
     public class StudentDataHandler
@@ -142,7 +144,8 @@ namespace ClassAssistantBot.Services
                 studentResults.Add(new StudentResult
                 {
                     Credits = dataAccess.Credits.Where(x => x.UserId == student.Student.UserId && x.ClassRoomId == student.Student.User.ClassRoomActiveId).Sum(x => x.Value),
-                    Username = student.Student.User.Username
+                    Username = student.Student.User.Username,
+                    Name = string.IsNullOrEmpty(student.Student.User.Name) ? student.Student.User.FirstName + " " + student.Student.User.LastName : student.Student.User.Name
                 });
             }
 
@@ -153,9 +156,11 @@ namespace ClassAssistantBot.Services
                 res.Append(i + 1);
                 res.Append(": ");
                 res.Append(studentResults[i].Credits);
-                res.Append(" -> /");
+                res.Append(" -> ");
+                res.Append(studentResults[i].Name);
+                res.Append("(/");
                 res.Append(studentResults[i].Username);
-                res.Append("\n");
+                res.Append(")\n");
             }
             return res.ToString();
         }

@@ -709,6 +709,7 @@ namespace ClassAssistantBot.Controllers
                                 text: student);
                     var res = studentDataHandler.GetStudentsOnClassByTeacherId(user.Id);
                     Menu.TeacherMenu(bot, message, res);
+                    return;
                 }
                 Logger.Error($"Error: El usuario {user.Username} está interactuando con un comando que no existe");
                 Menu.TeacherMenu(bot, message, "El comando insertado no existe, por favor, no me haga perder tiempo.");

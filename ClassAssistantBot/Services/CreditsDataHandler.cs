@@ -18,7 +18,7 @@ namespace ClassAssistantBot.Services
         {
             var teacher = dataAccess.Teachers.Where(x => x.UserId == id).First();
             var student = dataAccess.StudentsByClassRooms
-                .Where(x => x.ClassRoomId == teacher.User.ClassRoomActiveId && (x.Student.User.Username == userName.Substring(1) || x.Student.User.Username == userName.Substring(1)))
+                .Where(x => x.ClassRoomId == teacher.User.ClassRoomActiveId && (x.Student.User.Username == userName.Substring(1) || x.Student.User.Username == userName))
                 .Include(x => x.Student)
                 .ThenInclude(x => x.User)
                 .FirstOrDefault();
