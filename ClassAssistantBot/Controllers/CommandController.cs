@@ -232,6 +232,8 @@ namespace ClassAssistantBot.Controllers
                 if (user.Status == UserStatus.Meme)
                 {
                     memeDataHandler.SendMeme(user.Id, message.Document);
+                    bot.SendPhoto(chatId: "-1001772874734",
+                            photo: message.Document.FileId);
                     Menu.StudentMenu(bot, message);
                 }
                 else
@@ -246,6 +248,8 @@ namespace ClassAssistantBot.Controllers
                 if (user.Status == UserStatus.Meme)
                 {
                     memeDataHandler.SendMeme(user.Id, message.Photo[0]);
+                    bot.SendPhoto(chatId: "@MemeClaseDeFernan",
+                            photo: message.Photo[0].FileId);
                     Menu.StudentMenu(bot, message);
                 }
                 else

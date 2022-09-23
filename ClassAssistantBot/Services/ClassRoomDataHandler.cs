@@ -129,6 +129,7 @@ namespace ClassAssistantBot.Services
             foreach (var @class in classes)
             {
                 stringBuilder.Append($"{k}: {@class.Title}\n");
+                k++;
             }
 
             return stringBuilder.ToString();

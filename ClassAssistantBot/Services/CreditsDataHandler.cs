@@ -55,14 +55,46 @@ namespace ClassAssistantBot.Services
                 res.Append(":\n");
                 foreach (var credit in item)
                 {
-                    if(credit.Value != 0)
+                    if (credit.Value != 0)
                     {
+                        string text = "";
+                        if (dataAccess.ClassInterventions.Where(x => x.Id == credit.ObjectId).FirstOrDefault() != null)
+                        {
+                            text = dataAccess.ClassInterventions.Where(x => x.Id == credit.ObjectId).First().Text;
+                        }
+                        else if (dataAccess.ClassTitles.Where(x => x.Id == credit.ObjectId).FirstOrDefault() != null)
+                        {
+                            text = dataAccess.ClassTitles.Where(x => x.Id == credit.ObjectId).First().Title;
+                        }
+                        else if (dataAccess.Dailies.Where(x => x.Id == credit.ObjectId).FirstOrDefault() != null)
+                        {
+                            text = dataAccess.Dailies.Where(x => x.Id == credit.ObjectId).First().Text;
+                        }
+                        else if (dataAccess.Jokes.Where(x => x.Id == credit.ObjectId).FirstOrDefault() != null)
+                        {
+                            text = dataAccess.Jokes.Where(x => x.Id == credit.ObjectId).First().Text;
+                        }
+                        else if (dataAccess.RectificationToTheTeachers.Where(x => x.Id == credit.ObjectId).FirstOrDefault() != null)
+                        {
+                            text = dataAccess.RectificationToTheTeachers.Where(x => x.Id == credit.ObjectId).First().Text;
+                        }
+                        else if (dataAccess.StatusPhrases.Where(x => x.Id == credit.ObjectId).FirstOrDefault() != null)
+                        {
+                            text = dataAccess.StatusPhrases.Where(x => x.Id == credit.ObjectId).First().Phrase;
+                        }
+                        else if (dataAccess.Memes.Where(x => x.Id == credit.ObjectId).FirstOrDefault() != null)
+                        {
+                            text = "Meme";
+                        }
                         res.Append("    ");
                         res.Append(i);
                         res.Append(": ");
                         res.Append(credit.Value);
-                        res.Append(" -> ");
-                        res.Append(credit);
+                        if (!string.IsNullOrEmpty(text))
+                        {
+                            res.Append(" -> ");
+                            res.Append(text);
+                        }
                         res.Append(" -> ");
                         res.Append(credit.Text);
                         if (showTeacher)
