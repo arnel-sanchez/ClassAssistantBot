@@ -31,7 +31,7 @@ namespace ClassAssistantBot.Services
             if (student == null)
                 return $"No existe usuario con el username {userName}";
             var res = new StringBuilder();
-            if (string.IsNullOrEmpty(user.Name))
+            if (!string.IsNullOrEmpty(user.FirstName))
                 res = new StringBuilder($"{student.Student.User.FirstName} {student.Student.User.LastName}(@{student.Student.User.Username}):\n");
             else
                 res = new StringBuilder($"{student.Student.User.Name}(@{student.Student.User.Username}):\n");
