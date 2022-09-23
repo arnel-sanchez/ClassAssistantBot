@@ -1225,7 +1225,7 @@ namespace ClassAssistantBot.Controllers
                     credit_information += response[i] + " ";
                 }
             }
-            creditsDataHandler.AddCredits(credits, user.Id, pending.Student.User.Id, pending.ClassRoomId, credit_information);
+            creditsDataHandler.AddCredits(credits, user.Id, pending.ObjectId, pending.Student.User.Id, pending.ClassRoomId, credit_information);
             pendingDataHandler.RemovePending(pending);
             PendingsCommand(user);
 

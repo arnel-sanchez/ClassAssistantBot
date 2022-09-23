@@ -36,8 +36,12 @@ namespace ClassAssistantBot.Services
             {
                 res.Append(item.Type.ToString());
                 res.Append(": ");
-                res.Append(item.Student.User.Username);
-                res.Append(" -> /");
+                if (!string.IsNullOrEmpty(item.Student.User.Name))
+                    res.Append(item.Student.User.Name);
+                else
+                    res.Append(item.Student.User.FirstName + " " + item.Student.User.LastName);
+                res.Append("(" + item.Student.User.Username);
+                res.Append(") -> /");
                 res.Append(item.Code);
                 res.Append("\n");
             }

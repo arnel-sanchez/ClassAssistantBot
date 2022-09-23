@@ -29,5 +29,7 @@ namespace ClassAssistantBot.Models
         public ClassRoom ClassRoom { get; set; }
 
         public long Code { get; set; }
+
+        public string ObjectId { get; set; }
     }
 }

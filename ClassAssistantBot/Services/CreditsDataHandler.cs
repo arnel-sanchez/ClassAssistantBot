@@ -62,6 +62,8 @@ namespace ClassAssistantBot.Services
                         res.Append(": ");
                         res.Append(credit.Value);
                         res.Append(" -> ");
+                        res.Append(credit);
+                        res.Append(" -> ");
                         res.Append(credit.Text);
                         if (showTeacher)
                         {
@@ -182,7 +184,7 @@ namespace ClassAssistantBot.Services
             return res.ToString();
         }
 
-        public void AddCredits(long value, long teacherId, long userId, long classRoomId, string recomendation)
+        public void AddCredits(long value, long teacherId, string objectId, long userId, long classRoomId, string recomendation)
         {
             var random = new Random();
             var credit = new Credits
@@ -191,6 +193,7 @@ namespace ClassAssistantBot.Services
                 Id = Guid.NewGuid().ToString(),
                 Value = value,
                 UserId = userId,
+                ObjectId = objectId,
                 ClassRoomId = classRoomId,
                 Text = recomendation,
                 TeacherId = teacherId,
@@ -201,4 +204,3 @@ namespace ClassAssistantBot.Services
         }
     }
 }
-
