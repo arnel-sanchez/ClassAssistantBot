@@ -702,13 +702,10 @@ namespace ClassAssistantBot.Controllers
                     return;
                 }
 
-                var student = creditsDataHandler.GetCreditsByUserName(user.Id, command, true);
+                var student = creditsDataHandler.GetCreditsByUserName(user.Id, command, true, true);
                 if (!string.IsNullOrEmpty(student))
                 {
-                    bot.SendMessage(chatId: message.Chat.Id,
-                                text: student);
-                    var res = studentDataHandler.GetStudentsOnClassByTeacherId(user.Id);
-                    Menu.TeacherMenu(bot, message, res);
+                    Menu.TeacherMenu(bot, message, student);
                     return;
                 }
                 Logger.Error($"Error: El usuario {user.Username} está interactuando con un comando que no existe");
