@@ -37,7 +37,12 @@ namespace ClassAssistantBot.Services
                     new KeyboardButton[]
                     {
                         new KeyboardButton("*Estudiantes*"),
-                        new KeyboardButton("*Pendientes*")
+                        new KeyboardButton("*Ver Aula Actual*")
+                    },
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Pendientes*"),
+                        new KeyboardButton("*Pendientes Directos*")
                     },
                     new KeyboardButton[]
                     {
@@ -48,11 +53,6 @@ namespace ClassAssistantBot.Services
                     {
                         new KeyboardButton("*Iniciar Clase*"),
                         new KeyboardButton("*Ver Clases Inscritas*")
-                    },
-                    new KeyboardButton[]
-                    {
-                        new KeyboardButton("*Ver Aula Actual*"),
-                        new KeyboardButton("*Pendientes Directos*")
                     },
                     new KeyboardButton[]
                     {
