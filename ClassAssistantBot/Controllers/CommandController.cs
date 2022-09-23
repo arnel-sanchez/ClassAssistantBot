@@ -296,6 +296,7 @@ namespace ClassAssistantBot.Controllers
                 case "revisarclasesprácticas":
                     break;
                 case "pendientesdirectos":
+                    DirectPendingCommand(user);
                     break;
                 case "pendientes":
                     PendingsCommand(user);
@@ -1061,6 +1062,29 @@ namespace ClassAssistantBot.Controllers
                 else
                     Menu.StudentMenu(bot, message, $"El aula {classRoom} tiene creadas las clases:\n{res}");
                 return;
+            }
+        }
+
+        private void DirectPendingCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var pendings = pendingDataHandler.GetPendings(user, true);
+                Menu.CancelMenu(bot, message, pendings);
             }
         }
         #endregion

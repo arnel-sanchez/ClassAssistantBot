@@ -15,27 +15,45 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public string GetPendings(User user)
+        public string GetPendings(User user, bool directPendings = false)
         {
-            var pendings = dataAccess.Pendings
+            var pendings = new List<Pending>();
+            if (!directPendings)
+            {
+                pendings = dataAccess.Pendings
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
                 .Include(x => x.Student)
                 .ThenInclude(x => x.User)
                 .ToList();
-            var classRoom = dataAccess.ClassRooms
-                .Where(x => x.Id == user.ClassRoomActiveId)
-                .First();
-            var removePendings = new List<Pending>();
-            foreach (var pending in pendings)
-            {
-                var directPending = dataAccess.DirectPendings.Where(x => x.PendingId == pending.Id).FirstOrDefault();
-                if (directPending != null)
+                var removePendings = new List<Pending>();
+                foreach (var pending in pendings)
                 {
-                    removePendings.Add(pending);
+                    var directPending = dataAccess.DirectPendings.Where(x => x.PendingId == pending.Id).FirstOrDefault();
+                    if (directPending != null)
+                    {
+                        removePendings.Add(pending);
+                    }
+                }
+
+                pendings.RemoveAll(x => removePendings.Contains(x));
+            }
+            else
+            {
+                var directPending = dataAccess.DirectPendings
+                    .Where(x => x.UserId == user.Id && x.Pending.ClassRoomId == user.ClassRoomActiveId)
+                    .Include(x => x.Pending)
+                    .Include(x => x.Pending.Student)
+                    .Include(x => x.Pending.Student.User)
+                    .ToList();
+                foreach (var item in directPending)
+                {
+                    pendings.Add(item.Pending);
                 }
             }
 
-            pendings.RemoveAll(x => removePendings.Contains(x));
+            var classRoom = dataAccess.ClassRooms
+                .Where(x => x.Id == user.ClassRoomActiveId)
+                .First();
 
             user.Status = UserStatus.Pending;
             dataAccess.Users.Update(user);
