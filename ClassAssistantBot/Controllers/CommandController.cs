@@ -293,6 +293,10 @@ namespace ClassAssistantBot.Controllers
                 case "créditos":
                     CreditsCommand(user);
                     break;
+                case "revisarclasesprácticas":
+                    break;
+                case "pendientesdirectos":
+                    break;
                 case "pendientes":
                     PendingsCommand(user);
                     break;
@@ -537,11 +541,6 @@ namespace ClassAssistantBot.Controllers
                 var text = creditsDataHandler.GetCreditsById(user.Id);
                 Menu.StudentMenu(bot, message, text);
                 return;
-            }
-            else
-            {
-                creditsDataHandler.CreditByTeacher(user);
-                Menu.CancelMenu(bot, message, "Inserte el nombre de usuario del estudiante:");
             }
         }
 
@@ -1160,77 +1159,104 @@ namespace ClassAssistantBot.Controllers
         private void OnPendings(Models.User user, Message message)
         {
             var response = message.Text.Split(' ');
-            var credits = long.Parse(response[0]);
-            var text = "";
-            var pendingCode = "";
-            if (!string.IsNullOrEmpty(message.ReplyToMessage.Text))
-                pendingCode = message.ReplyToMessage.Text.Split("/")[1];
+            long credits = 0;
+            var canParse = long.TryParse(response[0], out credits);
+            if (canParse)
+            {
+                var text = "";
+                var pendingCode = "";
+                if (!string.IsNullOrEmpty(message.ReplyToMessage.Text))
+                    pendingCode = message.ReplyToMessage.Text.Split(" /")[1];
+                else
+                    pendingCode = message.ReplyToMessage.Caption.Split(" /")[1];
+                var pending = pendingDataHandler.GetPending(pendingCode);
+                var comment = "";
+
+                if (pending.Type == InteractionType.ClassIntervention)
+                {
+                    comment = classInterventionDataHandler.GetClassIntenvention(pending.ObjectId).Text;
+                }
+                else if (pending.Type == InteractionType.ClassTitle)
+                {
+                    comment = classTitleDataHandler.GetClassTitle(pending.ObjectId).Title;
+                }
+                else if (pending.Type == InteractionType.Daily)
+                {
+                    comment = dailyDataHandler.GetDaily(pending.ObjectId).Text;
+                }
+                else if (pending.Type == InteractionType.Joke)
+                {
+                    comment = jokeDataHandler.GetJoke(pending.ObjectId).Text;
+                }
+                else if (pending.Type == InteractionType.RectificationToTheTeacher)
+                {
+                    comment = rectificationToTheTeacherDataHandler.GetRectificationToTheTeacher(pending.ObjectId).Text;
+                }
+                else if (pending.Type == InteractionType.StatusPhrase)
+                {
+                    comment = statusPhraseDataHandler.GetStatusPhrase(pending.ObjectId).Phrase;
+                }
+
+                if (response.Length != 1 && !string.IsNullOrEmpty(comment))
+                {
+                    var res = "";
+                    for (int i = 1; i < response.Length; i++)
+                    {
+                        res += response[i];
+                    }
+                    text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}) y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
+                }
+                else if (response.Length != 1 && string.IsNullOrEmpty(comment))
+                {
+                    var res = "";
+                    for (int i = 1; i < response.Length; i++)
+                    {
+                        res += response[i];
+                    }
+                    text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()} y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
+                }
+                else if (response.Length == 1 && !string.IsNullOrEmpty(comment))
+                    text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}).";
+                else
+                    text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}.";
+                bot.SendMessage(chatId: pending.Student.User.ChatId,
+                                text: text);
+                string credit_information = "";
+                if (response.Length != 1)
+                {
+                    for (int i = 1; i < response.Length; i++)
+                    {
+                        credit_information += response[i] + " ";
+                    }
+                }
+                creditsDataHandler.AddCredits(credits, user.Id, pending.ObjectId, pending.Student.User.Id, pending.ClassRoomId, credit_information);
+                pendingDataHandler.RemovePending(pending);
+                PendingsCommand(user);
+            }
             else
-                pendingCode = message.ReplyToMessage.Caption.Split("/")[1];
-            var pending = pendingDataHandler.GetPending(pendingCode);
-            var comment = "";
-
-            if(pending.Type == InteractionType.ClassIntervention)
             {
-                comment = classInterventionDataHandler.GetClassIntenvention(pending.ObjectId).Text;
-            }
-            else if(pending.Type == InteractionType.ClassTitle)
-            {
-                comment = classTitleDataHandler.GetClassTitle(pending.ObjectId).Title;
-            }
-            else if(pending.Type == InteractionType.Daily)
-            {
-                comment = dailyDataHandler.GetDaily(pending.ObjectId).Text;
-            }
-            else if(pending.Type == InteractionType.Joke)
-            {
-                comment = jokeDataHandler.GetJoke(pending.ObjectId).Text;
-            }
-            else if(pending.Type == InteractionType.RectificationToTheTeacher)
-            {
-                comment = rectificationToTheTeacherDataHandler.GetRectificationToTheTeacher(pending.ObjectId).Text;
-            }
-            else if(pending.Type == InteractionType.StatusPhrase)
-            {
-                comment = statusPhraseDataHandler.GetStatusPhrase(pending.ObjectId).Phrase;
-            }
-
-            if (response.Length != 1 && !string.IsNullOrEmpty(comment))
-            {
-                var res = "";
-                for (int i = 1; i < response.Length; i++)
+                var pendingCode = "";
+                if (!string.IsNullOrEmpty(message.ReplyToMessage.Text))
+                    pendingCode = message.ReplyToMessage.Text.Split(" /")[1];
+                else
+                    pendingCode = message.ReplyToMessage.Caption.Split(" /")[1];
+                var pending = pendingDataHandler.GetPending(pendingCode);
+                foreach (var username in response)
                 {
-                    res += response[i];
+                    if (teacherDataHandler.ExistTeacher(username))
+                    {
+                        pendingDataHandler.AddDirectPending(username, pending.Id);
+                        bot.SendMessage(chatId: username,
+                            text: "Le han asignado un pendiente que tiene que revisar.");
+                    }
+                    else
+                    {
+                        bot.SendMessage(chatId: user.ChatId,
+                            text: $"No existe un usuario con el user name {username}.");
+                    }
                 }
-                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}) y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
+                PendingsCommand(user);
             }
-            else if (response.Length != 1 && string.IsNullOrEmpty(comment))
-            {
-                var res = "";
-                for (int i = 1; i < response.Length; i++)
-                {
-                    res += response[i];
-                }
-                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()} y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
-            }
-            else if (response.Length == 1 && !string.IsNullOrEmpty(comment))
-                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}).";
-            else
-                text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}.";
-            bot.SendMessage(chatId: pending.Student.User.ChatId,
-                            text: text);
-            string credit_information = "";
-            if(response.Length != 1)
-            {
-                for (int i = 1; i < response.Length; i++)
-                {
-                    credit_information += response[i] + " ";
-                }
-            }
-            creditsDataHandler.AddCredits(credits, user.Id, pending.ObjectId, pending.Student.User.Id, pending.ClassRoomId, credit_information);
-            pendingDataHandler.RemovePending(pending);
-            PendingsCommand(user);
-
         }
 
         private void OnAssignCredits(Models.User user, string username)
@@ -1248,9 +1274,7 @@ namespace ClassAssistantBot.Controllers
             var res = creditsDataHandler.AssignCreditMessage(user, text);
             bot.SendMessage(chatId: res.Item2,
                             text: $"Ha recibido {res.Item3} créditos y su profesor le dijo \"{res.Item1}\".");
-            bot.SendMessage(chatId: message.Chat.Id,
-                            text: "Créditos asignados satisfactoriamente.",
-                            replyMarkup: new ReplyKeyboardRemove());
+            Menu.TeacherMenu(bot, message, "Créditos asignados satisfactoriamente.");
         }
         #endregion
     }

@@ -17,6 +17,8 @@ namespace ClassAssistantBot.Services
             options.UseNpgsql(ConnectionString);
         }
 
+        public DbSet<DirectPending> DirectPendings { get; set; }
+
         public DbSet<Class> Classes { get; set; }
 
         public DbSet<Pending> Pendings { get; set; }

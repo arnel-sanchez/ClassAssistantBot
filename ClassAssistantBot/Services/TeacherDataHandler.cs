@@ -105,5 +105,12 @@ namespace ClassAssistantBot.Services
 
             return res;
         }
+
+        public bool ExistTeacher(string username)
+        {
+            var teacher = dataAccess.Teachers.Where(x => x.User.Username == username && x.User.Username == username.Substring(1)).FirstOrDefault();
+
+            return teacher != null;
+        }
     }
 }

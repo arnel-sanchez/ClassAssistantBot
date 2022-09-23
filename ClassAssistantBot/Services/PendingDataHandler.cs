@@ -25,6 +25,17 @@ namespace ClassAssistantBot.Services
             var classRoom = dataAccess.ClassRooms
                 .Where(x => x.Id == user.ClassRoomActiveId)
                 .First();
+            var removePendings = new List<Pending>();
+            foreach (var pending in pendings)
+            {
+                var directPending = dataAccess.DirectPendings.Where(x => x.PendingId == pending.Id).FirstOrDefault();
+                if (directPending != null)
+                {
+                    removePendings.Add(pending);
+                }
+            }
+
+            pendings.RemoveAll(x => removePendings.Contains(x));
 
             user.Status = UserStatus.Pending;
             dataAccess.Users.Update(user);
@@ -144,7 +155,23 @@ namespace ClassAssistantBot.Services
 
         public void RemovePending(Pending pending)
         {
+            var directPendings = dataAccess.DirectPendings.Where(x => x.PendingId == pending.Id).ToList();
             dataAccess.Pendings.Remove(pending);
+            dataAccess.DirectPendings.RemoveRange(directPendings);
+            dataAccess.SaveChanges();
+        }
+
+        public void AddDirectPending(string username, string pendingId)
+        {
+            var user = dataAccess.Users.Where(x => x.Username == username).First();
+
+            var directPending = new DirectPending
+            {
+                Id = Guid.NewGuid().ToString(),
+                PendingId = pendingId,
+                UserId = user.Id
+            };
+            dataAccess.DirectPendings.Add(directPending);
             dataAccess.SaveChanges();
         }
     }
