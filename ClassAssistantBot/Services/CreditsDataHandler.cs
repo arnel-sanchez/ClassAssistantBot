@@ -38,6 +38,7 @@ namespace ClassAssistantBot.Services
             var credits = dataAccess.Credits
                 .Include(x => x.Teacher)
                 .Where(x => x.UserId == student.Student.UserId && x.ClassRoomId == student.Student.User.ClassRoomActiveId)
+                .OrderByDescending(x => x.DateTime.Date)
                 .ToList()
                 .GroupBy(x => x.DateTime.Date);
 
