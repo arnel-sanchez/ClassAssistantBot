@@ -1245,8 +1245,8 @@ namespace ClassAssistantBot.Controllers
                 {
                     if (teacherDataHandler.ExistTeacher(username))
                     {
-                        pendingDataHandler.AddDirectPending(username, pending.Id);
-                        bot.SendMessage(chatId: username,
+                        var teacherChatId = pendingDataHandler.AddDirectPending(username, pending.Id);
+                        bot.SendMessage(chatId: teacherChatId,
                             text: "Le han asignado un pendiente que tiene que revisar.");
                     }
                     else

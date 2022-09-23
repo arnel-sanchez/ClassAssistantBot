@@ -161,7 +161,7 @@ namespace ClassAssistantBot.Services
             dataAccess.SaveChanges();
         }
 
-        public void AddDirectPending(string username, string pendingId)
+        public long AddDirectPending(string username, string pendingId)
         {
             var user = dataAccess.Users.Where(x => x.Username == username || x.Username == username.Substring(1)).First();
 
@@ -173,6 +173,7 @@ namespace ClassAssistantBot.Services
             };
             dataAccess.DirectPendings.Add(directPending);
             dataAccess.SaveChanges();
+            return user.ChatId;
         }
     }
 }
