@@ -58,7 +58,8 @@ namespace ClassAssistantBot.Services
                 ClassRoomId = user.ClassRoomActiveId,
                 Value = count * 10000,
                 Text = $"Has recibido {count * 10000} créditos por haber actualizado tu diario {count} días seguidos.",
-                TeacherId = dataAccess.TeachersByClassRooms.Include(x=>x.Teacher).Where(x=>x.ClassRoomId==user.ClassRoomActiveId).First().Teacher.UserId
+                TeacherId = dataAccess.TeachersByClassRooms.Include(x=>x.Teacher).Where(x=>x.ClassRoomId==user.ClassRoomActiveId).First().Teacher.UserId,
+                ObjectId = daily.Id
             };
             dataAccess.Credits.Add(credit);
             dataAccess.SaveChanges();
