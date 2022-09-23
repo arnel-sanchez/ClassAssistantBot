@@ -163,7 +163,7 @@ namespace ClassAssistantBot.Services
 
         public void AddDirectPending(string username, string pendingId)
         {
-            var user = dataAccess.Users.Where(x => x.Username == username).First();
+            var user = dataAccess.Users.Where(x => x.Username == username || x.Username == username.Substring(1)).First();
 
             var directPending = new DirectPending
             {
