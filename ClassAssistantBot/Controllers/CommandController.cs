@@ -605,7 +605,7 @@ namespace ClassAssistantBot.Controllers
                         },
                     }
                 };
-                Menu.CancelMenu(bot, message);
+                Menu.CancelMenu(bot, message, "Menú:");
                 bot.SendMessage(chatId: message.Chat.Id,
                                 text: pendings,
                                 replyMarkup: keyboard);
