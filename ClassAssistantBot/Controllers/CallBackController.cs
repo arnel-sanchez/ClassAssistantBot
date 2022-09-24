@@ -46,10 +46,33 @@ namespace ClassAssistantBot.Controllers
             var user = userDataHandler.GetUser(appUser.Id);
             if(callbackQuery.Data == "DenialOfCreditApplications")
             {
-                var code = callbackQuery.Message.Text.Split(" /")[1];
+                string code = "";
+                bool isText = true;
+                if (!string.IsNullOrEmpty(callbackQuery.Message.Text))
+                {
+                    code = callbackQuery.Message.Text.Split(" /")[1];
+                }
+                else if (!string.IsNullOrEmpty(callbackQuery.Message.Caption))
+                {
+                    code = callbackQuery.Message.Caption.Split(" /")[1];
+                    isText = false;
+                }
+                else
+                    //Error
+                    return;
                 var pending = pendingDataHandler.GetPending(code);
+                var @object = "";
+                var imageID = "";
+                @object = pendingDataHandler.GetPendingByCode(code, out imageID);
                 pendingDataHandler.RemovePending(pending);
                 Menu.TeacherMenu(bot, message);
+                if (isText)
+                    bot.SendMessage(chatId: pending.Student.User.ChatId,
+                                    text: $"El profesor @{user.Username} ha denegado su solicitud de créditos \n\n{@object}\n si tienes algún problema pregúntele a él, no la cojas conmigo.");
+                else
+                    bot.SendPhoto(chatId: pending.Student.User.ChatId,
+                                  photo: imageID,
+                                  caption: $"El profesor @{user.Username} ha denegado su solicitud de créditos si tienes algún problema pregúntele a él, no la cojas conmigo.");
             }
             else
             {
