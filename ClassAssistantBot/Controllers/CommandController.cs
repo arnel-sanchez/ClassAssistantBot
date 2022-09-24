@@ -334,9 +334,9 @@ namespace ClassAssistantBot.Controllers
                 case "chiste":
                     JokeCommand(user);
                     break;
-                case "diario":
-                    DailyCommand(user);
-                    break;
+                //case "diario":
+                //    DailyCommand(user);
+                //    break;
                 case "frasedeestado":
                     StatusPhraseCommand(user);
                     break;
