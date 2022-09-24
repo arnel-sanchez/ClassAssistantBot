@@ -727,21 +727,32 @@ namespace ClassAssistantBot.Controllers
             {
                 string file = "";
                 var pending = pendingDataHandler.GetPendingByCode(command, out file);
-                
+                var keyboard = new InlineKeyboardMarkup()
+                {
+                    InlineKeyboard = new InlineKeyboardButton[][]{
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "DenialOfCreditApplications",
+                                Text = "Denegar Solicitud de Créditos"
+                            }
+                        }
+                    }
+                };
                 if (!string.IsNullOrEmpty(pending))
                 {
                     if (string.IsNullOrEmpty(file))
                     {
                         bot.SendMessage(chatId: message.Chat.Id,
                             text: pending,
-                            replyMarkup: new ReplyKeyboardRemove());
+                            replyMarkup: keyboard);
                     }
                     else
                     {
                         bot.SendPhoto(chatId: message.Chat.Id,
                             photo: file,
                             caption: pending,
-                            replyMarkup: new ReplyKeyboardRemove());
+                            replyMarkup: keyboard);
                     }
                     return;
                 }

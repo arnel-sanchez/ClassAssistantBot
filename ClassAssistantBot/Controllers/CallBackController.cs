@@ -44,23 +44,32 @@ namespace ClassAssistantBot.Controllers
             this.appUser = callbackQuery.From;
 
             var user = userDataHandler.GetUser(appUser.Id);
-            Models.InteractionType interactionType = Models.InteractionType.None;
-            if (callbackQuery.Data == "Meme")
-                interactionType = Models.InteractionType.Meme;
-            else if (callbackQuery.Data == "ClassTitle")
-                interactionType = Models.InteractionType.ClassTitle;
-            else if (callbackQuery.Data == "ClassIntervention")
-                interactionType = Models.InteractionType.ClassIntervention;
-            else if (callbackQuery.Data == "StatusPhrase")
-                interactionType = Models.InteractionType.StatusPhrase;
-            else if (callbackQuery.Data == "Joke")
-                interactionType = Models.InteractionType.Joke;
-            else if (callbackQuery.Data == "RectificationToTheTeacher")
-                interactionType = Models.InteractionType.RectificationToTheTeacher;
-            var pendings = pendingDataHandler.GetPendings(user, false, interactionType);
-            var keyboard = new InlineKeyboardMarkup()
+            if(callbackQuery.Data == "DenialOfCreditApplications")
             {
-                InlineKeyboard = new InlineKeyboardButton[][]{
+                var code = callbackQuery.Message.Text.Split(" /")[1];
+                var pending = pendingDataHandler.GetPending(code);
+                pendingDataHandler.RemovePending(pending);
+                Menu.TeacherMenu(bot, message);
+            }
+            else
+            {
+                Models.InteractionType interactionType = Models.InteractionType.None;
+                if (callbackQuery.Data == "Meme")
+                    interactionType = Models.InteractionType.Meme;
+                else if (callbackQuery.Data == "ClassTitle")
+                    interactionType = Models.InteractionType.ClassTitle;
+                else if (callbackQuery.Data == "ClassIntervention")
+                    interactionType = Models.InteractionType.ClassIntervention;
+                else if (callbackQuery.Data == "StatusPhrase")
+                    interactionType = Models.InteractionType.StatusPhrase;
+                else if (callbackQuery.Data == "Joke")
+                    interactionType = Models.InteractionType.Joke;
+                else if (callbackQuery.Data == "RectificationToTheTeacher")
+                    interactionType = Models.InteractionType.RectificationToTheTeacher;
+                var pendings = pendingDataHandler.GetPendings(user, false, interactionType);
+                var keyboard = new InlineKeyboardMarkup()
+                {
+                    InlineKeyboard = new InlineKeyboardButton[][]{
                         new InlineKeyboardButton[]{
                             new InlineKeyboardButton
                             {
@@ -98,11 +107,12 @@ namespace ClassAssistantBot.Controllers
                             }
                         },
                     }
-            };
-            Menu.CancelMenu(bot, message, "Menú:");
-            bot.SendMessage(chatId: message.Chat.Id,
-                            text: pendings,
-                            replyMarkup: keyboard);
+                };
+                Menu.CancelMenu(bot, message, "Menú:");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: pendings,
+                                replyMarkup: keyboard);
+            }
         }
     }
 }
