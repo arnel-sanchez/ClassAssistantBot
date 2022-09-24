@@ -135,7 +135,7 @@ namespace ClassAssistantBot.Services
 
         }
 
-        public static void CancelMenu(BotClient bot, Message message, string text)
+        public static void CancelMenu(BotClient bot, Message message, string text = "")
         {
             var keyboard = new ReplyKeyboardMarkup
             {
