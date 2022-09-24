@@ -12,12 +12,14 @@ namespace ClassAssistantBot.Services
     public sealed class Engine : TelegramBotBase
     {
         private static BotClient? bot;
-        private static CommandController? commandControler;
+        private static CommandController? commandController;
+        private static CallBackController? callBackController;
 
         public static void StartPolling(DataAccess dataAccess, string apiKey)
         {
             bot = new BotClient(apiKey);
-            commandControler = new CommandController(bot, dataAccess);
+            commandController = new CommandController(bot, dataAccess);
+            callBackController = new CallBackController(bot, dataAccess);
             Engine.SetMyCommands();
             var updates = bot.GetUpdates<IEnumerable<Update>>();
             while (true)
@@ -53,12 +55,12 @@ namespace ClassAssistantBot.Services
 
         protected override void OnMessage(Message message)
         {
-            if (commandControler == null)
+            if (commandController == null)
             {
                 Logger.Error($"Error: Control de comandos nulo, problemas en el servidor");
                 return;
             }
-            commandControler.ProcessCommand(message);
+            commandController.ProcessCommand(message);
         }
 
         protected override void OnBotException(BotRequestException exp)
@@ -73,7 +75,12 @@ namespace ClassAssistantBot.Services
 
         protected override void OnCallbackQuery(CallbackQuery callbackQuery)
         {
-
+            if (callBackController == null)
+            {
+                Logger.Error($"Error: Control de comandos nulo, problemas en el servidor");
+                return;
+            }
+            callBackController.ProcessCallBackQuery(callbackQuery);
         }
 
         protected override void OnChannelPost(Message message)

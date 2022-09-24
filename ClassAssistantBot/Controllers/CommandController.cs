@@ -564,7 +564,51 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 var pendings = pendingDataHandler.GetPendings(user);
-                Menu.CancelMenu(bot, message, pendings);
+                var keyboard = new InlineKeyboardMarkup()
+                {
+                    InlineKeyboard = new InlineKeyboardButton[][]{
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "ClassIntervention",
+                                Text = "Intervención en Clase"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "ClassTitle",
+                                Text = "Cambiar Título de la Clase"
+                            }
+                        },
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "Meme",
+                                Text = "Meme"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "Joke",
+                                Text = "Chiste"
+                            }
+                        },
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "RectificationToTheTeacher",
+                                Text = "Rectificación al Profesor"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "StatusPhrase",
+                                Text = "Frase de Estado"
+                            }
+                        },
+                    }
+                };
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: pendings,
+                                replyMarkup: keyboard);
+                //Menu.CancelMenu(bot, message, pendings);
             }
         }
 

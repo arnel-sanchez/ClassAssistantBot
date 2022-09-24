@@ -15,7 +15,7 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public string GetPendings(User user, bool directPendings = false)
+        public string GetPendings(User user, bool directPendings = false, InteractionType interactionType = InteractionType.None)
         {
             var pendings = new List<Pending>();
             if (!directPendings)
@@ -54,6 +54,11 @@ namespace ClassAssistantBot.Services
             var classRoom = dataAccess.ClassRooms
                 .Where(x => x.Id == user.ClassRoomActiveId)
                 .First();
+            
+            if(interactionType != InteractionType.None && !directPendings)
+            {
+                 pendings.RemoveAll(x => x.Type != interactionType);
+            }
 
             user.Status = UserStatus.Pending;
             dataAccess.Users.Update(user);
