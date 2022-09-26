@@ -15,7 +15,7 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public string GetPendings(User user, bool directPendings = false, InteractionType interactionType = InteractionType.None)
+        public (string, int) GetPendings(User user, bool directPendings = false, InteractionType interactionType = InteractionType.None, int page = 1)
         {
             var pendings = new List<Pending>();
             if (!directPendings)
@@ -63,7 +63,10 @@ namespace ClassAssistantBot.Services
             user.Status = UserStatus.Pending;
             dataAccess.Users.Update(user);
             dataAccess.SaveChanges();
-
+            int count = pendings.Count/10;
+            if (pendings.Count % 10 != 0)
+                count++;
+            pendings = pendings.Skip((page - 1)*10).Take(10).ToList();
             var res = new StringBuilder($"Pendientes de la clase {classRoom.Name}:\n");
 
             foreach (var item in pendings)
@@ -81,7 +84,7 @@ namespace ClassAssistantBot.Services
             }
             if (pendings.Count == 0)
                 res.Append("No tiene revisiones pendientes en esta aula");
-            return res.ToString();
+            return (res.ToString(), count);
         }
 
         public string GetPendingByCode(string code, out string pend)

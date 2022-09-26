@@ -564,9 +564,17 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 var pendings = pendingDataHandler.GetPendings(user);
+                var inline = new List<InlineKeyboardButton>();
+                if (2 <= pendings.Item2)
+                    inline.Add(new InlineKeyboardButton
+                    {
+                        CallbackData = $"NextPending//2//{(int)InteractionType.None}",
+                        Text = ">>"
+                    });
                 var keyboard = new InlineKeyboardMarkup()
                 {
                     InlineKeyboard = new InlineKeyboardButton[][]{
+                        inline.ToArray(),
                         new InlineKeyboardButton[]{
                             new InlineKeyboardButton
                             {
@@ -607,7 +615,7 @@ namespace ClassAssistantBot.Controllers
                 };
                 Menu.CancelMenu(bot, message, "Menú:");
                 bot.SendMessage(chatId: message.Chat.Id,
-                                text: pendings,
+                                text: pendings.Item1,
                                 replyMarkup: keyboard);
             }
         }
@@ -1139,7 +1147,59 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 var pendings = pendingDataHandler.GetPendings(user, true);
-                Menu.CancelMenu(bot, message, pendings);
+                var inline = new List<InlineKeyboardButton>();
+                if (2 <= pendings.Item2)
+                    inline.Add(new InlineKeyboardButton
+                    {
+                        CallbackData = $"NextPending//2//{(int)InteractionType.None}",
+                        Text = ">>"
+                    });
+                var keyboard = new InlineKeyboardMarkup()
+                {
+                    InlineKeyboard = new InlineKeyboardButton[][]{
+                        inline.ToArray(),
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "ClassIntervention",
+                                Text = "Intervención en Clase"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "ClassTitle",
+                                Text = "Cambiar Título de la Clase"
+                            }
+                        },
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "Meme",
+                                Text = "Meme"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "Joke",
+                                Text = "Chiste"
+                            }
+                        },
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "RectificationToTheTeacher",
+                                Text = "Rectificación al Profesor"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = "StatusPhrase",
+                                Text = "Frase de Estado"
+                            }
+                        },
+                    }
+                };
+                Menu.CancelMenu(bot, message, "Menú:");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: pendings.Item1,
+                                replyMarkup: keyboard);
             }
         }
         #endregion
