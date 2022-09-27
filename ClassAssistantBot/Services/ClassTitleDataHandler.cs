@@ -70,7 +70,7 @@ namespace ClassAssistantBot.Services
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = classTitle.Id,
                 StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
-                Code = random.Next(1000, 9999).ToString()
+                Code = random.Next(100000, 999999).ToString()
             };
             dataAccess.Pendings.Add(pending);
 

@@ -45,7 +45,7 @@ namespace ClassAssistantBot.Services
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = statusPhrase.Id,
                 StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id,
-                Code = random.Next(1000, 9999).ToString()
+                Code = random.Next(100000, 999999).ToString()
             };
             dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
