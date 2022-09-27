@@ -233,7 +233,8 @@ namespace ClassAssistantBot.Controllers
                 {
                     memeDataHandler.SendMeme(user.Id, message.Document);
                     bot.SendPhoto(chatId: "@MemesMNCCUH2022",
-                            photo: message.Document.FileId);
+                            photo: message.Document.FileId,
+                            caption: "Meme enviado por: " + user.Username);
                     Menu.StudentMenu(bot, message);
                 }
                 else
@@ -249,7 +250,8 @@ namespace ClassAssistantBot.Controllers
                 {
                     memeDataHandler.SendMeme(user.Id, message.Photo[0]);
                     bot.SendPhoto(chatId: "@MemesMNCCUH2022",
-                            photo: message.Photo[0].FileId);
+                            photo: message.Photo[0].FileId,
+                            caption: "Meme enviado por: " + user.Username);
                     Menu.StudentMenu(bot, message);
                 }
                 else
