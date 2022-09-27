@@ -86,6 +86,10 @@ namespace ClassAssistantBot.Services
                     new KeyboardButton[]
                     {
                         new KeyboardButton("*Eliminar Estudiante del Aula*"),
+                        new KeyboardButton("*Asignar Canal de Memes*")
+                    },
+                    new KeyboardButton[]
+                    {
                         new KeyboardButton("*Cancelar*")
                     },
                 },

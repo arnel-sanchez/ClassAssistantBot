@@ -44,7 +44,8 @@ namespace ClassAssistantBot.Services
                 StudentsByClassRooms = new List<StudentByClassRoom>(),
                 TeachersByClassRooms = new List<TeacherByClassRoom>(),
                 StudentAccessKey = studentAccessKey,
-                TeacherAccessKey = teacherAccessKey
+                TeacherAccessKey = teacherAccessKey,
+                MemeChannel = ""
             };
 
             dataAccess.Add(classRoom);
@@ -133,6 +134,28 @@ namespace ClassAssistantBot.Services
             }
 
             return stringBuilder.ToString();
+        }
+
+        public void AssignMemeChannel(User user)
+        {
+            user.Status = UserStatus.AssignMemeChannel;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+        }
+
+        public void AssignMemeChannel(User user, string chanelName)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            classRoom.MemeChannel = chanelName;
+            dataAccess.ClassRooms.Update(classRoom);
+            dataAccess.SaveChanges();
+        }
+
+        public string GetMemeChannel(User user)
+        {
+            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().MemeChannel;
         }
     }
 }

@@ -28,7 +28,8 @@ namespace ClassAssistantBot.Models
         RemoveStudentFromClassRoom,
         Pending,
         AssignCreditsStudent,
-        AssignCredits
+        AssignCredits,
+        AssignMemeChannel
     }
 
     public class User : Telegram.BotAPI.AvailableTypes.ITelegramUser

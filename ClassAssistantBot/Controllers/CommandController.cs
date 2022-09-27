@@ -221,6 +221,20 @@ namespace ClassAssistantBot.Controllers
                             else
                                 Menu.StudentMenu(bot, message);
                             return;
+                        case UserStatus.AssignMemeChannel:
+                            classRoomDataHandler.AssignMemeChannel(user, message.Text);
+                            var text = "Canal de Meme asignado satisfactoriamente";
+                            try
+                            {
+                                bot.SendMessage(chatId: message.Text,
+                                    text: "Bot configurado satisfactoriamente.");
+                            }
+                            catch
+                            {
+                                text = "El nombre de usuario del bot insertado no existe";
+                            }
+                            Menu.TeacherConfigurationMenu(bot, message, text);
+                            return;
                     }
                     Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
                     bot.SendMessage(chatId: message.Chat.Id,
@@ -232,7 +246,7 @@ namespace ClassAssistantBot.Controllers
                 if (user.Status == UserStatus.Meme)
                 {
                     memeDataHandler.SendMeme(user.Id, message.Document);
-                    bot.SendPhoto(chatId: "@MemesMNCCUH2022",
+                    bot.SendPhoto(chatId: classRoomDataHandler.GetMemeChannel(user),
                             photo: message.Document.FileId,
                             caption: "Meme enviado por: @" + user.Username);
                     Menu.StudentMenu(bot, message);
@@ -249,7 +263,7 @@ namespace ClassAssistantBot.Controllers
                 if (user.Status == UserStatus.Meme)
                 {
                     memeDataHandler.SendMeme(user.Id, message.Photo[0]);
-                    bot.SendPhoto(chatId: "@MemesMNCCUH2022",
+                    bot.SendPhoto(chatId: classRoomDataHandler.GetMemeChannel(user),
                             photo: message.Photo[0].FileId,
                             caption: "Meme enviado por: @" + user.Username);
                     Menu.StudentMenu(bot, message);
@@ -362,6 +376,9 @@ namespace ClassAssistantBot.Controllers
                     break;
                 case "verclasesinscritas":
                     SeeListClass(user);
+                    break;
+                case "asignarcanaldememes":
+                    AssignMemeChannelCommand(user);
                     break;
                 default:
                     DefaultCommand(user, cmd);
@@ -1202,6 +1219,29 @@ namespace ClassAssistantBot.Controllers
                 bot.SendMessage(chatId: message.Chat.Id,
                                 text: pendings.Item1,
                                 replyMarkup: keyboard);
+            }
+        }
+
+        public void AssignMemeChannelCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                classRoomDataHandler.AssignMemeChannel(user);
+                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán los memes(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
         #endregion

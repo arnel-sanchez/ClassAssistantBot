@@ -18,5 +18,7 @@ namespace ClassAssistantBot.Models
         public int StudentAccessKey { get; set; }
         
         public int TeacherAccessKey { get; set; }
+
+        public string MemeChannel { get; set; }
     }
 }
