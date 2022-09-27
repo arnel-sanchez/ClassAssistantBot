@@ -45,6 +45,9 @@ namespace ClassAssistantBot.Services
             rectification.Text = text;
 
             var random = new Random();
+            string code = random.Next(100000, 999999).ToString();
+            while (dataAccess.Pendings.Where(x => x.Code == code).Count() != 0)
+                code = random.Next(100000, 999999).ToString();
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
@@ -52,7 +55,7 @@ namespace ClassAssistantBot.Services
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = rectification.Id,
                 StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
-                Code = random.Next(100000, 999999).ToString()
+                Code = code
             };
             dataAccess.Pendings.Add(pending);
 

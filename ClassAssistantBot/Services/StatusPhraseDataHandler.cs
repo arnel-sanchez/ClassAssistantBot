@@ -38,6 +38,9 @@ namespace ClassAssistantBot.Services
             };
             dataAccess.StatusPhrases.Add(statusPhrase);
             var random = new Random();
+            string code = random.Next(100000, 999999).ToString();
+            while (dataAccess.Pendings.Where(x => x.Code == code).Count() != 0)
+                code = random.Next(100000, 999999).ToString();
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
@@ -45,7 +48,7 @@ namespace ClassAssistantBot.Services
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = statusPhrase.Id,
                 StudentId = dataAccess.Students.Where(x => x.UserId == id).First().Id,
-                Code = random.Next(100000, 999999).ToString()
+                Code = code
             };
             dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
