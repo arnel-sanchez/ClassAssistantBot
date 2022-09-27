@@ -50,19 +50,22 @@ namespace ClassAssistantBot.Services
                     break;
                 }
             }
-            var credit = new Credits
+            if(dailies.Where(x => x.DateTime == DateTime.UtcNow.Date).Count() == 1)
             {
-                Id = Guid.NewGuid().ToString(),
-                DateTime = DateTime.UtcNow,
-                UserId = user.Id,
-                ClassRoomId = user.ClassRoomActiveId,
-                Value = count * 10000,
-                Text = $"Has recibido {count * 10000} créditos por haber actualizado tu diario {count} días seguidos.",
-                TeacherId = dataAccess.TeachersByClassRooms.Include(x=>x.Teacher).Where(x=>x.ClassRoomId==user.ClassRoomActiveId).First().Teacher.UserId,
-                ObjectId = daily.Id
-            };
-            dataAccess.Credits.Add(credit);
-            dataAccess.SaveChanges();
+                var credit = new Credits
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    DateTime = DateTime.UtcNow,
+                    UserId = user.Id,
+                    ClassRoomId = user.ClassRoomActiveId,
+                    Value = count * 10000,
+                    Text = $"Has recibido {count * 10000} créditos por haber actualizado tu diario {count} días seguidos.",
+                    TeacherId = dataAccess.TeachersByClassRooms.Include(x => x.Teacher).Where(x => x.ClassRoomId == user.ClassRoomActiveId).First().Teacher.UserId,
+                    ObjectId = daily.Id
+                };
+                dataAccess.Credits.Add(credit);
+                dataAccess.SaveChanges();
+            }
         }
 
         public Daily GetDaily(string dailyId)

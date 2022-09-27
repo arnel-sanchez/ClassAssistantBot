@@ -352,9 +352,9 @@ namespace ClassAssistantBot.Controllers
                 case "chiste":
                     JokeCommand(user);
                     break;
-                //case "diario":
-                //    DailyCommand(user);
-                //    break;
+                case "diario":
+                    DailyCommand(user);
+                    break;
                 case "frasedeestado":
                     StatusPhraseCommand(user);
                     break;
@@ -1382,18 +1382,20 @@ namespace ClassAssistantBot.Controllers
 
                 if (response.Length != 1 && !string.IsNullOrEmpty(comment))
                 {
-                    var res = "";
-                    for (int i = 1; i < response.Length; i++)
+                    var res = response[1];
+                    for (int i = 2; i < response.Length; i++)
                     {
+                        res += " ";
                         res += response[i];
                     }
                     text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}) y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
                 }
                 else if (response.Length != 1 && string.IsNullOrEmpty(comment))
                 {
-                    var res = "";
-                    for (int i = 1; i < response.Length; i++)
+                    var res = response[1];
+                    for (int i = 2; i < response.Length; i++)
                     {
+                        res += " ";
                         res += response[i];
                     }
                     text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()} y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
