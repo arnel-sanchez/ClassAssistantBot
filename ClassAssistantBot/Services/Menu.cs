@@ -75,7 +75,7 @@ namespace ClassAssistantBot.Services
                 Keyboard = new KeyboardButton[][]{
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Todos Los Pendientes*"),
+                        new KeyboardButton("*Todas las Aulas con Pendientes*"),
                         new KeyboardButton("*Llave del Profesor*")
                     },
                     new KeyboardButton[]

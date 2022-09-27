@@ -201,6 +201,27 @@ namespace ClassAssistantBot.Services
             dataAccess.SaveChanges();
             return user.ChatId;
         }
+
+        public string GetAllClassRoomWithPendings(User user)
+        {
+            var classRooms = dataAccess.TeachersByClassRooms
+                            .Where(x => x.Teacher.UserId == user.Id)
+                            .Include(x => x.ClassRoom)
+                            .ToList();
+            StringBuilder res = new StringBuilder();
+            int i = 0;
+            foreach (var classRoom in classRooms)
+            {
+                if (dataAccess.Pendings.Where(x=>x.ClassRoomId==classRoom.ClassRoomId).Count()!=0)
+                {
+                    res.Append(++i);
+                    res.Append(": ");
+                    res.Append(classRoom.ClassRoom.Name);
+                }
+            }
+
+            return res.ToString();
+        }
     }
 }
 

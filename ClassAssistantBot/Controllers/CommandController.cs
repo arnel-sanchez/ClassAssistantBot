@@ -319,8 +319,8 @@ namespace ClassAssistantBot.Controllers
                 case "pendientes":
                     PendingsCommand(user);
                     break;
-                case "todoslospendientes":
-                    AllPendingsCommand(user);
+                case "todaslasaulasconpendientes":
+                    AllClassRoomWithPendingsCommand(user);
                     break;
                 case "llavedelestudiante":
                     StudentAccessKeyCommand(user);
@@ -641,7 +641,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void AllPendingsCommand(Models.User? user)
+        private void AllClassRoomWithPendingsCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -659,7 +659,8 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-
+                var res = pendingDataHandler.GetAllClassRoomWithPendings(user);
+                Menu.TeacherConfigurationMenu(bot, message, res);
             }
         }
 
