@@ -246,7 +246,8 @@ namespace ClassAssistantBot.Controllers
                 if (user.Status == UserStatus.Meme)
                 {
                     memeDataHandler.SendMeme(user.Id, message.Document);
-                    bot.SendPhoto(chatId: classRoomDataHandler.GetMemeChannel(user),
+                    if (!string.IsNullOrEmpty(classRoomDataHandler.GetMemeChannel(user)))
+                        bot.SendPhoto(chatId: classRoomDataHandler.GetMemeChannel(user),
                             photo: message.Document.FileId,
                             caption: "Meme enviado por: @" + user.Username);
                     Menu.StudentMenu(bot, message);
@@ -260,10 +261,11 @@ namespace ClassAssistantBot.Controllers
             }
             else if(message.Photo != null)
             {
-                if (user.Status == UserStatus.Meme)
+                if (user.Status == UserStatus.Meme )
                 {
                     memeDataHandler.SendMeme(user.Id, message.Photo[0]);
-                    bot.SendPhoto(chatId: classRoomDataHandler.GetMemeChannel(user),
+                    if(!string.IsNullOrEmpty(classRoomDataHandler.GetMemeChannel(user)))
+                        bot.SendPhoto(chatId: classRoomDataHandler.GetMemeChannel(user),
                             photo: message.Photo[0].FileId,
                             caption: "Meme enviado por: @" + user.Username);
                     Menu.StudentMenu(bot, message);
