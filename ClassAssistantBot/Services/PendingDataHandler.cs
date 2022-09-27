@@ -217,6 +217,7 @@ namespace ClassAssistantBot.Services
                     res.Append(++i);
                     res.Append(": ");
                     res.Append(classRoom.ClassRoom.Name);
+                    res.Append("\n");
                 }
             }
 
