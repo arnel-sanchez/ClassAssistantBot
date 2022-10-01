@@ -17,5 +17,9 @@ namespace ClassAssistantBot.Models
         public long UserId { get; set; }
 
         public User User { get; set; }
+
+        public ClassRoom ClassRoom { get; set; }
+
+        public string ClassRoomId { get; set; }
     }
 }

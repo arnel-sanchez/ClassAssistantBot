@@ -18,6 +18,10 @@ namespace ClassAssistantBot.Models
 
         public User User { get; set; }
 
+        public ClassRoom ClassRoom { get; set; }
+
+        public string ClassRoomId { get; set; }
+
         public Teacher Teacher { get; set; }
 
         public string TeacherId { get; set; }

@@ -26,5 +26,9 @@ namespace ClassAssistantBot.Models
         public string MimeType { get; set; }
 
         public ulong FileSize { get; set; }
+
+        public ClassRoom ClassRoom { get; set; }
+
+        public string ClassRoomId { get; set; }
     }
 }

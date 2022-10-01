@@ -331,9 +331,9 @@ namespace ClassAssistantBot.Controllers
                 case "cambiardeaula":
                     ChangeClassRoomCommand(user);
                     break;
-                case "rectificaralprofesor":
+                /*case "rectificaralprofesor":
                     RectificationToTheTeacherCommand(user);
-                    break;
+                    break;*/
                 case "asignarcréditos":
                     AssignCreditsCommand(user);
                     break;
@@ -343,7 +343,7 @@ namespace ClassAssistantBot.Controllers
                 case "cancelar":
                     CancelCommand(user);
                     break;
-                case "intervenciónenclase":
+                /*case "intervenciónenclase":
                     ClassInterventionCommand(user);
                     break;
                 case "meme":
@@ -360,7 +360,7 @@ namespace ClassAssistantBot.Controllers
                     break;
                 case "cambiartítulodeclase":
                     ClassTitleCommand(user);
-                    break;
+                    break;*/
                 case "configuración":
                     ConfigurationCommand(user);
                     break;
@@ -756,10 +756,24 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 string file = "";
-                var pending = pendingDataHandler.GetPendingByCode(command, out file);
+                bool giveMeExplication = false;
+                var pending = pendingDataHandler.GetPendingByCode(command, out file, out giveMeExplication);
+                var buttonGiveMeExplication = new InlineKeyboardButton[]{};
+                if (giveMeExplication)
+                {
+                    buttonGiveMeExplication = new InlineKeyboardButton[]
+                    {
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"GiveMeExplication//{command}//{user.Username}",
+                            Text = "Pedir Explicación al Alumno"
+                        }
+                    };
+                }
                 var keyboard = new InlineKeyboardMarkup()
                 {
                     InlineKeyboard = new InlineKeyboardButton[][]{
+                        buttonGiveMeExplication,
                         new InlineKeyboardButton[]{
                             new InlineKeyboardButton
                             {
