@@ -208,6 +208,29 @@ namespace ClassAssistantBot.Controllers
                                   photo: imageID,
                                   caption: $"El profesor @{user.Username} ha denegado su solicitud de créditos si tienes algún problema pregúntele a él, no la cojas conmigo.");
             }
+            else if(callbackQuery.Data == "GiveMeExplication//")
+            {
+                var data = callbackQuery.Data.Split("//");
+
+                var pendingCode = data[1];
+                var username = data[2];
+
+                var pending = pendingDataHandler.GetPending(pendingCode);
+
+                var res = pendingDataHandler.GetContentObjectById(pending, username);
+
+                if (string.IsNullOrEmpty(res.Item2))
+                {
+                    bot.SendMessage(chatId: pending.Student.User.ChatId,
+                                    text: res.Item1);
+                }
+                else
+                {
+                    bot.SendPhoto(chatId: pending.Student.User.ChatId,
+                                  caption: res.Item1,
+                                  photo: res.Item2);
+                }
+            }
             else
             {
                 Models.InteractionType interactionType = Models.InteractionType.None;
