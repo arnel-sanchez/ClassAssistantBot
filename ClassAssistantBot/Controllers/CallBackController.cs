@@ -197,7 +197,8 @@ namespace ClassAssistantBot.Controllers
                 var pending = pendingDataHandler.GetPending(code);
                 var @object = "";
                 var imageID = "";
-                @object = pendingDataHandler.GetPendingByCode(code, out imageID);
+                bool giveMeExplication = false;
+                @object = pendingDataHandler.GetPendingByCode(code, out imageID, out giveMeExplication);
                 pendingDataHandler.RemovePending(pending);
                 Menu.TeacherMenu(bot, message);
                 if (isText)
