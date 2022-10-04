@@ -41,7 +41,7 @@ namespace ClassAssistantBot.Migrations
                 table: "Dailies",
                 type: "bigint",
                 nullable: false,
-                defaultValue: 0L);
+                defaultValue: 1);
 
             migrationBuilder.CreateIndex(
                 name: "IX_StatusPhrases_ClassRoomId",
