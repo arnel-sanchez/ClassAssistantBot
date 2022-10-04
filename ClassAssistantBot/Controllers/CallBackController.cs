@@ -44,7 +44,7 @@ namespace ClassAssistantBot.Controllers
             }
             this.appUser = callbackQuery.From;
 
-            var user = userDataHandler.GetUser(appUser.Id);
+            var user = userDataHandler.GetUser(appUser);
             if (callbackQuery.Data.Contains("NextPending//"))
             {
                 var data = callbackQuery.Data.Split("//");
