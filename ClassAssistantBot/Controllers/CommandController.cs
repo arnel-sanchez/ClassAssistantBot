@@ -71,7 +71,7 @@ namespace ClassAssistantBot.Controllers
             hasText = !string.IsNullOrEmpty(message.Text); // True if message has text;
 
             Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
-            var user = userDataHandler.GetUser(appUser.Id);
+            var user = userDataHandler.GetUser(appUser);
 
             if(user != null && user.ClassRoomActiveId == 0 && user.Status == UserStatus.Ready)
             {

@@ -34,9 +34,16 @@ namespace ClassAssistantBot.Services
             Console.WriteLine($"Inserting the new user {appUser.Username}");
         }
 
-        public User GetUser(long id)
+        public User GetUser(Telegram.BotAPI.AvailableTypes.User user)
         {
-            return dataAccess.Users.Where(x => x.TelegramId == id).FirstOrDefault();
+            var userRes = dataAccess.Users.Where(x => x.TelegramId == user.Id).FirstOrDefault();
+            if(userRes!=null && userRes.Username != user.Username)
+            {
+                userRes.Username = user.Username;
+                dataAccess.Users.Update(userRes);
+                dataAccess.SaveChanges();
+            }
+            return userRes;
         }
 
         public void VerifyUser(User user)
