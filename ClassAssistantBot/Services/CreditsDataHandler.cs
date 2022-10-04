@@ -165,6 +165,7 @@ namespace ClassAssistantBot.Services
                 ObjectId = misc.Id,
                 Code = random.Next(10000, 99999)
             };
+            dataAccess.Miscellaneous.Add(misc);
             dataAccess.Credits.Add(credit);
             dataAccess.SaveChanges();
             return true;

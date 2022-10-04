@@ -50,5 +50,7 @@ namespace ClassAssistantBot.Services
         public DbSet<TeacherByClassRoom> TeachersByClassRooms { get; set; }
 
         public DbSet<StudentByClassRoom> StudentsByClassRooms { get; set; }
+
+        public DbSet<Miscellaneous> Miscellaneous { get; set; }
     }
 }
