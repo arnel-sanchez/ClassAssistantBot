@@ -29,7 +29,14 @@ namespace ClassAssistantBot.Models
         Pending,
         AssignCreditsStudent,
         AssignCredits,
-        AssignMemeChannel
+        AssignMemeChannel,
+        AssignJokeChannel,
+        AssignClassInterventionChannel,
+        AssignDiaryChannel,
+        AssignStatusPhraseChannel,
+        AssignClassTitleChannel,
+        AssignRectificationToTheTeacherChannel,
+        SendInformation
     }
 
     public class User : Telegram.BotAPI.AvailableTypes.ITelegramUser

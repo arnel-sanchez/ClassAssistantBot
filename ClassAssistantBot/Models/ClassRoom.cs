@@ -20,5 +20,17 @@ namespace ClassAssistantBot.Models
         public int TeacherAccessKey { get; set; }
 
         public string MemeChannel { get; set; }
+
+        public string JokesChannel { get; set; }
+
+        public string RectificationToTheTeacherChannel { get; set; }
+
+        public string ClassInterventionChannel { get; set; }
+
+        public string ClassTitleChannel { get; set; }
+
+        public string DiaryChannel { get; set; }
+
+        public string StatusPhraseChannel { get; set; }
     }
 }

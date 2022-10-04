@@ -36,6 +36,7 @@ namespace ClassAssistantBot.Services
                 FileName = document.FileName,
                 Height = document.Thumb.Height,
                 Width = document.Thumb.Width,
+                ClassRoomId = user.ClassRoomActiveId
             };
             dataAccess.Memes.Add(meme);
             var random = new Random();
@@ -72,6 +73,7 @@ namespace ClassAssistantBot.Services
                 FileName = "",
                 Height = photo.Height,
                 Width = photo.Width,
+                ClassRoomId = user.ClassRoomActiveId
             };
             dataAccess.Memes.Add(meme);
 

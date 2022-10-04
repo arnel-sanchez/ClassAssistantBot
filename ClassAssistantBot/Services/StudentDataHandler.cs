@@ -81,8 +81,9 @@ namespace ClassAssistantBot.Services
             Console.WriteLine($"The student {user.Username} is entering class");
         }
 
-        public string AssignStudentAtClass(long id, string codeText)
+        public string AssignStudentAtClass(long id, string codeText, out bool success)
         {
+            success = false;
             int code = 0;
             bool canParse = int.TryParse(codeText, out code);
 
@@ -122,6 +123,7 @@ namespace ClassAssistantBot.Services
                 dataAccess.StudentsByClassRooms.Add(studentByClassRoom);
                 dataAccess.SaveChanges();
                 Console.WriteLine($"The student {user.Username} has entered class");
+                success = true;
                 return $"Ha entrado en el aula satisfactoriamente";
             }
         }

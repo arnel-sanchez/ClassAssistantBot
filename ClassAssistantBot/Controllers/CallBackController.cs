@@ -1,4 +1,5 @@
 ﻿using System;
+using ClassAssistantBot.Models;
 using ClassAssistantBot.Services;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
@@ -70,36 +71,36 @@ namespace ClassAssistantBot.Controllers
                         new InlineKeyboardButton[]{
                             new InlineKeyboardButton
                             {
-                                CallbackData = "ClassIntervention",
+                                CallbackData = $"ClassIntervention//1//{(int)InteractionType.ClassIntervention}",
                                 Text = "Intervención en Clase"
                             },
                             new InlineKeyboardButton
                             {
-                                CallbackData = "ClassTitle",
+                                CallbackData = $"ClassTitle//1//{(int)InteractionType.ClassTitle}",
                                 Text = "Cambiar Título de la Clase"
                             }
                         },
                         new InlineKeyboardButton[]{
                             new InlineKeyboardButton
                             {
-                                CallbackData = "Meme",
+                                CallbackData = $"Meme//1//{(int)InteractionType.Meme}",
                                 Text = "Meme"
                             },
                             new InlineKeyboardButton
                             {
-                                CallbackData = "Joke",
+                                CallbackData = $"Joke//1//{(int)InteractionType.Joke}",
                                 Text = "Chiste"
                             }
                         },
                         new InlineKeyboardButton[]{
                             new InlineKeyboardButton
                             {
-                                CallbackData = "RectificationToTheTeacher",
+                                CallbackData = $"RectificationToTheTeacher//1//{(int)InteractionType.RectificationToTheTeacher}",
                                 Text = "Rectificación al Profesor"
                             },
                             new InlineKeyboardButton
                             {
-                                CallbackData = "StatusPhrase",
+                                CallbackData = $"StatusPhrase//1//{(int)InteractionType.StatusPhrase}",
                                 Text = "Frase de Estado"
                             }
                         },
@@ -117,66 +118,7 @@ namespace ClassAssistantBot.Controllers
                 int page = int.Parse(data[1]);
                 var interactionType = (Models.InteractionType)int.Parse(data[2]);
                 var pendings = pendingDataHandler.GetPendings(user, false, interactionType, page);
-                var inline = new List<InlineKeyboardButton>();
-                if (page - 1 >= 1)
-                    inline.Add(new InlineKeyboardButton
-                    {
-                        CallbackData = $"BackPending//{page - 1}//{(int)interactionType}",
-                        Text = "<<"
-                    });
-                if (page + 1 <= pendings.Item2)
-                    inline.Add(new InlineKeyboardButton
-                    {
-                        CallbackData = $"NextPending//{page + 1}//{(int)interactionType}",
-                        Text = ">>"
-                    });
-                var keyboard = new InlineKeyboardMarkup()
-                {
-                    InlineKeyboard = new InlineKeyboardButton[][]{
-                        inline.ToArray(),
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "ClassIntervention",
-                                Text = "Intervención en Clase"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "ClassTitle",
-                                Text = "Cambiar Título de la Clase"
-                            }
-                        },
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "Meme",
-                                Text = "Meme"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "Joke",
-                                Text = "Chiste"
-                            }
-                        },
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "RectificationToTheTeacher",
-                                Text = "Rectificación al Profesor"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "StatusPhrase",
-                                Text = "Frase de Estado"
-                            }
-                        },
-                    }
-                };
-                Menu.CancelMenu(bot, message, "Menú:");
-                bot.SendMessage(chatId: message.Chat.Id,
-                                text: pendings.Item1,
-                                replyMarkup: keyboard);
-
+                Menu.PendingsPaginators(bot, message, pendings.Item1, pendings.Item2, page, interactionType);
             }
             else if(callbackQuery.Data == "DenialOfCreditApplications")
             {
@@ -200,7 +142,6 @@ namespace ClassAssistantBot.Controllers
                 bool giveMeExplication = false;
                 @object = pendingDataHandler.GetPendingByCode(code, out imageID, out giveMeExplication);
                 pendingDataHandler.RemovePending(pending);
-                Menu.TeacherMenu(bot, message);
                 if (isText)
                     bot.SendMessage(chatId: pending.Student.User.ChatId,
                                     text: $"El profesor @{user.Username} ha denegado su solicitud de créditos \n\n{@object}\n si tienes algún problema pregúntele a él, no la cojas conmigo.");
@@ -208,8 +149,10 @@ namespace ClassAssistantBot.Controllers
                     bot.SendPhoto(chatId: pending.Student.User.ChatId,
                                   photo: imageID,
                                   caption: $"El profesor @{user.Username} ha denegado su solicitud de créditos si tienes algún problema pregúntele a él, no la cojas conmigo.");
+                var pendings = pendingDataHandler.GetPendings(user);
+                Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
-            else if(callbackQuery.Data == "GiveMeExplication//")
+            else if(callbackQuery.Data.Contains("GiveMeExplication//"))
             {
                 var data = callbackQuery.Data.Split("//");
 
@@ -231,6 +174,8 @@ namespace ClassAssistantBot.Controllers
                                   caption: res.Item1,
                                   photo: res.Item2);
                 }
+                var pendings = pendingDataHandler.GetPendings(user);
+                Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
             else
             {
@@ -248,58 +193,7 @@ namespace ClassAssistantBot.Controllers
                 else if (callbackQuery.Data == "RectificationToTheTeacher")
                     interactionType = Models.InteractionType.RectificationToTheTeacher;
                 var pendings = pendingDataHandler.GetPendings(user, false, interactionType);
-                var keyboard = new InlineKeyboardMarkup()
-                {
-                    InlineKeyboard = new InlineKeyboardButton[][]{
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = $"NextPending//1//{(int)interactionType}",
-                                Text = ">>"
-                            }
-                        },
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "ClassIntervention",
-                                Text = "Intervención en Clase"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "ClassTitle",
-                                Text = "Cambiar Título de la Clase"
-                            }
-                        },
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "Meme",
-                                Text = "Meme"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "Joke",
-                                Text = "Chiste"
-                            }
-                        },
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "RectificationToTheTeacher",
-                                Text = "Rectificación al Profesor"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "StatusPhrase",
-                                Text = "Frase de Estado"
-                            }
-                        },
-                    }
-                };
-                Menu.CancelMenu(bot, message, "Menú:");
-                bot.SendMessage(chatId: message.Chat.Id,
-                                text: pendings.Item1,
-                                replyMarkup: keyboard);
+                Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2, interactionType);
             }
         }
     }

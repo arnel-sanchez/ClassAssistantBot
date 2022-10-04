@@ -30,7 +30,8 @@ namespace ClassAssistantBot.Services
                 Text = String.Empty,
                 TeacherId = teacher.Id,
                 User = user,
-                Teacher = teacher
+                Teacher = teacher,
+                ClassRoomId = user.ClassRoomActiveId,
             };
 
             dataAccess.Users.Update(user);

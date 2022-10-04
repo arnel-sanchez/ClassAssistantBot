@@ -157,6 +157,157 @@ namespace ClassAssistantBot.Services
         {
             return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().MemeChannel;
         }
+
+        public void AssignJokesChannel(User user)
+        {
+            user.Status = UserStatus.AssignJokeChannel;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+        }
+
+        public void AssignJokesChannel(User user, string chanelName)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            classRoom.JokesChannel = chanelName;
+            dataAccess.ClassRooms.Update(classRoom);
+            dataAccess.SaveChanges();
+        }
+
+        public string GetJokesChannel(User user)
+        {
+            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().JokesChannel;
+        }
+
+        public void AssignClassInterventionChannel(User user)
+        {
+            user.Status = UserStatus.AssignClassInterventionChannel;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+        }
+
+        public void AssignClassInterventionChannel(User user, string chanelName)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            classRoom.ClassInterventionChannel = chanelName;
+            dataAccess.ClassRooms.Update(classRoom);
+            dataAccess.SaveChanges();
+        }
+
+        public string GetClassInterventionChannel(User user)
+        {
+            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().ClassInterventionChannel;
+        }
+
+        public void AssignDiaryChannel(User user)
+        {
+            user.Status = UserStatus.AssignDiaryChannel;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+        }
+
+        public void AssignDiaryChannel(User user, string chanelName)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            classRoom.DiaryChannel = chanelName;
+            dataAccess.ClassRooms.Update(classRoom);
+            dataAccess.SaveChanges();
+        }
+
+        public string GetDiaryChannel(User user)
+        {
+            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().DiaryChannel;
+        }
+
+        public void AssignStatusPhraseChannel(User user)
+        {
+            user.Status = UserStatus.AssignStatusPhraseChannel;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+        }
+
+        public void AssignStatusPhraseChannel(User user, string chanelName)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            classRoom.StatusPhraseChannel = chanelName;
+            dataAccess.ClassRooms.Update(classRoom);
+            dataAccess.SaveChanges();
+        }
+
+        public string GetStatusPhraseChannel(User user)
+        {
+            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().StatusPhraseChannel;
+        }
+
+        public void AssignClassTitleChannel(User user)
+        {
+            user.Status = UserStatus.AssignClassTitleChannel;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+        }
+
+        public void AssignClassTitleChannel(User user, string chanelName)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            classRoom.ClassTitleChannel = chanelName;
+            dataAccess.ClassRooms.Update(classRoom);
+            dataAccess.SaveChanges();
+        }
+
+        public string GetClassTitleChannel(User user)
+        {
+            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().ClassTitleChannel;
+        }
+
+        public void AssignRectificationToTheTeacherChannel(User user)
+        {
+            user.Status = UserStatus.AssignRectificationToTheTeacherChannel;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+        }
+
+        public void AssignRectificationToTheTeacherChannel(User user, string chanelName)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            classRoom.RectificationToTheTeacherChannel = chanelName;
+            dataAccess.ClassRooms.Update(classRoom);
+            dataAccess.SaveChanges();
+        }
+
+        public string GetRectificationToTheTeacherChannel(User user)
+        {
+            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().RectificationToTheTeacherChannel;
+        }
+
+        public void SendInformationToTheStudents(User user)
+        {
+            user.Status = UserStatus.SendInformation;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+        }
+
+        public List<StudentByClassRoom> GetStudentsOnClassRoom(User user)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+            return dataAccess.StudentsByClassRooms
+                .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
+                .Include(x => x.Student)
+                .Include(x => x.Student.User)
+                .ToList();
+        }
     }
 }
 

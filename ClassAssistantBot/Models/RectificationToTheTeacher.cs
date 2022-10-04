@@ -20,7 +20,7 @@ namespace ClassAssistantBot.Models
 
         public ClassRoom ClassRoom { get; set; }
 
-        public string ClassRoomId { get; set; }
+        public long ClassRoomId { get; set; }
 
         public Teacher Teacher { get; set; }
 

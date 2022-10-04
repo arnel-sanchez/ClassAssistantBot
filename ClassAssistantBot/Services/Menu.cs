@@ -75,18 +75,37 @@ namespace ClassAssistantBot.Services
                 Keyboard = new KeyboardButton[][]{
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Todas las Aulas con Pendientes*"),
+                        new KeyboardButton("*Llave del Estudiante*"),
                         new KeyboardButton("*Llave del Profesor*")
                     },
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Llave del Estudiante*"),
+                        new KeyboardButton("*Todas las Aulas con Pendientes*"),
                         new KeyboardButton("*Cambiar de Aula*")
                     },
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Eliminar Estudiante del Aula*"),
-                        new KeyboardButton("*Asignar Canal de Memes*")
+                        new KeyboardButton("*Asignar Canal de Memes*"),
+                        new KeyboardButton("*Asignar Canal de Chistes*")
+                    },
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Asignar Canal de Interveciones en Clases*"),
+                        new KeyboardButton("*Asignar Canal de Actulización de Diario*")
+                    },
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Asignar Canal de Frases de Estado*"),
+                        new KeyboardButton("*Asignar Canal de Títulos de Clases*")
+                    },
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Asignar Canal de Rectificaciones de Profesores*"),
+                        new KeyboardButton("*Eliminar Estudiante del Aula*")
+                    },
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Enviar información a todos los estudiantes del aula*")
                     },
                     new KeyboardButton[]
                     {
@@ -223,6 +242,126 @@ namespace ClassAssistantBot.Services
                 Keyboard = listButton,
                 ResizeKeyboard = true
             };
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: text,
+                            replyMarkup: keyboard);
+        }
+
+        public static void PendingsFilters(BotClient bot, Message message, string text, int countPages, InteractionType interactionType = InteractionType.None)
+        {
+            var inline = new List<InlineKeyboardButton>();
+            if (2 <= countPages)
+                inline.Add(new InlineKeyboardButton
+                {
+                    CallbackData = $"NextPending//2//{(int)InteractionType.None}",
+                    Text = ">>"
+                });
+            var keyboard = new InlineKeyboardMarkup()
+            {
+                InlineKeyboard = new InlineKeyboardButton[][]{
+                    inline.ToArray(),
+                    new InlineKeyboardButton[]{
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"ClassIntervention//1//{(int)InteractionType.ClassIntervention}",
+                            Text = "Intervención en Clase"
+                        },
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"ClassTitle//1//{(int)InteractionType.ClassTitle}",
+                            Text = "Cambiar Título de la Clase"
+                        }
+                    },
+                    new InlineKeyboardButton[]{
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"Meme//1//{(int)InteractionType.Meme}",
+                            Text = "Meme"
+                        },
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"Joke//1//{(int)InteractionType.Joke}",
+                            Text = "Chiste"
+                        }
+                    },
+                    new InlineKeyboardButton[]{
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"RectificationToTheTeacher//1//{(int)InteractionType.RectificationToTheTeacher}",
+                            Text = "Rectificación al Profesor"
+                        },
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"StatusPhrase//1//{(int)InteractionType.StatusPhrase}",
+                            Text = "Frase de Estado"
+                        }
+                    },
+                }
+            };
+            Menu.CancelMenu(bot, message, "Menú:");
+            bot.SendMessage(chatId: message.Chat.Id,
+                            text: text,
+                            replyMarkup: keyboard);
+        }
+
+        public static void PendingsPaginators(BotClient bot, Message message, string text, int countPages, int thisPage, InteractionType interactionType = InteractionType.None)
+        {
+            var inline = new List<InlineKeyboardButton>();
+            if (thisPage - 1 >= 1)
+                inline.Add(new InlineKeyboardButton
+                {
+                    CallbackData = $"BackPending//{thisPage - 1}//{(int)interactionType}",
+                    Text = "<<"
+                });
+            if (thisPage + 1 <= countPages)
+                inline.Add(new InlineKeyboardButton
+                {
+                    CallbackData = $"NextPending//{thisPage + 1}//{(int)interactionType}",
+                    Text = ">>"
+                });
+            var keyboard = new InlineKeyboardMarkup()
+            {
+                InlineKeyboard = new InlineKeyboardButton[][]{
+                        inline.ToArray(),
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = $"ClassIntervention//1//{(int)InteractionType.ClassIntervention}",
+                                Text = "Intervención en Clase"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = $"ClassTitle//1//{(int)InteractionType.ClassTitle}",
+                                Text = "Cambiar Título de la Clase"
+                            }
+                        },
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = $"Meme//1//{(int)InteractionType.Meme}",
+                                Text = "Meme"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = $"Joke//1//{(int)InteractionType.Joke}",
+                                Text = "Chiste"
+                            }
+                        },
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = $"RectificationToTheTeacher//1//{(int)InteractionType.RectificationToTheTeacher}",
+                                Text = "Rectificación al Profesor"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = $"StatusPhrase//1//{(int)InteractionType.StatusPhrase}",
+                                Text = "Frase de Estado"
+                            }
+                        },
+                    }
+            };
+            Menu.CancelMenu(bot, message, "Menú:");
             bot.SendMessage(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);

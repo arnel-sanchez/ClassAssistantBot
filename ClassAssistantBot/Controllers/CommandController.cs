@@ -145,15 +145,17 @@ namespace ClassAssistantBot.Controllers
                             OnRegister(user, message.Text);
                             return;
                         case UserStatus.StudentEnteringClass:
-                            OnAssignStudentAtClass(appUser.Id, message.Text);
-                            Menu.StudentMenu(bot, message);
+                            var assignedStudentSuccesfully = OnAssignStudentAtClass(appUser.Id, message.Text);
+                            if(assignedStudentSuccesfully)
+                                Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.Pending:
                             OnPendings(user, message);
                             return;
                         case UserStatus.TeacherEnteringClass:
-                            OnAssignTeacherAtClass(appUser.Id, message.Text);
-                            Menu.TeacherMenu(bot, message);
+                            var assignedTeacherSuccesfully = OnAssignTeacherAtClass(appUser.Id, message.Text);
+                            if(assignedTeacherSuccesfully)
+                                Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.TeacherCreatingClass:
                             OnCreateClassRoom(appUser.Id, message.Text);
@@ -223,7 +225,7 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.AssignMemeChannel:
                             classRoomDataHandler.AssignMemeChannel(user, message.Text);
-                            var text = "Canal de Meme asignado satisfactoriamente";
+                            var memeChannelConfigurationText = "Canal de Meme asignado satisfactoriamente";
                             try
                             {
                                 bot.SendMessage(chatId: message.Text,
@@ -231,9 +233,102 @@ namespace ClassAssistantBot.Controllers
                             }
                             catch
                             {
-                                text = "El nombre de usuario del bot insertado no existe";
+                                memeChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
                             }
-                            Menu.TeacherConfigurationMenu(bot, message, text);
+                            Menu.TeacherConfigurationMenu(bot, message, memeChannelConfigurationText);
+                            return;
+                        case UserStatus.AssignJokeChannel:
+                            classRoomDataHandler.AssignJokesChannel(user, message.Text);
+                            var jokeChannelConfigurationText = "Canal de Chistes asignado satisfactoriamente";
+                            try
+                            {
+                                bot.SendMessage(chatId: message.Text,
+                                    text: "Bot configurado satisfactoriamente.");
+                            }
+                            catch
+                            {
+                                jokeChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
+                            }
+                            Menu.TeacherConfigurationMenu(bot, message, jokeChannelConfigurationText);
+                            return;
+                        case UserStatus.AssignClassInterventionChannel:
+                            classRoomDataHandler.AssignClassInterventionChannel(user, message.Text);
+                            var classInterventionsChannelConfigurationText = "Canal de Intervenciones en Clases asignado satisfactoriamente";
+                            try
+                            {
+                                bot.SendMessage(chatId: message.Text,
+                                    text: "Bot configurado satisfactoriamente.");
+                            }
+                            catch
+                            {
+                                classInterventionsChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
+                            }
+                            Menu.TeacherConfigurationMenu(bot, message, classInterventionsChannelConfigurationText);
+                            return;
+                        case UserStatus.AssignClassTitleChannel:
+                            classRoomDataHandler.AssignClassTitleChannel(user, message.Text);
+                            var classTitlesChannelConfigurationText = "Canal de propuestas de Títulos de Clases asignado satisfactoriamente";
+                            try
+                            {
+                                bot.SendMessage(chatId: message.Text,
+                                    text: "Bot configurado satisfactoriamente.");
+                            }
+                            catch
+                            {
+                                classTitlesChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
+                            }
+                            Menu.TeacherConfigurationMenu(bot, message, classTitlesChannelConfigurationText);
+                            return;
+                        case UserStatus.AssignDiaryChannel:
+                            classRoomDataHandler.AssignDiaryChannel(user, message.Text);
+                            var diaryChannelConfigurationText = "Canal de Actualizaciones de Diario asignado satisfactoriamente";
+                            try
+                            {
+                                bot.SendMessage(chatId: message.Text,
+                                    text: "Bot configurado satisfactoriamente.");
+                            }
+                            catch
+                            {
+                                diaryChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
+                            }
+                            Menu.TeacherConfigurationMenu(bot, message, diaryChannelConfigurationText);
+                            return;
+                        case UserStatus.AssignRectificationToTheTeacherChannel:
+                            classRoomDataHandler.AssignRectificationToTheTeacherChannel(user, message.Text);
+                            var rectificationToTheTeacherChannelConfigurationText = "Canal de Rectificaciones a los profesores asignado satisfactoriamente";
+                            try
+                            {
+                                bot.SendMessage(chatId: message.Text,
+                                    text: "Bot configurado satisfactoriamente.");
+                            }
+                            catch
+                            {
+                                rectificationToTheTeacherChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
+                            }
+                            Menu.TeacherConfigurationMenu(bot, message, rectificationToTheTeacherChannelConfigurationText);
+                            return;
+                        case UserStatus.AssignStatusPhraseChannel:
+                            classRoomDataHandler.AssignStatusPhraseChannel(user, message.Text);
+                            var statusPhraseChannelConfigurationText = "Canal de Frases de Estado asignado satisfactoriamente";
+                            try
+                            {
+                                bot.SendMessage(chatId: message.Text,
+                                    text: "Bot configurado satisfactoriamente.");
+                            }
+                            catch
+                            {
+                                statusPhraseChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
+                            }
+                            Menu.TeacherConfigurationMenu(bot, message, statusPhraseChannelConfigurationText);
+                            return;
+                        case UserStatus.SendInformation:
+                            var students = classRoomDataHandler.GetStudentsOnClassRoom(user);
+                            foreach (var student in students)
+                            {
+                                bot.SendMessage(chatId: student.Student.User.ChatId,
+                                    text: message.Text);
+                            }
+                            Menu.TeacherConfigurationMenu(bot, message);
                             return;
                     }
                     Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
@@ -331,9 +426,9 @@ namespace ClassAssistantBot.Controllers
                 case "cambiardeaula":
                     ChangeClassRoomCommand(user);
                     break;
-                /*case "rectificaralprofesor":
+                case "rectificaralprofesor":
                     RectificationToTheTeacherCommand(user);
-                    break;*/
+                    break;
                 case "asignarcréditos":
                     AssignCreditsCommand(user);
                     break;
@@ -343,7 +438,7 @@ namespace ClassAssistantBot.Controllers
                 case "cancelar":
                     CancelCommand(user);
                     break;
-                /*case "intervenciónenclase":
+                case "intervenciónenclase":
                     ClassInterventionCommand(user);
                     break;
                 case "meme":
@@ -360,7 +455,7 @@ namespace ClassAssistantBot.Controllers
                     break;
                 case "cambiartítulodeclase":
                     ClassTitleCommand(user);
-                    break;*/
+                    break;
                 case "configuración":
                     ConfigurationCommand(user);
                     break;
@@ -381,6 +476,27 @@ namespace ClassAssistantBot.Controllers
                     break;
                 case "asignarcanaldememes":
                     AssignMemeChannelCommand(user);
+                    break;
+                case "asignarcanaldechistes":
+                    AssignJokesChannelCommand(user);
+                    break;
+                case "asignarcanaldeintervecionesenclases":
+                    AssignClassTitleChannelCommand(user);
+                    break;
+                case "asignarcanaldeactulizacióndediario":
+                    AssignDiaryChannelCommand(user);
+                    break;
+                case "asignarcanaldefrasesdeestado":
+                    AssignStatusPhraseChannelCommand(user);
+                    break;
+                case "asignarcanaldetítulosdeclases":
+                    AssignClassTitleChannelCommand(user);
+                    break;
+                case "asignarcanalderectificacionesdeprofesores":
+                    AssignRectificationToTheTeacherChannelCommand(user);
+                    break;
+                case "enviarinformaciónatodoslosestudiantesdelaula":
+                    SendStudentsInformation(user);
                     break;
                 default:
                     DefaultCommand(user, cmd);
@@ -585,59 +701,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 var pendings = pendingDataHandler.GetPendings(user);
-                var inline = new List<InlineKeyboardButton>();
-                if (2 <= pendings.Item2)
-                    inline.Add(new InlineKeyboardButton
-                    {
-                        CallbackData = $"NextPending//2//{(int)InteractionType.None}",
-                        Text = ">>"
-                    });
-                var keyboard = new InlineKeyboardMarkup()
-                {
-                    InlineKeyboard = new InlineKeyboardButton[][]{
-                        inline.ToArray(),
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "ClassIntervention",
-                                Text = "Intervención en Clase"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "ClassTitle",
-                                Text = "Cambiar Título de la Clase"
-                            }
-                        },
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "Meme",
-                                Text = "Meme"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "Joke",
-                                Text = "Chiste"
-                            }
-                        },
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "RectificationToTheTeacher",
-                                Text = "Rectificación al Profesor"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "StatusPhrase",
-                                Text = "Frase de Estado"
-                            }
-                        },
-                    }
-                };
-                Menu.CancelMenu(bot, message, "Menú:");
-                bot.SendMessage(chatId: message.Chat.Id,
-                                text: pendings.Item1,
-                                replyMarkup: keyboard);
+                Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
         }
 
@@ -660,6 +724,8 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 var res = pendingDataHandler.GetAllClassRoomWithPendings(user);
+                if (string.IsNullOrEmpty(res))
+                    res = "No tienen pendientes en ninguna de sus aulas";
                 Menu.TeacherConfigurationMenu(bot, message, res);
             }
         }
@@ -1261,6 +1327,167 @@ namespace ClassAssistantBot.Controllers
                 Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán los memes(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
+
+        public void AssignJokesChannelCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                classRoomDataHandler.AssignJokesChannel(user);
+                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán los chistes(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+            }
+        }
+
+        public void AssignClassInterventionChannelCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                classRoomDataHandler.AssignClassInterventionChannel(user);
+                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las intervenciones en clase(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+            }
+        }
+
+        public void AssignDiaryChannelCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                classRoomDataHandler.AssignDiaryChannel(user);
+                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las actualizaciones a los diarios(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+            }
+        }
+
+        public void AssignStatusPhraseChannelCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                classRoomDataHandler.AssignStatusPhraseChannel(user);
+                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las frases de estado(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+            }
+        }
+
+        public void AssignClassTitleChannelCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                classRoomDataHandler.AssignClassTitleChannel(user);
+                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán los propuestas de títulos de clases(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+            }
+        }
+
+        public void AssignRectificationToTheTeacherChannelCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                classRoomDataHandler.AssignRectificationToTheTeacherChannel(user);
+                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las rectificaciones a los profesores(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+            }
+        }
+
+        public void SendStudentsInformation(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                classRoomDataHandler.SendInformationToTheStudents(user);
+                Menu.CancelMenu(bot, message, "Inserte la información que le quiere enviar a sus estudiantes:");
+            }
+        }
         #endregion
 
         #region Procesos que completan comandos de varias operaciones
@@ -1280,20 +1507,24 @@ namespace ClassAssistantBot.Controllers
             Menu.RegisterMenu(bot, message);
         }
 
-        private void OnAssignStudentAtClass(long id, string text)
+        private bool OnAssignStudentAtClass(long id, string text)
         {
-            var res = studentDataHandler.AssignStudentAtClass(id, text);
+            var success = false;
+            var res = studentDataHandler.AssignStudentAtClass(id, text, out success);
             bot.SendMessage(chatId: message.Chat.Id,
                             text: res,
                             replyMarkup: new ReplyKeyboardRemove());
+            return success;
         }
 
-        private void OnAssignTeacherAtClass(long id, string text)
+        private bool OnAssignTeacherAtClass(long id, string text)
         {
-            var res = teacherDataHandler.AssignTeacherAtClass(id, text);
+            bool success = false;
+            var res = teacherDataHandler.AssignTeacherAtClass(id, text, out success);
             bot.SendMessage(chatId: message.Chat.Id,
                             text: res,
                             replyMarkup: new ReplyKeyboardRemove());
+            return success;
         }
 
         private void OnCreateClassRoom(long id, string name)

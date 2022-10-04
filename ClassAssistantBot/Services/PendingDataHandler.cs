@@ -103,7 +103,7 @@ namespace ClassAssistantBot.Services
                     .Include(x => x.User)
                     .Include(x => x.Class)
                     .First(x => x.Id == pending.ObjectId);
-                res.Append($"ClassIntervention de {classIntervention.User.Username}\n");
+                res.Append($"Intervención en Clase de {classIntervention.User.Username}\n");
                 res.Append($"Clase: {classIntervention.Class.Title}\n");
                 res.Append($"Intevención: {classIntervention.Text}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
@@ -114,7 +114,7 @@ namespace ClassAssistantBot.Services
                     .Include(x => x.Class)
                     .Include(x => x.User)
                     .First(x => x.Id == pending.ObjectId);
-                res.Append($"ClassTitle de {classTitle.User.Username}\n");
+                res.Append($"Cambio de Título de la Clase {classTitle.User.Username}\n");
                 res.Append($"Clase: {classTitle.Class.Title}\n");
                 res.Append($"Título: {classTitle.Title}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
@@ -124,7 +124,7 @@ namespace ClassAssistantBot.Services
                 var daily = dataAccess.Dailies
                     .Include(x => x.User)
                     .First(x => x.Id == pending.ObjectId);
-                res.Append($"Daily de {daily.User.Username}\n");
+                res.Append($"Actualización de Diario de {daily.User.Username}\n");
                 res.Append($"Actualización: {daily.Text}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
             }
@@ -133,7 +133,7 @@ namespace ClassAssistantBot.Services
                 var joke = dataAccess.Jokes
                     .Include(x => x.User)
                     .First(x => x.Id == pending.ObjectId);
-                res.Append($"Joke de {joke.User.Username}\n");
+                res.Append($"Chiste de {joke.User.Username}\n");
                 res.Append($"Texto: {joke.Text}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
                 giveMeExplication = true;
@@ -154,7 +154,7 @@ namespace ClassAssistantBot.Services
                     .Include(x => x.Teacher.User)
                     .Include(x => x.User)
                     .First(x => x.Id == pending.ObjectId);
-                res.Append($"RectificationToTheTeachers de {rectificationToTheTeacher.User.Username}\n");
+                res.Append($"Rectificación al Profesor de {rectificationToTheTeacher.User.Username}\n");
                 res.Append($"Profesor: {rectificationToTheTeacher.Teacher.User.Username}\n");
                 res.Append($"Texto: {rectificationToTheTeacher.Text}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
@@ -164,7 +164,7 @@ namespace ClassAssistantBot.Services
                 var statusphrase = dataAccess.StatusPhrases
                     .Include(x => x.User)
                     .First(x => x.Id == pending.ObjectId);
-                res.Append($"StatusPhrases de {statusphrase.User.Username}\n");
+                res.Append($"Cambio de Frase de Estado de {statusphrase.User.Username}\n");
                 res.Append($"Frase: {statusphrase.Phrase}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
             }

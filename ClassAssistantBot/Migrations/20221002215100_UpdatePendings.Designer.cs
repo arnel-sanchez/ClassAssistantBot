@@ -3,6 +3,7 @@ using System;
 using ClassAssistantBot.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClassAssistantBot.Migrations
 {
     [DbContext(typeof(DataAccess))]
-    partial class DataAccessModelSnapshot : ModelSnapshot
+    [Migration("20221002215100_UpdatePendings")]
+    partial class UpdatePendings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,35 +87,11 @@ namespace ClassAssistantBot.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("ClassInterventionChannel")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClassTitleChannel")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("DiaryChannel")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("JokesChannel")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("MemeChannel")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("RectificationToTheTeacherChannel")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("StatusPhraseChannel")
                         .IsRequired()
                         .HasColumnType("text");
 

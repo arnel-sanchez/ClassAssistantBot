@@ -30,7 +30,8 @@ namespace ClassAssistantBot.Services
                 DateTime = DateTime.UtcNow,
                 Id = Guid.NewGuid().ToString(),
                 Text = message,
-                UserId = user.Id
+                UserId = user.Id,
+                ClassRoomId = user.ClassRoomActiveId,
             };
             dataAccess.Jokes.Add(joke);
             var random = new Random();
