@@ -878,6 +878,7 @@ namespace ClassAssistantBot.Controllers
                 };
                 if (!string.IsNullOrEmpty(pending))
                 {
+                    Menu.CancelMenu(bot, message);
                     if (string.IsNullOrEmpty(file))
                     {
                         bot.SendMessage(chatId: message.Chat.Id,
