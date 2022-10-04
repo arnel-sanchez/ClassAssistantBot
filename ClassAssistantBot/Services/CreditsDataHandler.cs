@@ -145,7 +145,14 @@ namespace ClassAssistantBot.Services
             }
 
             var random = new Random();
-
+            var misc = new Miscellaneous
+            {
+                ClassRoomId = user.ClassRoomActiveId,
+                DateTime = DateTime.UtcNow,
+                Id = Guid.NewGuid().ToString(),
+                UserId = student.UserId,
+                Text = ""
+            };
             var credit = new Credits
             {
                 ClassRoomId = user.ClassRoomActiveId,
@@ -155,6 +162,7 @@ namespace ClassAssistantBot.Services
                 UserId = student.UserId,
                 Value = 0,
                 Text = String.Empty,
+                ObjectId = misc.Id,
                 Code = random.Next(10000, 99999)
             };
             dataAccess.Credits.Add(credit);

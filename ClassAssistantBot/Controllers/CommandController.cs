@@ -23,6 +23,7 @@ namespace ClassAssistantBot.Controllers
         private ClassInterventionDataHandler classInterventionDataHandler;
         private RectificationToTheTeacherDataHandler rectificationToTheTeacherDataHandler;
         private ClassTitleDataHandler classTitleDataHandler;
+        private MiscellaneousDataHandler miscellaneousDataHandler;
         private BotClient bot;
         private Message message;
         private bool hasText = false;
@@ -43,6 +44,7 @@ namespace ClassAssistantBot.Controllers
             this.classInterventionDataHandler = new ClassInterventionDataHandler(dataAccess);
             this.rectificationToTheTeacherDataHandler = new RectificationToTheTeacherDataHandler(dataAccess);
             this.classTitleDataHandler = new ClassTitleDataHandler(dataAccess);
+            this.miscellaneousDataHandler = new MiscellaneousDataHandler(dataAccess);
             this.bot = bot;
             this.message = new Message();
             this.appUser = new Telegram.BotAPI.AvailableTypes.User();
@@ -346,7 +348,11 @@ namespace ClassAssistantBot.Controllers
                                 bot.SendMessage(chatId: student.Student.User.ChatId,
                                     text: message.Text);
                             }
-                            Menu.TeacherConfigurationMenu(bot, message);
+                            Menu.TeacherMenu(bot, message);
+                            return;
+                        case UserStatus.Miscellaneous:
+
+                            Menu.StudentMenu(bot, message);
                             return;
                     }
                     Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
@@ -428,6 +434,9 @@ namespace ClassAssistantBot.Controllers
                     break;
                 case "pendientesdirectos":
                     DirectPendingCommand(user);
+                    break;
+                case "misceláneas":
+                    CreateMiscellaneousCommand(user);
                     break;
                 case "pendientes":
                     PendingsCommand(user);
@@ -1504,6 +1513,29 @@ namespace ClassAssistantBot.Controllers
             {
                 classRoomDataHandler.SendInformationToTheStudents(user);
                 Menu.CancelMenu(bot, message, "Inserte la información que le quiere enviar a sus estudiantes:");
+            }
+        }
+
+        public void CreateMiscellaneousCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                miscellaneousDataHandler.CreateMiscellaneous(user);
+                Menu.CancelMenu(bot, message, "Inserte la miscelánea que quiere proponer:");
             }
         }
         #endregion

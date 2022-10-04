@@ -143,6 +143,7 @@ namespace ClassAssistantBot.Services
                         new KeyboardButton("*Cambiar Título de Clase*")
                         },
                     new KeyboardButton[]{
+                        new KeyboardButton("*Misceláneas*"),
                         new KeyboardButton("*Configuración*"),
                         },
                 },
