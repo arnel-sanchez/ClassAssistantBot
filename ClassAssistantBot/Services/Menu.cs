@@ -56,6 +56,10 @@ namespace ClassAssistantBot.Services
                     },
                     new KeyboardButton[]
                     {
+                        new KeyboardButton("*Enviar información a todos los estudiantes del aula*")
+                    },
+                    new KeyboardButton[]
+                    {
                         new KeyboardButton("*Configuración*")
                     }
                 },
@@ -102,10 +106,6 @@ namespace ClassAssistantBot.Services
                     {
                         new KeyboardButton("*Asignar Canal de Rectificaciones de Profesores*"),
                         new KeyboardButton("*Eliminar Estudiante del Aula*")
-                    },
-                    new KeyboardButton[]
-                    {
-                        new KeyboardButton("*Enviar información a todos los estudiantes del aula*")
                     },
                     new KeyboardButton[]
                     {

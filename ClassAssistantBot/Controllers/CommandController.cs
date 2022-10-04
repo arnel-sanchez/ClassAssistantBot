@@ -167,14 +167,23 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.StatusPhrase:
                             statusPhraseDataHandler.ChangeStatusPhrase(user.Id, message.Text);
+                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetStatusPhraseChannel(user)))
+                                bot.SendMessage(chatId: classRoomDataHandler.GetStatusPhraseChannel(user),
+                                    text: "Frase de Estado enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.Joke:
                             jokeDataHandler.DoJoke(user.Id, message.Text);
+                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetJokesChannel(user)))
+                                bot.SendMessage(chatId: classRoomDataHandler.GetJokesChannel(user),
+                                    text: "Chiste enviado por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.Daily:
                             dailyDataHandler.UpdateDaily(user.Id, message.Text);
+                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetDiaryChannel(user)))
+                                bot.SendMessage(chatId: classRoomDataHandler.GetDiaryChannel(user),
+                                    text: "Actualización al Diario enviado por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.RemoveStudentFromClassRoom:
@@ -187,6 +196,9 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.RectificationToTheTeacherUserName:
                             OnRectificationToTheTeacherAtText(user, message.Text);
+                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetRectificationToTheTeacherChannel(user)))
+                                bot.SendMessage(chatId: classRoomDataHandler.GetRectificationToTheTeacherChannel(user),
+                                    text: "Rectificación al Profesor enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.CreateClass:
@@ -195,10 +207,16 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.ClassTitleSelect:
                             OnChangeClassTitle(user, message.Text);
+                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassTitleChannel(user)))
+                                bot.SendMessage(chatId: classRoomDataHandler.GetClassTitleChannel(user),
+                                    text: "Cambio de Título de Clase enviado por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.ClassInterventionSelect:
                             OnClassIntervention(user, message.Text);
+                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassInterventionChannel(user)))
+                                bot.SendMessage(chatId: classRoomDataHandler.GetClassInterventionChannel(user),
+                                    text: "Intervención en Clase enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.AssignCreditsStudent:
@@ -481,7 +499,7 @@ namespace ClassAssistantBot.Controllers
                     AssignJokesChannelCommand(user);
                     break;
                 case "asignarcanaldeintervecionesenclases":
-                    AssignClassTitleChannelCommand(user);
+                    AssignClassInterventionChannelCommand(user);
                     break;
                 case "asignarcanaldeactulizacióndediario":
                     AssignDiaryChannelCommand(user);
