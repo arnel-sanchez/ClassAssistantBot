@@ -13,28 +13,28 @@ namespace ClassAssistantBot.Migrations
                 table: "StatusPhrases",
                 type: "bigint",
                 nullable: false,
-                defaultValue: 0L);
+                defaultValue: 1);
 
             migrationBuilder.AddColumn<long>(
                 name: "ClassRoomId",
                 table: "RectificationToTheTeachers",
                 type: "bigint",
                 nullable: false,
-                defaultValue: 0L);
+                defaultValue: 1);
 
             migrationBuilder.AddColumn<long>(
                 name: "ClassRoomId",
                 table: "Memes",
                 type: "bigint",
                 nullable: false,
-                defaultValue: 0L);
+                defaultValue: 1);
 
             migrationBuilder.AddColumn<long>(
                 name: "ClassRoomId",
                 table: "Jokes",
                 type: "bigint",
                 nullable: false,
-                defaultValue: 0L);
+                defaultValue: 1);
 
             migrationBuilder.AddColumn<long>(
                 name: "ClassRoomId",
