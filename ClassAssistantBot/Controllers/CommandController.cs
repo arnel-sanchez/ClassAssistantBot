@@ -351,7 +351,7 @@ namespace ClassAssistantBot.Controllers
                             Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.Miscellaneous:
-
+                            miscellaneousDataHandler.CreateMiscellaneous(user, message.Text);
                             Menu.StudentMenu(bot, message);
                             return;
                     }
