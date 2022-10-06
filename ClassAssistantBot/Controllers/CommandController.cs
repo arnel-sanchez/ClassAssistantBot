@@ -1298,7 +1298,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        public void AssignMemeChannelCommand(Models.User? user)
+        private void AssignMemeChannelCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -1321,7 +1321,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        public void AssignJokesChannelCommand(Models.User? user)
+        private void AssignJokesChannelCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -1344,7 +1344,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        public void AssignClassInterventionChannelCommand(Models.User? user)
+        private void AssignClassInterventionChannelCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -1367,7 +1367,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        public void AssignDiaryChannelCommand(Models.User? user)
+        private void AssignDiaryChannelCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -1390,7 +1390,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        public void AssignStatusPhraseChannelCommand(Models.User? user)
+        private void AssignStatusPhraseChannelCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -1413,7 +1413,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        public void AssignClassTitleChannelCommand(Models.User? user)
+        private void AssignClassTitleChannelCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -1436,7 +1436,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        public void AssignRectificationToTheTeacherChannelCommand(Models.User? user)
+        private void AssignRectificationToTheTeacherChannelCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -1459,7 +1459,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        public void SendStudentsInformation(Models.User? user)
+        private void SendStudentsInformation(Models.User? user)
         {
             if (user == null)
             {
@@ -1482,7 +1482,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        public void CreateMiscellaneousCommand(Models.User? user)
+        private void CreateMiscellaneousCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -1505,7 +1505,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        public void AssignMiscellaneousChannelCommand(Models.User? user)
+        private void AssignMiscellaneousChannelCommand(Models.User? user)
         {
             if (user == null)
             {

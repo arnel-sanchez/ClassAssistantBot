@@ -401,24 +401,16 @@ namespace ClassAssistantBot.Services
             teachers = teachers.Where(x => x.UserId != user.Id).ToList();
             if (teachers.Count != 0)
             {
-                for (int i = 0; i < teachers.Count/2 + 1; i++)
+                for (int i = 0; i < teachers.Count; i++)
                 {
                     var temp = new List<InlineKeyboardButton>()
                     {
                         new InlineKeyboardButton
                         {
-                            CallbackData = $"AssignDirectPending//{command}//{teachers[i * 2].User.Username}",
-                            Text = $"@{teachers[i*2].User.Username}"
+                            CallbackData = $"AssignDirectPending//{command}//{teachers[i].User.Username}",
+                            Text = $"@{teachers[i].User.Username}"
                         }
                     };
-                    if(i * 2 + 1 < teachers.Count)
-                    {
-                        temp.Add(new InlineKeyboardButton
-                        {
-                            CallbackData = $"AssignDirectPending//{command}//{teachers[i * 2].User.Username}",
-                            Text = $"@{teachers[i * 2 + 1].User.Username}"
-                        });
-                    }
                     buttonTeachers.Add(temp.ToArray());
                 }
             }
