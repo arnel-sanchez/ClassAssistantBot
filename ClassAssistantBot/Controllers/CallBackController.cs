@@ -106,6 +106,13 @@ namespace ClassAssistantBot.Controllers
                                 Text = "Frase de Estado"
                             }
                         },
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = $"Miscellaneous//1//{(int)InteractionType.Miscellaneous}",
+                                Text = "Miscelánea"
+                            }
+                        },
                     }
                 };
                 Menu.CancelMenu(bot, message, "Menú:");
@@ -202,17 +209,19 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 Models.InteractionType interactionType = Models.InteractionType.None;
-                if (callbackQuery.Data == "Meme")
+                if (callbackQuery.Data.Contains("Meme"))
                     interactionType = Models.InteractionType.Meme;
-                else if (callbackQuery.Data == "ClassTitle")
+                else if (callbackQuery.Data.Contains("ClassTitle"))
                     interactionType = Models.InteractionType.ClassTitle;
-                else if (callbackQuery.Data == "ClassIntervention")
+                else if (callbackQuery.Data.Contains("ClassIntervention"))
                     interactionType = Models.InteractionType.ClassIntervention;
-                else if (callbackQuery.Data == "StatusPhrase")
+                else if (callbackQuery.Data.Contains("StatusPhrase"))
                     interactionType = Models.InteractionType.StatusPhrase;
-                else if (callbackQuery.Data == "Joke")
+                else if (callbackQuery.Data.Contains("Joke"))
                     interactionType = Models.InteractionType.Joke;
-                else if (callbackQuery.Data == "RectificationToTheTeacher")
+                else if (callbackQuery.Data.Contains("Miscellaneous"))
+                    interactionType = Models.InteractionType.Miscellaneous;
+                else if (callbackQuery.Data.Contains("RectificationToTheTeacher"))
                     interactionType = Models.InteractionType.RectificationToTheTeacher;
                 var pendings = pendingDataHandler.GetPendings(user, false, interactionType);
                 Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2, interactionType);

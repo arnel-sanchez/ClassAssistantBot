@@ -39,7 +39,7 @@ namespace ClassAssistantBot.Services
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = InteractionType.Joke,
+                Type = InteractionType.Miscellaneous,
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = miscellaneous.Id,
                 StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,

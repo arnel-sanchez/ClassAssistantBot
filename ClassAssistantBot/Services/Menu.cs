@@ -106,10 +106,11 @@ namespace ClassAssistantBot.Services
                     new KeyboardButton[]
                     {
                         new KeyboardButton("*Asignar Canal de Rectificaciones de Profesores*"),
-                        new KeyboardButton("*Eliminar Estudiante del Aula*")
+                        new KeyboardButton("*Asignar Canal de Misceláneas*")
                     },
                     new KeyboardButton[]
                     {
+                        new KeyboardButton("*Eliminar Estudiante del Aula*"),
                         new KeyboardButton("*Cancelar*")
                     },
                 },
@@ -300,6 +301,13 @@ namespace ClassAssistantBot.Services
                             Text = "Frase de Estado"
                         }
                     },
+                    new InlineKeyboardButton[]{
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"Miscellaneous//1//{(int)InteractionType.Miscellaneous}",
+                            Text = "Miscelánea"
+                        }
+                    },
                 }
             };
             Menu.CancelMenu(bot, message, "Menú:");
@@ -361,6 +369,13 @@ namespace ClassAssistantBot.Services
                             {
                                 CallbackData = $"StatusPhrase//1//{(int)InteractionType.StatusPhrase}",
                                 Text = "Frase de Estado"
+                            }
+                        },
+                        new InlineKeyboardButton[]{
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = $"Miscellaneous//1//{(int)InteractionType.Miscellaneous}",
+                                Text = "Miscelánea"
                             }
                         },
                     }

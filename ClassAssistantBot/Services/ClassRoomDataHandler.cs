@@ -308,6 +308,28 @@ namespace ClassAssistantBot.Services
                 .Include(x => x.Student.User)
                 .ToList();
         }
+
+        public void AssignMiscellaneousChannel(User user)
+        {
+            user.Status = UserStatus.AssignMiscellaneousChannel;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+        }
+
+        public void AssignMiscellaneousChannel(User user, string chanelName)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            classRoom.MiscelaneousChannel = chanelName;
+            dataAccess.ClassRooms.Update(classRoom);
+            dataAccess.SaveChanges();
+        }
+
+        public string GetMiscellaneousChannel(User user)
+        {
+            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().MiscelaneousChannel;
+        }
     }
 }
 

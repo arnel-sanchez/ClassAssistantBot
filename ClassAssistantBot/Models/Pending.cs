@@ -10,7 +10,8 @@ namespace ClassAssistantBot.Models
         RectificationToTheTeacher,
         StatusPhrase,
         ClassIntervention,
-        None
+        None,
+        Miscellaneous
     }
 
     public class Pending

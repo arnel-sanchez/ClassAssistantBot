@@ -32,5 +32,7 @@ namespace ClassAssistantBot.Models
         public string DiaryChannel { get; set; }
 
         public string StatusPhraseChannel { get; set; }
+
+        public string MiscelaneousChannel { get; set; }
     }
 }

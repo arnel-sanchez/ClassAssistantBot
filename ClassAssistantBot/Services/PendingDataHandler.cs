@@ -108,6 +108,16 @@ namespace ClassAssistantBot.Services
                 res.Append($"Intevención: {classIntervention.Text}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
             }
+            else if (pending.Type == InteractionType.Miscellaneous)
+            {
+                var miscellaneous = dataAccess.Miscellaneous
+                    .Include(x => x.User)
+                    .Include(x => x.ClassRoom)
+                    .First(x => x.Id == pending.ObjectId);
+                res.Append($"Miscelánea de {miscellaneous.User.Username}\n");
+                res.Append($"Comentario: {miscellaneous.Text}\n");
+                res.Append($"Código de Pendiente: /{pending.Code}\n");
+            }
             else if (pending.Type == InteractionType.ClassTitle)
             {
                 var classTitle = dataAccess.ClassTitles
@@ -237,6 +247,14 @@ namespace ClassAssistantBot.Services
                     .Include(x => x.Class.ClassRoom)
                     .First(x => x.Id == pending.ObjectId);
                 return ($"El profesor @{teacherUsername} le está pidiendo una explicación sobre su intervención en clases({classIntervention.Text}) en la clase \"{classIntervention.Class.Title}\" del aula \"{classIntervention.Class.ClassRoom.Name}\" debido a que no entendió de qué iba.", "");
+            }
+            else if (pending.Type == InteractionType.Miscellaneous)
+            {
+                var classIntervention = dataAccess.Miscellaneous
+                    .Include(x => x.User)
+                    .Include(x => x.ClassRoom)
+                    .First(x => x.Id == pending.ObjectId);
+                return ($"El profesor @{teacherUsername} le está pidiendo una explicación sobre su miscelánea({classIntervention.Text}) en lel aula \"{classIntervention.ClassRoom.Name}\" debido a que no entendió de qué iba.", "");
             }
             else if (pending.Type == InteractionType.ClassTitle)
             {

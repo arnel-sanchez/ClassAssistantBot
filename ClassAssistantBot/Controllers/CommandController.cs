@@ -341,6 +341,20 @@ namespace ClassAssistantBot.Controllers
                             }
                             Menu.TeacherConfigurationMenu(bot, message, statusPhraseChannelConfigurationText);
                             return;
+                        case UserStatus.AssignMiscellaneousChannel:
+                            classRoomDataHandler.AssignMiscellaneousChannel(user, message.Text);
+                            var miscellaneousChannelConfigurationText = "Canal de Misceláneas asignado satisfactoriamente";
+                            try
+                            {
+                                bot.SendMessage(chatId: message.Text,
+                                    text: "Bot configurado satisfactoriamente.");
+                            }
+                            catch
+                            {
+                                miscellaneousChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
+                            }
+                            Menu.TeacherConfigurationMenu(bot, message, miscellaneousChannelConfigurationText);
+                            return;
                         case UserStatus.SendInformation:
                             var students = classRoomDataHandler.GetStudentsOnClassRoom(user);
                             foreach (var student in students)
@@ -352,6 +366,9 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.Miscellaneous:
                             miscellaneousDataHandler.CreateMiscellaneous(user, message.Text);
+                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetMiscellaneousChannel(user)))
+                                bot.SendMessage(chatId: classRoomDataHandler.GetMiscellaneousChannel(user),
+                                    text: "Miscelánea enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
                     }
@@ -486,8 +503,8 @@ namespace ClassAssistantBot.Controllers
                 case "configuración":
                     ConfigurationCommand(user);
                     break;
-                case "poll":
-                    PollCommand(user);
+                case "asignarcanaldemisceláneas":
+                    AssignMiscellaneousChannelCommand(user);
                     break;
                 case "iniciarclase":
                     StartClassCommand(user);
@@ -1097,18 +1114,6 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void PollCommand(Models.User? user)
-        {
-            if (user == null)
-            {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
-                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
-                return;
-            }
-            throw new NotImplementedException();
-        }
-
         private void StartClassCommand(Models.User? user)
         {
             if (user == null)
@@ -1427,7 +1432,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 classRoomDataHandler.AssignClassTitleChannel(user);
-                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán los propuestas de títulos de clases(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las propuestas de títulos de clases(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
 
@@ -1497,6 +1502,29 @@ namespace ClassAssistantBot.Controllers
             {
                 miscellaneousDataHandler.CreateMiscellaneous(user);
                 Menu.CancelMenu(bot, message, "Inserte la miscelánea que quiere proponer:");
+            }
+        }
+
+        public void AssignMiscellaneousChannelCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                classRoomDataHandler.AssignMiscellaneousChannel(user);
+                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las misceláneas(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
         #endregion

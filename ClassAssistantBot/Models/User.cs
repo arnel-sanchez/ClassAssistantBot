@@ -37,7 +37,8 @@ namespace ClassAssistantBot.Models
         AssignClassTitleChannel,
         AssignRectificationToTheTeacherChannel,
         SendInformation,
-        Miscellaneous
+        Miscellaneous,
+        AssignMiscellaneousChannel,
     }
 
     public class User : Telegram.BotAPI.AvailableTypes.ITelegramUser
