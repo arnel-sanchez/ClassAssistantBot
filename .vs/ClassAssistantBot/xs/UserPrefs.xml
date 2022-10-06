@@ -1,28 +1,11 @@
-﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default">
-  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
-  <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+﻿<Properties StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Controllers/EngineController.cs">
-    <Files>
-      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="834" Column="71" />
-      <File FileName="ClassAssistantBot/Services/Menu.cs" Line="411" Column="32" />
-      <File FileName="ClassAssistantBot/Controllers/EngineController.cs" Line="6" Column="22" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="ClassAssistantBot" expanded="True">
-            <Node name="ClassAssistantBot" expanded="True">
-              <Node name="Controllers" expanded="True">
-                <Node name="EngineController.cs" selected="True" />
-              </Node>
-              <Node name="Services" expanded="True" />
-            </Node>
+            <Node name="ClassAssistantBot" expanded="True" />
           </Node>
         </State>
       </Pad>
@@ -31,5 +14,12 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
+  <MultiItemStartupConfigurations />
+  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

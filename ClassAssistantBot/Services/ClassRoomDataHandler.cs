@@ -309,6 +309,18 @@ namespace ClassAssistantBot.Services
                 .ToList();
         }
 
+        public List<TeacherByClassRoom> GetTeachersOnClassRoom(User user)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            dataAccess.SaveChanges();
+            return dataAccess.TeachersByClassRooms
+                .Where(x => x.ClassRoomId == user.ClassRoomActiveId && x.Teacher.UserId != user.Id)
+                .Include(x => x.Teacher)
+                .Include(x => x.Teacher.User)
+                .ToList();
+        }
+
         public void AssignMiscellaneousChannel(User user)
         {
             user.Status = UserStatus.AssignMiscellaneousChannel;

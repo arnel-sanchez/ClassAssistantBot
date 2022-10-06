@@ -362,6 +362,12 @@ namespace ClassAssistantBot.Controllers
                                 bot.SendMessage(chatId: student.Student.User.ChatId,
                                     text: message.Text);
                             }
+                            var teachers = classRoomDataHandler.GetTeachersOnClassRoom(user);
+                            foreach (var teacher in teachers)
+                            {
+                                bot.SendMessage(chatId: teacher.Teacher.User.ChatId,
+                                    text: message.Text);
+                            }
                             Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.Miscellaneous:
