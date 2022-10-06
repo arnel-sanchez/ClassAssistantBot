@@ -258,7 +258,7 @@ namespace ClassAssistantBot.Services
             if (2 <= countPages)
                 inline.Add(new InlineKeyboardButton
                 {
-                    CallbackData = $"NextPending//2//{(int)InteractionType.None}",
+                    CallbackData = $"NextPending//2//{(int)interactionType}",
                     Text = ">>"
                 });
             var keyboard = new InlineKeyboardMarkup()
