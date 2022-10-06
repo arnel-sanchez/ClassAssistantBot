@@ -2,6 +2,7 @@
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableTypes;
+using User = ClassAssistantBot.Models.User;
 
 namespace ClassAssistantBot.Services
 {
@@ -170,6 +171,8 @@ namespace ClassAssistantBot.Services
                 },
                 ResizeKeyboard = true
             }; ;
+            if (string.IsNullOrEmpty(text))
+                text = "Cancelar";
             bot.SendMessage(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
@@ -366,6 +369,76 @@ namespace ClassAssistantBot.Services
             bot.SendMessage(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
+        }
+
+        public static bool PendingCommands(BotClient bot, Message message, string pending, List<Teacher> teachers, bool giveMeExplication, string command, User user, string file)
+        {
+            var buttonGiveMeExplication = new List<InlineKeyboardButton>();
+            if (giveMeExplication)
+            {
+                buttonGiveMeExplication.Add(new InlineKeyboardButton
+                {
+                    CallbackData = $"GiveMeExplication//{command}//{user.Username}",
+                    Text = "Pedir Explicación al Alumno"
+                });
+            }
+            var buttonTeachers = new List<InlineKeyboardButton[]>();
+            teachers = teachers.Where(x => x.UserId != user.Id).ToList();
+            if (teachers.Count != 0)
+            {
+                for (int i = 0; i < teachers.Count/2 + 1; i++)
+                {
+                    var temp = new List<InlineKeyboardButton>()
+                    {
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"AssignDirectPending//{command}//{teachers[i * 2].User.Username}",
+                            Text = $"@{teachers[i*2].User.Username}"
+                        }
+                    };
+                    if(i * 2 + 1 < teachers.Count)
+                    {
+                        temp.Add(new InlineKeyboardButton
+                        {
+                            CallbackData = $"AssignDirectPending//{command}//{teachers[i * 2].User.Username}",
+                            Text = $"@{teachers[i * 2 + 1].User.Username}"
+                        });
+                    }
+                    buttonTeachers.Add(temp.ToArray());
+                }
+            }
+            buttonTeachers.Add(buttonGiveMeExplication.ToArray());
+            buttonTeachers.Add(
+                new InlineKeyboardButton[]{
+                    new InlineKeyboardButton
+                    {
+                        CallbackData = "DenialOfCreditApplications",
+                        Text = "Denegar Solicitud de Créditos"
+                    }
+                });
+            var keyboard = new InlineKeyboardMarkup()
+            {
+                InlineKeyboard = buttonTeachers.ToArray()
+            };
+            if (!string.IsNullOrEmpty(pending))
+            {
+                Menu.CancelMenu(bot, message);
+                if (string.IsNullOrEmpty(file))
+                {
+                    bot.SendMessage(chatId: message.Chat.Id,
+                        text: pending,
+                        replyMarkup: keyboard);
+                }
+                else
+                {
+                    bot.SendPhoto(chatId: message.Chat.Id,
+                        photo: file,
+                        caption: pending,
+                        replyMarkup: keyboard);
+                }
+                return true;
+            }
+            return false;
         }
     }
 }

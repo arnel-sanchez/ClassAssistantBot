@@ -851,49 +851,9 @@ namespace ClassAssistantBot.Controllers
                 string file = "";
                 bool giveMeExplication = false;
                 var pending = pendingDataHandler.GetPendingByCode(command, out file, out giveMeExplication);
-                var buttonGiveMeExplication = new InlineKeyboardButton[]{};
-                if (giveMeExplication)
-                {
-                    buttonGiveMeExplication = new InlineKeyboardButton[]
-                    {
-                        new InlineKeyboardButton
-                        {
-                            CallbackData = $"GiveMeExplication//{command}//{user.Username}",
-                            Text = "Pedir Explicación al Alumno"
-                        }
-                    };
-                }
-                var keyboard = new InlineKeyboardMarkup()
-                {
-                    InlineKeyboard = new InlineKeyboardButton[][]{
-                        buttonGiveMeExplication,
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = "DenialOfCreditApplications",
-                                Text = "Denegar Solicitud de Créditos"
-                            }
-                        }
-                    }
-                };
-                if (!string.IsNullOrEmpty(pending))
-                {
-                    Menu.CancelMenu(bot, message);
-                    if (string.IsNullOrEmpty(file))
-                    {
-                        bot.SendMessage(chatId: message.Chat.Id,
-                            text: pending,
-                            replyMarkup: keyboard);
-                    }
-                    else
-                    {
-                        bot.SendPhoto(chatId: message.Chat.Id,
-                            photo: file,
-                            caption: pending,
-                            replyMarkup: keyboard);
-                    }
+                var teachers = teacherDataHandler.GetTeachers(user);
+                if (Menu.PendingCommands(bot, message, pending, teachers, giveMeExplication, command, user, file))
                     return;
-                }
 
                 var student = creditsDataHandler.GetCreditsByUserName(user.Id, command, true, true);
                 if (!string.IsNullOrEmpty(student))

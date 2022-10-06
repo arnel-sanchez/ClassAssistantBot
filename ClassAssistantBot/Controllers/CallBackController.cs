@@ -15,6 +15,7 @@ namespace ClassAssistantBot.Controllers
         private Telegram.BotAPI.AvailableTypes.User appUser;
         private PendingDataHandler pendingDataHandler;
         private UserDataHandler userDataHandler;
+        private TeacherDataHandler teacherDataHandler;
 
         public CallBackController(BotClient bot, DataAccess dataAccess)
         {
@@ -24,6 +25,7 @@ namespace ClassAssistantBot.Controllers
             this.appUser = new Telegram.BotAPI.AvailableTypes.User();
             this.pendingDataHandler = new PendingDataHandler(dataAccess);
             this.userDataHandler = new UserDataHandler(dataAccess);
+            this.teacherDataHandler = new TeacherDataHandler(dataAccess);
         }
 
         public void ProcessCallBackQuery(CallbackQuery callbackQuery)
@@ -173,6 +175,26 @@ namespace ClassAssistantBot.Controllers
                     bot.SendPhoto(chatId: pending.Student.User.ChatId,
                                   caption: res.Item1,
                                   photo: res.Item2);
+                }
+                var pendings = pendingDataHandler.GetPendings(user);
+                Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
+            }
+            else if (callbackQuery.Data.Contains("AssignDirectPending//"))
+            {
+                var data = callbackQuery.Data.Split("//");
+                var command = data[1];
+                var teacherUsername = data[2];
+                var pending = pendingDataHandler.GetPending(command);
+                if (teacherDataHandler.ExistTeacher(teacherUsername))
+                {
+                    var teacherChatId = pendingDataHandler.AddDirectPending(teacherUsername, pending.Id);
+                    bot.SendMessage(chatId: teacherChatId,
+                        text: "Le han asignado un pendiente que tiene que revisar.");
+                }
+                else
+                {
+                    bot.SendMessage(chatId: user.ChatId,
+                        text: $"No existe un usuario con el user name {teacherUsername}.");
                 }
                 var pendings = pendingDataHandler.GetPendings(user);
                 Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
