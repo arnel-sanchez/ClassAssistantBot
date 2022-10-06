@@ -160,7 +160,7 @@ namespace ClassAssistantBot.Services
                 res.Append(studentResults[i].Credits);
                 res.Append(" -> ");
                 res.Append(studentResults[i].Name);
-                res.Append("(/");
+                res.Append(" (/");
                 res.Append(studentResults[i].Username);
                 res.Append(")\n");
             }

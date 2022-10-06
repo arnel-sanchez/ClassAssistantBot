@@ -71,7 +71,36 @@ namespace ClassAssistantBot.Services
 
             foreach (var item in pendings)
             {
-                res.Append(item.Type.ToString());
+                var type = "Rectificación al Profesor";
+                if(item.Type == InteractionType.ClassIntervention)
+                {
+                    type = "Interveción en Clase";
+                }
+                else if (item.Type == InteractionType.ClassTitle)
+                {
+                    type = "Cambio de Título de Clase";
+                }
+                else if (item.Type == InteractionType.Daily)
+                {
+                    type = "Actualización al Diario";
+                }
+                else if (item.Type == InteractionType.Joke)
+                {
+                    type = "Chiste";
+                }
+                else if (item.Type == InteractionType.Meme)
+                {
+                    type = "Meme";
+                }
+                else if (item.Type == InteractionType.Miscellaneous)
+                {
+                    type = "Miscelánea";
+                }
+                else if (item.Type == InteractionType.StatusPhrase)
+                {
+                    type = "Frase de Estado";
+                }
+                res.Append(type);
                 res.Append(": ");
                 if (!string.IsNullOrEmpty(item.Student.User.Name))
                     res.Append(item.Student.User.Name);
