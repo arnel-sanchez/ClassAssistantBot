@@ -83,6 +83,10 @@ namespace ClassAssistantBot.Services
                         {
                             text = dataAccess.StatusPhrases.Where(x => x.Id == credit.ObjectId).First().Phrase;
                         }
+                        else if (dataAccess.Miscellaneous.Where(x => x.Id == credit.ObjectId).FirstOrDefault() != null)
+                        {
+                            text = dataAccess.Miscellaneous.Where(x => x.Id == credit.ObjectId).First().Text;
+                        }
                         else if (dataAccess.Memes.Where(x => x.Id == credit.ObjectId).FirstOrDefault() != null)
                         {
                             text = "Meme";

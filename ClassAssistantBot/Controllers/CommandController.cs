@@ -24,6 +24,7 @@ namespace ClassAssistantBot.Controllers
         private RectificationToTheTeacherDataHandler rectificationToTheTeacherDataHandler;
         private ClassTitleDataHandler classTitleDataHandler;
         private MiscellaneousDataHandler miscellaneousDataHandler;
+        private PracticClassDataHandler practicClassDataHandler;
         private BotClient bot;
         private Message message;
         private bool hasText = false;
@@ -45,6 +46,7 @@ namespace ClassAssistantBot.Controllers
             this.rectificationToTheTeacherDataHandler = new RectificationToTheTeacherDataHandler(dataAccess);
             this.classTitleDataHandler = new ClassTitleDataHandler(dataAccess);
             this.miscellaneousDataHandler = new MiscellaneousDataHandler(dataAccess);
+            this.practicClassDataHandler = new PracticClassDataHandler(dataAccess); 
             this.bot = bot;
             this.message = new Message();
             this.appUser = new Telegram.BotAPI.AvailableTypes.User();
@@ -238,7 +240,7 @@ namespace ClassAssistantBot.Controllers
                                 return;
                             }
                             classRoomDataHandler.ChangeClassRoom(user.Id, outPut);
-                            if (user.IsTecaher)
+                              if (user.IsTecaher)
                                 Menu.TeacherMenu(bot, message);
                             else
                                 Menu.StudentMenu(bot, message);
@@ -270,6 +272,20 @@ namespace ClassAssistantBot.Controllers
                                 jokeChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
                             }
                             Menu.TeacherConfigurationMenu(bot, message, jokeChannelConfigurationText);
+                            return;
+                        case UserStatus.ReviewPracticClass:
+                            var review = practicClassDataHandler.ReviewPrecticalClass(user, message.Text);
+                            if (review.Item1)
+                            {
+                                Menu.TeacherMenu(bot, message, review.Item2);
+                                bot.SendMessage(chatId: review.Item4,
+                                    text: $"El profesor @{user.Username} le ha revisado la Clase Práctica {review.Item3}.");
+                            }
+                            else
+                            {
+                                bot.SendMessage(chatId: user.ChatId,
+                                    text: $"En la revisión ha ocurrido el siguiente error: {review.Item2}\nPor favor, vuelva a intentarlo.");
+                            }
                             return;
                         case UserStatus.AssignClassInterventionChannel:
                             classRoomDataHandler.AssignClassInterventionChannel(user, message.Text);
@@ -377,6 +393,17 @@ namespace ClassAssistantBot.Controllers
                                     text: "Miscelánea enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
+                        case UserStatus.CreatePracticClass:
+                            var canCreateClass = practicClassDataHandler.CreatePracticClass(user, message.Text);
+                            if(canCreateClass)
+                            {
+                                Menu.TeacherMenu(bot, message);
+                            }
+                            else
+                            {
+                                Menu.CancelMenu(bot, message, "Clase Práctica con Formato Incorrecto");
+                            }
+                            return;
                     }
                     Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
                     bot.SendMessage(chatId: message.Chat.Id,
@@ -453,7 +480,11 @@ namespace ClassAssistantBot.Controllers
                 case "créditos":
                     CreditsCommand(user);
                     break;
-                case "revisarclasesprácticas":
+                case "revisarclasepráctica":
+                    ReviewPracticClassCommand(user);
+                    break;
+                case "crearclasepráctica":
+                    CreatePracticClassCommand(user);
                     break;
                 case "pendientesdirectos":
                     DirectPendingCommand(user);
@@ -1522,7 +1553,7 @@ namespace ClassAssistantBot.Controllers
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Asignar Canal de Misceláneas");
                 bot.SendMessage(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
@@ -1531,6 +1562,53 @@ namespace ClassAssistantBot.Controllers
             {
                 classRoomDataHandler.AssignMiscellaneousChannel(user);
                 Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las misceláneas(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+            }
+        }
+
+        private void CreatePracticClassCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                practicClassDataHandler.CreatePracticClass(user);
+                Menu.CancelMenu(bot, message, "Inserte la Clase Práctica en el formato siguiente: \n CP1 1 10000 1a 20000 2a 400000 ......");
+            }
+        }
+
+        private void ReviewPracticClassCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var practicalClasses = practicClassDataHandler.ReviewPracticClass(user);
+                Menu.CancelMenu(bot, message);
+                Menu.PracticalClassList(bot, message, practicalClasses, "Seleccione una Clase Práctica:");
             }
         }
         #endregion

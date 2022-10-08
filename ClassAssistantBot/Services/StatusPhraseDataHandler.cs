@@ -35,7 +35,7 @@ namespace ClassAssistantBot.Services
                 Id = Guid.NewGuid().ToString(),
                 Phrase = message,
                 UserId = user.Id,
-                ClassRoomId = user.ClassRoomActiveId,
+                ClassRoomId = user.ClassRoomActiveId
             };
             dataAccess.StatusPhrases.Add(statusPhrase);
             var random = new Random();

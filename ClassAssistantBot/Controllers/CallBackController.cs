@@ -16,6 +16,7 @@ namespace ClassAssistantBot.Controllers
         private PendingDataHandler pendingDataHandler;
         private UserDataHandler userDataHandler;
         private TeacherDataHandler teacherDataHandler;
+        private PracticClassDataHandler practicClassDataHandler;
 
         public CallBackController(BotClient bot, DataAccess dataAccess)
         {
@@ -26,6 +27,7 @@ namespace ClassAssistantBot.Controllers
             this.pendingDataHandler = new PendingDataHandler(dataAccess);
             this.userDataHandler = new UserDataHandler(dataAccess);
             this.teacherDataHandler = new TeacherDataHandler(dataAccess);
+            this.practicClassDataHandler = new PracticClassDataHandler(dataAccess);
         }
 
         public void ProcessCallBackQuery(CallbackQuery callbackQuery)
@@ -205,6 +207,18 @@ namespace ClassAssistantBot.Controllers
                 }
                 var pendings = pendingDataHandler.GetPendings(user);
                 Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
+            }
+            else if (callbackQuery.Data.Contains("PracticalClassID//"))
+            {
+                var data = callbackQuery.Data.Split("//");
+                var students = practicClassDataHandler.ReviewPracticClassSelect(user);
+                Menu.PracticalClassStudentsList(bot, message, students, data[1], "Seleccione el estudiante:");
+            }
+            else if (callbackQuery.Data.Contains("StudentID//"))
+            {
+                var data = callbackQuery.Data.Split("//");
+                practicClassDataHandler.ReviewPracticClassPending(user, long.Parse(data[1]), data[2]);
+                Menu.CancelMenu(bot, message, "Inserte la Revisón de Clase Práctica en el formato siguiente: \n 1 1a 2a ...... (true o false) si se entregó antes de la fecha de la clase");
             }
             else
             {

@@ -3,6 +3,7 @@ using System;
 using ClassAssistantBot.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClassAssistantBot.Migrations
 {
     [DbContext(typeof(DataAccess))]
-    partial class DataAccessModelSnapshot : ModelSnapshot
+    [Migration("20221008195213_AddCPExcercise")]
+    partial class AddCPExcercise
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -427,26 +429,6 @@ namespace ClassAssistantBot.Migrations
                     b.HasIndex("ClassRoomId");
 
                     b.ToTable("PracticClasses");
-                });
-
-            modelBuilder.Entity("ClassAssistantBot.Models.PracticClassPending", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PracticClassId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("StudentId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PracticClassPendings");
                 });
 
             modelBuilder.Entity("ClassAssistantBot.Models.RectificationToTheTeacher", b =>

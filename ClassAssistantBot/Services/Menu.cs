@@ -47,7 +47,7 @@ namespace ClassAssistantBot.Services
                     },
                     new KeyboardButton[]
                     {
-                        new KeyboardButton("*Revisar Clases Prácticas*"),
+                        new KeyboardButton("*Revisar Clase Práctica*"),
                         new KeyboardButton("*Asignar Créditos*")
                     },
                     new KeyboardButton[]
@@ -57,6 +57,7 @@ namespace ClassAssistantBot.Services
                     },
                     new KeyboardButton[]
                     {
+                        new KeyboardButton("*Crear Clase Práctica*"),
                         new KeyboardButton("*Enviar información a todos los estudiantes del aula*")
                     },
                     new KeyboardButton[]
@@ -446,6 +447,54 @@ namespace ClassAssistantBot.Services
                 return true;
             }
             return false;
+        }
+
+        public static void PracticalClassList(BotClient bot, Message message, List<PracticClass> practicClasses, string text = "")
+        {
+            var buttonTeachers = new List<InlineKeyboardButton[]>();
+            for (int i = 0; i < practicClasses.Count; i++)
+            {
+                var temp = new List<InlineKeyboardButton>()
+                    {
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"PracticalClassID//{practicClasses[i].Id}",
+                            Text = $"{practicClasses[i].Name}"
+                        }
+                    };
+                buttonTeachers.Add(temp.ToArray());
+            }
+            var keyboard = new InlineKeyboardMarkup()
+            {
+                InlineKeyboard = buttonTeachers.ToArray()
+            };
+            bot.SendMessage(chatId: message.Chat.Id,
+                        text: text,
+                        replyMarkup: keyboard);
+        }
+
+        public static void PracticalClassStudentsList(BotClient bot, Message message, List<Student> students, string practicClassId, string text = "")
+        {
+            var buttonTeachers = new List<InlineKeyboardButton[]>();
+            for (int i = 0; i < students.Count; i++)
+            {
+                var temp = new List<InlineKeyboardButton>()
+                    {
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"StudentID//{students[i].UserId}//{practicClassId}",
+                            Text = $"{(string.IsNullOrEmpty(students[i].User.FirstName) ? students[i].User.Name : students[i].User.FirstName + students[i].User.LastName )}"
+                        }
+                    };
+                buttonTeachers.Add(temp.ToArray());
+            }
+            var keyboard = new InlineKeyboardMarkup()
+            {
+                InlineKeyboard = buttonTeachers.ToArray()
+            };
+            bot.SendMessage(chatId: message.Chat.Id,
+                        text: text,
+                        replyMarkup: keyboard);
         }
     }
 }

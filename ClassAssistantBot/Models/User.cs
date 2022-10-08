@@ -39,6 +39,10 @@ namespace ClassAssistantBot.Models
         SendInformation,
         Miscellaneous,
         AssignMiscellaneousChannel,
+        CreatePracticClass,
+        ReviewPracticClassSelect,
+        ReviewPracticClassSelectStudent,
+        ReviewPracticClass
     }
 
     public class User : Telegram.BotAPI.AvailableTypes.ITelegramUser
