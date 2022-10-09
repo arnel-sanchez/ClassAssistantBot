@@ -74,7 +74,10 @@ namespace ClassAssistantBot.Controllers
 
             Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
             var user = userDataHandler.GetUser(appUser);
-            Console.WriteLine((string.IsNullOrEmpty(user.Name) ? user.FirstName + " " + user.LanguageCode : user.Name ) + " " + user.Status + " " + user.ClassRoomActiveId);
+            if(user.ClassRoomActiveId==0)
+            {
+                classRoomDataHandler.AssignClassRoom(user);
+            }
 
             if (user != null && user.ClassRoomActiveId == 0 && user.Status == UserStatus.Ready)
             {
@@ -1116,7 +1119,7 @@ namespace ClassAssistantBot.Controllers
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
-            if (user.Status != UserStatus.Ready)
+            if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando changeclass");
                 bot.SendMessage(chatId: message.Chat.Id,
