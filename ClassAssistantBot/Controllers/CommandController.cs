@@ -78,7 +78,9 @@ namespace ClassAssistantBot.Controllers
 
             if (user.Username == "Hiperion123")
             {
+                Console.WriteLine("Entro 1");
                 classRoomDataHandler.AssignClassRoom();
+                Console.WriteLine("Entro 2");
             }
 
             if (user != null && user.ClassRoomActiveId == 0 && user.Status == UserStatus.Ready)
