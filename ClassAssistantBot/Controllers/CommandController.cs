@@ -1116,7 +1116,7 @@ namespace ClassAssistantBot.Controllers
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
-            if (user.Status != UserStatus.Ready && !user.IsTecaher)
+            if (user.Status != UserStatus.Ready)
             {
                 Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando changeclass");
                 bot.SendMessage(chatId: message.Chat.Id,
