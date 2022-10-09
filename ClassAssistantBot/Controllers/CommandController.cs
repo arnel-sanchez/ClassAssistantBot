@@ -66,7 +66,7 @@ namespace ClassAssistantBot.Controllers
             {
                 return;
             }
-            Logger.Warning($"New message from chat id: {message.Chat.Id}");
+            Logger.Warning($"New message from chat id: {(string.IsNullOrEmpty(message.From.Username) ? message.Chat.Id : message.From.Username )}");
 
             appUser = message.From; // Save current user;
             this.message = message; // Save current message;
@@ -74,7 +74,6 @@ namespace ClassAssistantBot.Controllers
 
             Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
             var user = userDataHandler.GetUser(appUser);
-            Console.WriteLine((string.IsNullOrEmpty(user.Name) ? user.FirstName + " " + user.LanguageCode : user.Name ) + " " + user.Status + " " + user.ClassRoomActiveId);
 
             if (user != null && user.ClassRoomActiveId == 0 && user.Status!=UserStatus.Verified && user.Status!=UserStatus.StudentEnteringClass && user.Status!=UserStatus.CreatingTecaher && user.Status!=UserStatus.TeacherCreatingClass && user.Status!=UserStatus.TeacherEnteringClass)
             {
