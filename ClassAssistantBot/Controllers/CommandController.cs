@@ -74,6 +74,7 @@ namespace ClassAssistantBot.Controllers
 
             Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
             var user = userDataHandler.GetUser(appUser);
+            Console.WriteLine(user);
 
             if(user != null && user.ClassRoomActiveId == 0 && user.Status == UserStatus.Ready)
             {

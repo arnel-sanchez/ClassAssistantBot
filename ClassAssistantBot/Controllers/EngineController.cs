@@ -46,9 +46,7 @@ namespace ClassAssistantBot.Services
             bot.SetMyCommands(
                 new BotCommand[]
                 {
-                    new BotCommand("start", "Inicia una nueva instancia del bot"),
-                    new BotCommand("student", "Se registra el usuario como estudiante"),
-                    new BotCommand("teacher", "Se registra el usuario como profesor")
+                    new BotCommand("start", "Inicia una nueva instancia del bot")
                 }
             );
         }
