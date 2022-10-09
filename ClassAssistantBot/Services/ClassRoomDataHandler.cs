@@ -31,11 +31,13 @@ namespace ClassAssistantBot.Services
             Console.WriteLine("Ass 2");
             dataAccess.StudentsByClassRooms.RemoveRange(st);
             Console.WriteLine("Ass 3");
+            var student = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id;
+            Console.WriteLine("Ass 4.1");
             dataAccess.StudentsByClassRooms.Add(new StudentByClassRoom
             {
                 ClassRoomId = 3,
                 Id = Guid.NewGuid().ToString(),
-                StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id
+                StudentId = student
             });
             Console.WriteLine("Ass 4");
             dataAccess.Users.Update(user);
