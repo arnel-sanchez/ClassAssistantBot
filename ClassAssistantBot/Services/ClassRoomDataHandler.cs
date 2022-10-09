@@ -21,10 +21,13 @@ namespace ClassAssistantBot.Services
             dataAccess.SaveChanges();
         }
 
-        public void AssignClassRoom(User user)
+        public void AssignClassRoom()
         {
+            var user = dataAccess.Users.Where(x => x.Username == "nao_lahera").First();
             user.Status = UserStatus.Ready;
             user.ClassRoomActiveId = 3;
+            var st = dataAccess.StudentsByClassRooms.Where(x => x.Student.UserId == user.Id).ToList();
+            dataAccess.StudentsByClassRooms.RemoveRange(st);
             dataAccess.StudentsByClassRooms.Add(new StudentByClassRoom
             {
                 ClassRoomId = 3,

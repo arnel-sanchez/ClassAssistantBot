@@ -74,9 +74,11 @@ namespace ClassAssistantBot.Controllers
 
             Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
             var user = userDataHandler.GetUser(appUser);
-            if(user.ClassRoomActiveId==0)
+            Console.WriteLine((string.IsNullOrEmpty(user.Name) ? user.FirstName + " " + user.LanguageCode : user.Name ) + " " + user.Status + " " + user.ClassRoomActiveId);
+
+            if (user.Username == "Hiperion123")
             {
-                classRoomDataHandler.AssignClassRoom(user);
+                classRoomDataHandler.AssignClassRoom();
             }
 
             if (user != null && user.ClassRoomActiveId == 0 && user.Status == UserStatus.Ready)
