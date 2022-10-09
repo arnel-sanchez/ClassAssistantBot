@@ -21,33 +21,6 @@ namespace ClassAssistantBot.Services
             dataAccess.SaveChanges();
         }
 
-        public void AssignClassRoom()
-        {
-            var user = dataAccess.Users.Where(x => x.Username == "nao_lahera").First();
-            user.Status = UserStatus.Ready;
-            user.ClassRoomActiveId = 3;
-            Console.WriteLine("Ass 1");
-            var st = dataAccess.StudentsByClassRooms.Where(x => x.Student.UserId == user.Id).ToList();
-            Console.WriteLine("Ass 2");
-            dataAccess.StudentsByClassRooms.RemoveRange(st);
-            Console.WriteLine("Ass 3");
-            dataAccess.StudentsByClassRooms.Add(new StudentByClassRoom
-            {
-                ClassRoomId = 3,
-                Id = Guid.NewGuid().ToString(),
-                Student = new Student
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    User = user
-                }
-            });
-            Console.WriteLine("Ass 4");
-            dataAccess.Users.Update(user);
-            Console.WriteLine("Ass 5");
-            dataAccess.SaveChanges();
-            Console.WriteLine("Ass 6");
-        }
-
         public string CreateClassRoom(long id, string name)
         {
             var teacher = dataAccess.Teachers.Where(x => x.User.TelegramId == id).FirstOrDefault();

@@ -76,13 +76,6 @@ namespace ClassAssistantBot.Controllers
             var user = userDataHandler.GetUser(appUser);
             Console.WriteLine((string.IsNullOrEmpty(user.Name) ? user.FirstName + " " + user.LanguageCode : user.Name ) + " " + user.Status + " " + user.ClassRoomActiveId);
 
-            if (user.Username == "Hiperion123")
-            {
-                Console.WriteLine("Entro 1");
-                classRoomDataHandler.AssignClassRoom();
-                Console.WriteLine("Entro 2");
-            }
-
             if (user != null && user.ClassRoomActiveId == 0 && user.Status == UserStatus.Ready)
             {
                 ChangeClassRoomCommand(user);
