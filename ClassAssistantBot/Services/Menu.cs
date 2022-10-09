@@ -260,7 +260,7 @@ namespace ClassAssistantBot.Services
                 inline.Add(new InlineKeyboardButton
                 {
                     CallbackData = $"NextPending//2//{(int)interactionType}",
-                    Text = ">>"
+                    Text = $">>2/{countPages}"
                 });
             var keyboard = new InlineKeyboardMarkup()
             {
@@ -324,13 +324,13 @@ namespace ClassAssistantBot.Services
                 inline.Add(new InlineKeyboardButton
                 {
                     CallbackData = $"BackPending//{thisPage - 1}//{(int)interactionType}",
-                    Text = "<<"
+                    Text = $"{thisPage - 1}/{countPages}<<"
                 });
             if (thisPage + 1 <= countPages)
                 inline.Add(new InlineKeyboardButton
                 {
                     CallbackData = $"NextPending//{thisPage + 1}//{(int)interactionType}",
-                    Text = ">>"
+                    Text = $">>{thisPage + 1}/{countPages}"
                 });
             var keyboard = new InlineKeyboardMarkup()
             {

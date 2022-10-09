@@ -76,9 +76,10 @@ namespace ClassAssistantBot.Controllers
             var user = userDataHandler.GetUser(appUser);
             Console.WriteLine((string.IsNullOrEmpty(user.Name) ? user.FirstName + " " + user.LanguageCode : user.Name ) + " " + user.Status + " " + user.ClassRoomActiveId);
 
-            if (user != null && user.ClassRoomActiveId == 0 && user.Status == UserStatus.Ready)
+            if (user != null && user.ClassRoomActiveId == 0 && user.Status!=UserStatus.Verified && user.Status!=UserStatus.StudentEnteringClass && user.Status!=UserStatus.CreatingTecaher && user.Status!=UserStatus.TeacherCreatingClass && user.Status!=UserStatus.TeacherEnteringClass)
             {
-                ChangeClassRoomCommand(user);
+                userDataHandler.VerifyUser(user);
+                Menu.RegisterMenu(bot, message);
                 return;
             }
 
@@ -193,7 +194,19 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.RemoveStudentFromClassRoom:
                             var res = studentDataHandler.RemoveStudentFromClassRoom(user.Id, message.Text);
-                            Menu.TeacherMenu(bot, message, res);
+                            bot.SendMessage(chatId: res.Item2,
+                                    text: $"El profesor @{user.Username} le ha sacado del aula.",
+                                    replyMarkup: new ReplyKeyboardMarkup
+                                    {
+                                        Keyboard = new KeyboardButton[][]{
+                                            new KeyboardButton[]
+                                            {
+                                                new KeyboardButton("*Entrar a la Facultad*")
+                                            }
+                                        },
+                                        ResizeKeyboard = true
+                                    });
+                            Menu.TeacherMenu(bot, message, res.Item1);
                             return;
                         case UserStatus.ClassIntervention:
                             classInterventionDataHandler.CreateIntervention(user, message.Text);
@@ -457,7 +470,6 @@ namespace ClassAssistantBot.Controllers
 
         private void OnCommand(string cmd, string[] args, ClassAssistantBot.Models.User user)
         {
-            Logger.Warning($"Params: {args.Length}");
             switch (cmd)
             {
                 case "start":
@@ -1288,7 +1300,7 @@ namespace ClassAssistantBot.Controllers
                     inline.Add(new InlineKeyboardButton
                     {
                         CallbackData = $"NextPending//2//{(int)InteractionType.None}",
-                        Text = ">>"
+                        Text = $">>2/{pendings.Item2}"
                     });
                 var keyboard = new InlineKeyboardMarkup()
                 {
@@ -1623,7 +1635,6 @@ namespace ClassAssistantBot.Controllers
             var list = text.Split(' ');
 
             user.Name = text;
-            user.Status = UserStatus.Verified;
             userDataHandler.VerifyUser(user);
             Logger.Success($"Verifying the user {user.Username}");
 

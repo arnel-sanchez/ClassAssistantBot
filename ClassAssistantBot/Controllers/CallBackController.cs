@@ -55,72 +55,7 @@ namespace ClassAssistantBot.Controllers
                 int page = int.Parse(data[1]);
                 var interactionType = (Models.InteractionType)int.Parse(data[2]);
                 var pendings = pendingDataHandler.GetPendings(user, false, interactionType, page);
-                var inline = new List<InlineKeyboardButton>();
-                if (page - 1 >= 1)
-                    inline.Add(new InlineKeyboardButton
-                    {
-                        CallbackData = $"BackPending//{page - 1}//{(int)interactionType}",
-                        Text = "<<"
-                    });
-                if (page + 1 <= pendings.Item2)
-                    inline.Add(new InlineKeyboardButton
-                    {
-                        CallbackData = $"NextPending//{page + 1}//{(int)interactionType}",
-                        Text = ">>"
-                    });
-                var keyboard = new InlineKeyboardMarkup()
-                {
-                    InlineKeyboard = new InlineKeyboardButton[][]{
-                        inline.ToArray(),
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = $"ClassIntervention//1//{(int)InteractionType.ClassIntervention}",
-                                Text = "Intervención en Clase"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = $"ClassTitle//1//{(int)InteractionType.ClassTitle}",
-                                Text = "Cambiar Título de la Clase"
-                            }
-                        },
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = $"Meme//1//{(int)InteractionType.Meme}",
-                                Text = "Meme"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = $"Joke//1//{(int)InteractionType.Joke}",
-                                Text = "Chiste"
-                            }
-                        },
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = $"RectificationToTheTeacher//1//{(int)InteractionType.RectificationToTheTeacher}",
-                                Text = "Rectificación al Profesor"
-                            },
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = $"StatusPhrase//1//{(int)InteractionType.StatusPhrase}",
-                                Text = "Frase de Estado"
-                            }
-                        },
-                        new InlineKeyboardButton[]{
-                            new InlineKeyboardButton
-                            {
-                                CallbackData = $"Miscellaneous//1//{(int)InteractionType.Miscellaneous}",
-                                Text = "Miscelánea"
-                            }
-                        },
-                    }
-                };
-                Menu.CancelMenu(bot, message, "Menú:");
-                bot.SendMessage(chatId: message.Chat.Id,
-                                text: pendings.Item1,
-                                replyMarkup: keyboard);
+                Menu.PendingsPaginators(bot, message, pendings.Item1, pendings.Item2, page, interactionType);
 
             }
             else if (callbackQuery.Data.Contains("BackPending//"))

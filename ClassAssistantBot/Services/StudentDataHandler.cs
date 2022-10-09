@@ -23,13 +23,13 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public string RemoveStudentFromClassRoom(long id, string userName)
+        public (string, string) RemoveStudentFromClassRoom(long id, string userName)
         {
             var teacher = dataAccess.Users.First(x => x.Id == id);
-            var user = dataAccess.Users.FirstOrDefault(x => x.Username == userName.Substring(1));
+            var user = dataAccess.Users.FirstOrDefault(x => x.Username == userName.Substring(1) || x.Username == userName);
 
             if (user == null)
-                return "No existe extudiante con ese nombre de usuario, por favor atienda lo que hace.";
+                return ("No existe extudiante con ese nombre de usuario, por favor atienda lo que hace.", "");
             else
             {
                 teacher.Status = UserStatus.Ready;
@@ -40,7 +40,7 @@ namespace ClassAssistantBot.Services
                 dataAccess.StudentsByClassRooms.RemoveRange(userByClassRoom);
                 dataAccess.Users.Update(teacher);
                 dataAccess.SaveChanges();
-                return "Estudiante sacado del aula con éxito";
+                return ("Estudiante sacado del aula con éxito", user.ChatId.ToString());
             }
         }
 

@@ -48,6 +48,7 @@ namespace ClassAssistantBot.Services
 
         public void VerifyUser(User user)
         {
+            user.Status = UserStatus.Verified;
             dataAccess.Users.Update(user);
             dataAccess.SaveChanges();
         }
