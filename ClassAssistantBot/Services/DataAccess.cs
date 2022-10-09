@@ -9,7 +9,7 @@ namespace ClassAssistantBot.Services
 
         public DataAccess()
         {
-            ConnectionString = "Host=db;Port=5432;Username=postgres;Password=biUrwej1obwok;Database=ClassAssitantBot;";
+            ConnectionString = "Host=localhost;Port=5432;Username=postgres;Password=biUrwej1obwok;Database=ClassAssitantBot;";
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)

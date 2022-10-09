@@ -598,14 +598,17 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                Logger.Error($"Error: El usuario {user.Username} está intentando registrarse nuevamente en el bot.");
-                if (user.IsTecaher)
+                if(user.Status == UserStatus.Ready)
                 {
-                    Menu.TeacherMenu(bot, message);
-                }
-                else
-                {
-                    Menu.StudentMenu(bot, message);
+                    Logger.Error($"Error: El usuario {user.Username} está intentando registrarse nuevamente en el bot.");
+                    if (user.IsTecaher)
+                    {
+                        Menu.TeacherMenu(bot, message);
+                    }
+                    else
+                    {
+                        Menu.StudentMenu(bot, message);
+                    }
                 }
             }
         }
