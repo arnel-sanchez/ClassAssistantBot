@@ -112,8 +112,12 @@ namespace ClassAssistantBot.Services
                     new KeyboardButton[]
                     {
                         new KeyboardButton("*Eliminar Estudiante del Aula*"),
-                        new KeyboardButton("*Cancelar*")
+                        new KeyboardButton("*Editar Nombre De Clase Práctica*")
                     },
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Cancelar*")
+                    }
                 },
                 ResizeKeyboard = true
             }; ;

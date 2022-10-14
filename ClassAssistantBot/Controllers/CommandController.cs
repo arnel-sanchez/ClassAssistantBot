@@ -399,6 +399,10 @@ namespace ClassAssistantBot.Controllers
                             }
                             Menu.TeacherMenu(bot, message);
                             return;
+                        case UserStatus.EditPracticalClasss:
+                            var editPracticalClassRes = practicClassDataHandler.EditPracticalClassName(user, message.Text);
+                            Menu.TeacherMenu(bot, message, editPracticalClassRes);
+                            return;
                         case UserStatus.Miscellaneous:
                             miscellaneousDataHandler.CreateMiscellaneous(user, message.Text);
                             if (!string.IsNullOrEmpty(classRoomDataHandler.GetMiscellaneousChannel(user)))
@@ -590,6 +594,9 @@ namespace ClassAssistantBot.Controllers
                     break;
                 case "enviarinformaciónatodoslosestudiantesdelaula":
                     SendStudentsInformation(user);
+                    break;
+                case "editarnombredeclasepráctica":
+                    EditPracticalClassName(user);
                     break;
                 default:
                     DefaultCommand(user, cmd);
@@ -1626,6 +1633,29 @@ namespace ClassAssistantBot.Controllers
                 Menu.PracticalClassList(bot, message, practicalClasses, "Seleccione una Clase Práctica:");
             }
         }
+
+        private void EditPracticalClassName(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var practicalClasses = practicClassDataHandler.EditPracticalClassName(user);
+                Menu.CancelMenu(bot, message, practicalClasses);
+            }
+        }
         #endregion
 
         #region Procesos que completan comandos de varias operaciones
@@ -1675,7 +1705,7 @@ namespace ClassAssistantBot.Controllers
         private void OnRectificationToTheTeacherAtTeacherUserName(Models.User user, string teacherUserName)
         {
             rectificationToTheTeacherDataHandler.DoRectificationToTheTaecherUserName(user, teacherUserName);
-            Menu.CancelMenu(bot, message, "Explique a groso modo en qué se equivocó el profesor y su correción:");
+            Menu.CancelMenu(bot, message, "Explique a grosso modo en qué se equivocó el profesor y su correción:");
         }
 
         private void OnRectificationToTheTeacherAtText(Models.User user, string text)

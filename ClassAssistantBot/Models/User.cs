@@ -42,7 +42,8 @@ namespace ClassAssistantBot.Models
         CreatePracticClass,
         ReviewPracticClassSelect,
         ReviewPracticClassSelectStudent,
-        ReviewPracticClass
+        ReviewPracticClass,
+        EditPracticalClasss
     }
 
     public class User : Telegram.BotAPI.AvailableTypes.ITelegramUser

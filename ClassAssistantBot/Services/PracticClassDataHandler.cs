@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using ClassAssistantBot.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -156,6 +157,58 @@ namespace ClassAssistantBot.Services
             {
                 return (false, $"No insertó correctamente la revisión.", "", "");
             }
+        }
+
+        public string EditPracticalClassName(User user)
+        {
+            user.Status = UserStatus.EditPracticalClasss;
+            dataAccess.Users.Update(user);
+
+            StringBuilder res = new StringBuilder("Listado de Clases Prácticas:\n");
+
+            var practicalClasses = dataAccess.PracticClasses.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
+            int k = 1;
+            foreach (var practicaClass in practicalClasses)
+            {
+                res.Append(k);
+                res.Append(":");
+                res.Append(practicaClass.Name);
+                res.Append(" (");
+                res.Append(practicaClass.Code);
+                res.Append(")\n");
+            }
+
+            res.Append("\n\n**Para editar el nombre de la Clase Práctica debe escribir el código entre paréntesis seguido de un espacio y luego el nuevo nombre**");
+            dataAccess.SaveChanges();
+            return res.ToString();
+        }
+
+        public string EditPracticalClassName(User user, string text)
+        {
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+
+            var data = text.Split(" ");
+
+            var code = data[0];
+
+            var name = data[1];
+
+            for (int i = 2; i < data.Length; i++)
+            {
+                name += " ";
+                name += data[i];
+            }
+
+            var practicalClass = dataAccess.PracticClasses.Where(x => x.Code == code).FirstOrDefault();
+
+            if (practicalClass == null)
+                return "No existe una Clase Práctica con ese código.";
+
+            practicalClass.Name = name;
+            dataAccess.PracticClasses.Update(practicalClass);
+            dataAccess.SaveChanges();
+            return "Clase Práctica Editada Satisfactoriamente";
         }
     }
 }
