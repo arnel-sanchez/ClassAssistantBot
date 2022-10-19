@@ -84,7 +84,7 @@ namespace ClassAssistantBot.Services
                     res.Add(excercise);
                 }
             }
-
+            res = res.OrderBy(x => x.Code).ToList();
             return res;
         }
 
