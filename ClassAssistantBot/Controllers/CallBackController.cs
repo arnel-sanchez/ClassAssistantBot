@@ -107,7 +107,7 @@ namespace ClassAssistantBot.Controllers
 
                 var pending = pendingDataHandler.GetPending(pendingCode);
 
-                var res = pendingDataHandler.GetContentObjectById(pending, username);
+                var res = pendingDataHandler.GetPendingExplicationData(pending, username);
 
                 if (string.IsNullOrEmpty(res.Item2))
                 {

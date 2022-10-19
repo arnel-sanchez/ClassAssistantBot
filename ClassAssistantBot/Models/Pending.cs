@@ -31,6 +31,8 @@ namespace ClassAssistantBot.Models
         public string ObjectId { get; set; }
 
         public string Code { get; set; }
+
+        public bool GiveMeAnExplication { get; set; }
     }
 }
 

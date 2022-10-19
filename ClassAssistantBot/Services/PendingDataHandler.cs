@@ -1,7 +1,6 @@
-﻿using System.Text;
+﻿        using System.Text;
 using ClassAssistantBot.Models;
 using Microsoft.EntityFrameworkCore;
-using Telegram.BotAPI.AvailableTypes;
 using User = ClassAssistantBot.Models.User;
 
 namespace ClassAssistantBot.Services
@@ -109,6 +108,10 @@ namespace ClassAssistantBot.Services
                 res.Append("(" + item.Student.User.Username);
                 res.Append(") -> /");
                 res.Append(item.Code);
+                if (item.GiveMeAnExplication)
+                {
+                    res.Append(" (A espera de explicación)");
+                }
                 res.Append("\n");
             }
             if (pendings.Count == 0)
@@ -266,8 +269,11 @@ namespace ClassAssistantBot.Services
             return res.ToString();
         }
 
-        public (string, string) GetContentObjectById(Pending pending, string teacherUsername)
+        public (string, string) GetPendingExplicationData(Pending pending, string teacherUsername)
         {
+            pending.GiveMeAnExplication = true;
+            dataAccess.Pendings.Update(pending);
+            dataAccess.SaveChanges();
             if (pending.Type == InteractionType.ClassIntervention)
             {
                 var classIntervention = dataAccess.ClassInterventions
