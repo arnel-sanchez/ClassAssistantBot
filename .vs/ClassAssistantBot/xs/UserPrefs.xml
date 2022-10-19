@@ -1,18 +1,30 @@
 ﻿<Properties StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default" GitUserInfo="UsingGIT">
+  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MultiItemStartupConfigurations />
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Services/PracticClassDataHandler.cs">
+  <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Services/Menu.cs">
     <Files>
-      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="1708" Column="60" />
-      <File FileName="ClassAssistantBot/Services/Menu.cs" Line="115" Column="77" />
-      <File FileName="ClassAssistantBot/Services/PracticClassDataHandler.cs" Line="162" Column="1" />
+      <File FileName="ClassAssistantBot/Services/PracticClassDataHandler.cs" Line="68" Column="115" />
+      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="289" Column="60" />
+      <File FileName="ClassAssistantBot/Controllers/CallBackController.cs" Line="158" Column="90" />
+      <File FileName="ClassAssistantBot/Services/Menu.cs" Line="508" Column="60" />
+      <File FileName="ClassAssistantBot/Services/StudentDataHandler.cs" Line="170" Column="41" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="ClassAssistantBot" expanded="True">
-            <Node name="ClassAssistantBot" expanded="True" />
+            <Node name="ClassAssistantBot" expanded="True">
+              <Node name="Controllers" expanded="True" />
+              <Node name="Models" expanded="True" />
+              <Node name="Services" expanded="True" />
+            </Node>
           </Node>
         </State>
       </Pad>
@@ -21,10 +33,4 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
-  <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
 </Properties>

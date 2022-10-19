@@ -286,20 +286,6 @@ namespace ClassAssistantBot.Controllers
                             }
                             Menu.TeacherConfigurationMenu(bot, message, jokeChannelConfigurationText);
                             return;
-                        case UserStatus.ReviewPracticClass:
-                            var review = practicClassDataHandler.ReviewPrecticalClass(user, message.Text);
-                            if (review.Item1)
-                            {
-                                Menu.TeacherMenu(bot, message, review.Item2);
-                                bot.SendMessage(chatId: review.Item4,
-                                    text: $"El profesor @{user.Username} le ha revisado la Clase Práctica {review.Item3}.");
-                            }
-                            else
-                            {
-                                bot.SendMessage(chatId: user.ChatId,
-                                    text: $"En la revisión ha ocurrido el siguiente error: {review.Item2}\nPor favor, vuelva a intentarlo.");
-                            }
-                            return;
                         case UserStatus.AssignClassInterventionChannel:
                             classRoomDataHandler.AssignClassInterventionChannel(user, message.Text);
                             var classInterventionsChannelConfigurationText = "Canal de Intervenciones en Clases asignado satisfactoriamente";
@@ -1628,7 +1614,7 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                var practicalClasses = practicClassDataHandler.ReviewPracticClass(user);
+                var practicalClasses = practicClassDataHandler.GetPracticClasses(user);
                 Menu.CancelMenu(bot, message);
                 Menu.PracticalClassList(bot, message, practicalClasses, "Seleccione una Clase Práctica:");
             }

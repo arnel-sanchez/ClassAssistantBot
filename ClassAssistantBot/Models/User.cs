@@ -40,8 +40,6 @@ namespace ClassAssistantBot.Models
         Miscellaneous,
         AssignMiscellaneousChannel,
         CreatePracticClass,
-        ReviewPracticClassSelect,
-        ReviewPracticClassSelectStudent,
         ReviewPracticClass,
         EditPracticalClasss
     }

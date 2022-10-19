@@ -166,6 +166,26 @@ namespace ClassAssistantBot.Services
             }
             return res.ToString();
         }
+
+        public List<Student> GetStudents(User teacher)
+        {
+            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == teacher.ClassRoomActiveId).First();
+            var students = dataAccess.StudentsByClassRooms
+                .Where(x => x.ClassRoomId == teacher.ClassRoomActiveId)
+                .Include(x => x.ClassRoom)
+                .Include(x => x.Student)
+                .ThenInclude(x => x.User)
+                .ToList();
+
+            var list = new List<Student>();
+
+            foreach (var student in students)
+            {
+                list.Add(student.Student);
+            }
+
+            return list;
+        }
     }
 }
 

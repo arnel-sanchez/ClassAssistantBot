@@ -16,6 +16,7 @@ namespace ClassAssistantBot.Controllers
         private PendingDataHandler pendingDataHandler;
         private UserDataHandler userDataHandler;
         private TeacherDataHandler teacherDataHandler;
+        private StudentDataHandler studentDataHandler;
         private PracticClassDataHandler practicClassDataHandler;
 
         public CallBackController(BotClient bot, DataAccess dataAccess)
@@ -28,6 +29,7 @@ namespace ClassAssistantBot.Controllers
             this.userDataHandler = new UserDataHandler(dataAccess);
             this.teacherDataHandler = new TeacherDataHandler(dataAccess);
             this.practicClassDataHandler = new PracticClassDataHandler(dataAccess);
+            this.studentDataHandler = new StudentDataHandler(dataAccess);
         }
 
         public void ProcessCallBackQuery(CallbackQuery callbackQuery)
@@ -143,17 +145,55 @@ namespace ClassAssistantBot.Controllers
                 var pendings = pendingDataHandler.GetPendings(user);
                 Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
-            else if (callbackQuery.Data.Contains("PracticalClassID//"))
+            else if (callbackQuery.Data.Contains("PracticalClassCode//"))
             {
                 var data = callbackQuery.Data.Split("//");
-                var students = practicClassDataHandler.ReviewPracticClassSelect(user);
+                var students = studentDataHandler.GetStudents(user);
                 Menu.PracticalClassStudentsList(bot, message, students, data[1], "Seleccione el estudiante:");
             }
-            else if (callbackQuery.Data.Contains("StudentID//"))
+            else if (callbackQuery.Data.Contains("StudentUserName//"))
             {
                 var data = callbackQuery.Data.Split("//");
-                practicClassDataHandler.ReviewPracticClassPending(user, long.Parse(data[1]), data[2]);
-                Menu.CancelMenu(bot, message, "Inserte la Revisón de Clase Práctica en el formato siguiente: \n 1 1a 2a ...... (true o false) si se entregó antes de la fecha de la clase");
+                var excercises = practicClassDataHandler.GetExcercises(user, data[1], data[2]);
+                if (excercises.Count() == 0)
+                {
+                    var students = studentDataHandler.GetStudents(user);
+                    Menu.PracticalClassStudentsList(bot, message, students, data[2], "El estudiante que seleccionó no tiene ejercicios pendientes en esta clase. Seleccione un nuevo estudiante:");
+                }
+                else
+                {
+                    Menu.PracticalClassExcersicesList(bot, message, excercises, data[2], data[1], "Seleccione el ejercicio:");
+                }
+            }
+            else if (callbackQuery.Data.Contains("ExcserciseCode//"))
+            {
+                var data = callbackQuery.Data.Split("//");
+                Menu.PracticalClassIsDouble(bot, message, data[1], data[3], data[2], "Entregó antes de la Clase Práctica?");
+            }
+            else if (callbackQuery.Data.Contains("IsDouble//"))
+            {
+                var data = callbackQuery.Data.Split("//");
+                var res = practicClassDataHandler.ReviewPrecticalClass(user, data[1], data[2], data[3], bool.Parse(data[4]));
+                if (res.Item1)
+                {
+                    bot.SendMessage(chatId: res.Item4,
+                        text: res.Item2);
+                    var excercises = practicClassDataHandler.GetExcercises(user, data[2], data[3]);
+                    if (excercises.Count() == 0)
+                    {
+                        var students = studentDataHandler.GetStudents(user);
+                        Menu.PracticalClassStudentsList(bot, message, students, data[2], "El estudiante que seleccionó no tiene ejercicios pendientes en esta clase. Seleccione un nuevo estudiante:");
+                    }
+                    else
+                    {
+                        Menu.PracticalClassExcersicesList(bot, message, excercises, data[3], data[2], "Seleccione el ejercicio:");
+                    }
+                }
+                else
+                {
+                    var students = studentDataHandler.GetStudents(user);
+                    Menu.PracticalClassStudentsList(bot, message, students, data[2], $"Ocurrió el siguiente error: {res.Item2}.\n\nVuelva a seleccionar el estudiante:");
+                }
             }
             else
             {

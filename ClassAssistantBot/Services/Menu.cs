@@ -462,7 +462,7 @@ namespace ClassAssistantBot.Services
                     {
                         new InlineKeyboardButton
                         {
-                            CallbackData = $"PracticalClassID//{practicClasses[i].Id}",
+                            CallbackData = $"PracticalClassCode//{practicClasses[i].Code}",
                             Text = $"{practicClasses[i].Name}"
                         }
                     };
@@ -477,7 +477,7 @@ namespace ClassAssistantBot.Services
                         replyMarkup: keyboard);
         }
 
-        public static void PracticalClassStudentsList(BotClient bot, Message message, List<Student> students, string practicClassId, string text = "")
+        public static void PracticalClassStudentsList(BotClient bot, Message message, List<Student> students, string practicalClassCode, string text = "")
         {
             var buttonTeachers = new List<InlineKeyboardButton[]>();
             for (int i = 0; i < students.Count; i++)
@@ -486,7 +486,7 @@ namespace ClassAssistantBot.Services
                     {
                         new InlineKeyboardButton
                         {
-                            CallbackData = $"StudentID//{students[i].UserId}//{practicClassId}",
+                            CallbackData = $"StudentUserName//{students[i].User.Username}//{practicalClassCode}",
                             Text = $"{(string.IsNullOrEmpty(students[i].User.FirstName) ? students[i].User.Name : students[i].User.FirstName + students[i].User.LastName )}"
                         }
                     };
@@ -495,6 +495,63 @@ namespace ClassAssistantBot.Services
             var keyboard = new InlineKeyboardMarkup()
             {
                 InlineKeyboard = buttonTeachers.ToArray()
+            };
+            bot.SendMessage(chatId: message.Chat.Id,
+                        text: text,
+                        replyMarkup: keyboard);
+        }
+
+        public static void PracticalClassExcersicesList(BotClient bot, Message message, List<Excercise> excercises, string practicalClassCode, string studentUserName, string text = "")
+        {
+            var buttonTeachers = new List<InlineKeyboardButton[]>();
+            for (int i = 0; i < excercises.Count; i++)
+            {
+                var temp = new List<InlineKeyboardButton>()
+                    {
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"ExcserciseCode//{excercises[i].Code}//{studentUserName}//{practicalClassCode}",
+                            Text = $"{excercises[i].Code}"
+                        }
+                    };
+                buttonTeachers.Add(temp.ToArray());
+            }
+            buttonTeachers.Add(new InlineKeyboardButton[]
+            {
+                new InlineKeyboardButton
+                {
+                    CallbackData = $"PracticalClassCode//{practicalClassCode}",
+                    Text = $"Atrás"
+                }
+            });
+            var keyboard = new InlineKeyboardMarkup()
+            {
+                InlineKeyboard = buttonTeachers.ToArray()
+            };
+            bot.SendMessage(chatId: message.Chat.Id,
+                        text: text,
+                        replyMarkup: keyboard);
+        }
+
+        public static void PracticalClassIsDouble(BotClient bot, Message message, string excerciseCode, string practicalClassCode, string studentUserName, string text = "")
+        {
+            var keyboard = new InlineKeyboardMarkup()
+            {
+                InlineKeyboard = new InlineKeyboardButton[][]{
+                    new InlineKeyboardButton[]
+                    {
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"IsDouble//{excerciseCode}//{studentUserName}//{practicalClassCode}//{true}",
+                            Text = $"Sí"
+                        },
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"IsDouble//{excerciseCode}//{studentUserName}//{practicalClassCode}//{false}",
+                            Text = $"No"
+                        },
+                    }
+                }
             };
             bot.SendMessage(chatId: message.Chat.Id,
                         text: text,
