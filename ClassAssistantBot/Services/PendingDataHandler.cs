@@ -99,6 +99,10 @@ namespace ClassAssistantBot.Services
                 {
                     type = "Frase de Estado";
                 }
+                else if (item.Type == InteractionType.Daily)
+                {
+                    type = "Actualización al Diario";
+                }
                 res.Append(type);
                 res.Append(": ");
                 if (!string.IsNullOrEmpty(item.Student.User.Name))

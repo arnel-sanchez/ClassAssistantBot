@@ -93,6 +93,11 @@ namespace ClassAssistantBot.Services
             dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
         }
+
+        public Meme GetMeme(string memeId)
+        {
+            return dataAccess.Memes.Where(x => x.Id == memeId).First();
+        }
     }
 }
 

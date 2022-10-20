@@ -17,6 +17,7 @@ namespace ClassAssistantBot.Controllers
         private UserDataHandler userDataHandler;
         private TeacherDataHandler teacherDataHandler;
         private StudentDataHandler studentDataHandler;
+        private DailyDataHandler dailyDataHandler;
         private PracticClassDataHandler practicClassDataHandler;
 
         public CallBackController(BotClient bot, DataAccess dataAccess)
@@ -30,6 +31,7 @@ namespace ClassAssistantBot.Controllers
             this.teacherDataHandler = new TeacherDataHandler(dataAccess);
             this.practicClassDataHandler = new PracticClassDataHandler(dataAccess);
             this.studentDataHandler = new StudentDataHandler(dataAccess);
+            this.dailyDataHandler = new DailyDataHandler(dataAccess);
         }
 
         public void ProcessCallBackQuery(CallbackQuery callbackQuery)
@@ -67,6 +69,24 @@ namespace ClassAssistantBot.Controllers
                 var interactionType = (Models.InteractionType)int.Parse(data[2]);
                 var pendings = pendingDataHandler.GetPendings(user, false, interactionType, page);
                 Menu.PendingsPaginators(bot, message, pendings.Item1, pendings.Item2, page, interactionType);
+            }
+            else if (callbackQuery.Data == "AcceptDiaryUpdate")
+            {
+                string code = "";
+                if (!string.IsNullOrEmpty(callbackQuery.Message.Text))
+                {
+                    code = callbackQuery.Message.Text.Split(" /")[1];
+                }
+                else
+                    //Error
+                    return;
+                var pending = pendingDataHandler.GetPending(code);
+                var diary = dailyDataHandler.GetDaily(pending.ObjectId);
+                bot.SendMessage(chatId: pending.Student.User.ChatId,
+                                    text: $"El profesor @{user.Username} ha Aceptado su solicitud de actualización de diario:\n\n{diary.Text}");
+                dailyDataHandler.AcceptDiary(user, pending.Student.UserId, pending.ObjectId);
+                var pendings = pendingDataHandler.GetPendings(user);
+                Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
             else if(callbackQuery.Data == "DenialOfCreditApplications")
             {
@@ -210,6 +230,8 @@ namespace ClassAssistantBot.Controllers
                     interactionType = Models.InteractionType.Joke;
                 else if (callbackQuery.Data.Contains("Miscellaneous"))
                     interactionType = Models.InteractionType.Miscellaneous;
+                else if (callbackQuery.Data.Contains("Diary"))
+                    interactionType = Models.InteractionType.Daily;
                 else if (callbackQuery.Data.Contains("RectificationToTheTeacher"))
                     interactionType = Models.InteractionType.RectificationToTheTeacher;
                 var pendings = pendingDataHandler.GetPendings(user, false, interactionType);

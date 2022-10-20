@@ -311,6 +311,11 @@ namespace ClassAssistantBot.Services
                         {
                             CallbackData = $"Miscellaneous//1//{(int)InteractionType.Miscellaneous}",
                             Text = "Miscelánea"
+                        },
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"Diary//1//{(int)InteractionType.Daily}",
+                            Text = "Actualización del Diario"
                         }
                     },
                 }
@@ -381,6 +386,11 @@ namespace ClassAssistantBot.Services
                             {
                                 CallbackData = $"Miscellaneous//1//{(int)InteractionType.Miscellaneous}",
                                 Text = "Miscelánea"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                CallbackData = $"Diary//1//{(int)InteractionType.Daily}",
+                                Text = "Actualización del Diario"
                             }
                         },
                     }
@@ -450,6 +460,46 @@ namespace ClassAssistantBot.Services
                 }
                 return true;
             }
+            return false;
+        }
+
+        public static bool PendingDiaryCommands(BotClient bot, Message message, string pending, bool giveMeExplication, string command, User user)
+        {
+            var buttonGiveMeExplication = new List<InlineKeyboardButton>();
+            if (giveMeExplication)
+            {
+                buttonGiveMeExplication.Add(new InlineKeyboardButton
+                {
+                    CallbackData = $"GiveMeExplication//{command}//{user.Username}",
+                    Text = "Pedir Explicación al Alumno"
+                });
+            }
+            var buttonTeachers = new List<InlineKeyboardButton[]>();
+            buttonTeachers.Add(
+                new InlineKeyboardButton[]{
+                    new InlineKeyboardButton
+                    {
+                        CallbackData = "AcceptDiaryUpdate",
+                        Text = "Aceptar la Actualización al Diario"
+                    }
+                });
+            buttonTeachers.Add(buttonGiveMeExplication.ToArray());
+            buttonTeachers.Add(
+                new InlineKeyboardButton[]{
+                    new InlineKeyboardButton
+                    {
+                        CallbackData = "DenialOfCreditApplications",
+                        Text = "Denegar Solicitud de Créditos"
+                    }
+                });
+            var keyboard = new InlineKeyboardMarkup()
+            {
+                InlineKeyboard = buttonTeachers.ToArray()
+            };
+            Menu.CancelMenu(bot, message);
+            bot.SendMessage(chatId: message.Chat.Id,
+                    text: pending,
+                    replyMarkup: keyboard);
             return false;
         }
 
