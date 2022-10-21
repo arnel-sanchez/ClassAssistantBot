@@ -209,9 +209,6 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.ClassIntervention:
                             classInterventionDataHandler.CreateIntervention(user, message.Text);
-                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassInterventionChannel(user)))
-                                bot.SendMessage(chatId: classRoomDataHandler.GetClassInterventionChannel(user),
-                                    text: "Intervención en Clase enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.RectificationToTheTeacherUserName:
@@ -226,11 +223,17 @@ namespace ClassAssistantBot.Controllers
                             Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.ClassTitleSelect:
+                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassTitleChannel(user)))
+                                bot.SendMessage(chatId: classRoomDataHandler.GetClassTitleChannel(user),
+                                    text: "Cambio de Título de Clase enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             OnChangeClassTitle(user, message.Text);
                             Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.ClassInterventionSelect:
                             OnClassIntervention(user, message.Text);
+                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassInterventionChannel(user)))
+                                bot.SendMessage(chatId: classRoomDataHandler.GetClassInterventionChannel(user),
+                                    text: "Intervención en Clase enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.AssignCreditsStudent:
