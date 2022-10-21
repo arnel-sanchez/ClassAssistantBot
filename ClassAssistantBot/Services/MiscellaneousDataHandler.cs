@@ -48,6 +48,11 @@ namespace ClassAssistantBot.Services
             dataAccess.Pendings.Add(pending);
             dataAccess.SaveChanges();
         }
+
+        public Miscellaneous GetMiscellaneous(string miscellaneousId)
+        {
+            return dataAccess.Miscellaneous.Where(x => x.Id == miscellaneousId).First();
+        }
     }
 }
 

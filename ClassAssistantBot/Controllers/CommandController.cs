@@ -373,9 +373,6 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.Miscellaneous:
                             miscellaneousDataHandler.CreateMiscellaneous(user, message.Text);
-                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetMiscellaneousChannel(user)))
-                                bot.SendMessage(chatId: classRoomDataHandler.GetMiscellaneousChannel(user),
-                                    text: "Miscelánea enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.CreatePracticClass:
@@ -1760,6 +1757,44 @@ namespace ClassAssistantBot.Controllers
                 {
                     comment = statusPhraseDataHandler.GetStatusPhrase(pending.ObjectId).Phrase;
                 }
+                else if(pending.Type == InteractionType.Miscellaneous)
+                {
+                    comment = miscellaneousDataHandler.GetMiscellaneous(pending.ObjectId).Text;
+                }
+                string type = "";
+
+                if (pending.Type == InteractionType.ClassIntervention)
+                {
+                    type = "Intervención en Clases";
+                }
+                else if (pending.Type == InteractionType.ClassTitle)
+                {
+                    type = "Cambio de Título a la Clase";
+                }
+                else if (pending.Type == InteractionType.Daily)
+                {
+                    type = "Actualización del Diario";
+                }
+                else if (pending.Type == InteractionType.Joke)
+                {
+                    type = "Chiste";
+                }
+                else if (pending.Type == InteractionType.RectificationToTheTeacher)
+                {
+                    type = "Rectificación a los Profesores";
+                }
+                else if (pending.Type == InteractionType.StatusPhrase)
+                {
+                    type = "Cambio de Frase de Estado";
+                }
+                else if (pending.Type == InteractionType.Miscellaneous)
+                {
+                    type = "Miscelánea";
+                }
+                else if (pending.Type == InteractionType.Meme)
+                {
+                    type = "Meme";
+                }
 
                 if (response.Length != 1 && !string.IsNullOrEmpty(comment))
                 {
@@ -1769,7 +1804,7 @@ namespace ClassAssistantBot.Controllers
                         res += " ";
                         res += response[i];
                     }
-                    text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}) y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
+                    text = $"Ha recibido {credits} créditos por su {type} ({comment}) y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
                 }
                 else if (response.Length != 1 && string.IsNullOrEmpty(comment))
                 {
@@ -1779,12 +1814,12 @@ namespace ClassAssistantBot.Controllers
                         res += " ";
                         res += response[i];
                     }
-                    text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()} y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
+                    text = $"Ha recibido {credits} créditos por su {type} y su profesor le ha hecho la siguiente recomendación: \"{res}\".";
                 }
                 else if (response.Length == 1 && !string.IsNullOrEmpty(comment))
-                    text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}({comment}).";
+                    text = $"Ha recibido {credits} créditos por su {type} ({comment}).";
                 else
-                    text = $"Ha recibido {credits} créditos por su {pending.Type.ToString()}.";
+                    text = $"Ha recibido {credits} créditos por su {type}.";
                 bot.SendMessage(chatId: pending.Student.User.ChatId,
                                 text: text);
                 string credit_information = "";
@@ -1803,42 +1838,42 @@ namespace ClassAssistantBot.Controllers
                     comment = classInterventionDataHandler.GetClassIntenvention(pending.ObjectId).Text;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassInterventionChannel(user)))
                         bot.SendMessage(chatId: classRoomDataHandler.GetClassInterventionChannel(user),
-                            text: "Intervención en Clase enviada por: @" + user.Username + "\n\"" + comment + "\"");
+                            text: "Intervención en Clase enviada por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.ClassTitle)
                 {
                     comment = classTitleDataHandler.GetClassTitle(pending.ObjectId).Title;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassTitleChannel(user)))
                         bot.SendMessage(chatId: classRoomDataHandler.GetClassTitleChannel(user),
-                            text: "Cambio de Título de Clase enviado por: @" + user.Username + "\n\"" + comment + "\"");
+                            text: "Cambio de Título de Clase enviado por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.Daily)
                 {
                     comment = dailyDataHandler.GetDaily(pending.ObjectId).Text;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetDiaryChannel(user)))
                         bot.SendMessage(chatId: classRoomDataHandler.GetDiaryChannel(user),
-                            text: "Actualización al Diario enviado por: @" + user.Username + "\n\"" + comment + "\"");
+                            text: "Actualización al Diario enviado por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.Joke)
                 {
                     comment = jokeDataHandler.GetJoke(pending.ObjectId).Text;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetJokesChannel(user)))
                         bot.SendMessage(chatId: classRoomDataHandler.GetJokesChannel(user),
-                            text: "Chiste enviado por: @" + user.Username + "\n\"" + comment + "\"");
+                            text: "Chiste enviado por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.RectificationToTheTeacher)
                 {
                     comment = rectificationToTheTeacherDataHandler.GetRectificationToTheTeacher(pending.ObjectId).Text;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetRectificationToTheTeacherChannel(user)))
                         bot.SendMessage(chatId: classRoomDataHandler.GetRectificationToTheTeacherChannel(user),
-                            text: "Rectificación al Profesor enviada por: @" + user.Username + "\n\"" + comment + "\"");
+                            text: "Rectificación al Profesor enviada por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.StatusPhrase)
                 {
                     comment = statusPhraseDataHandler.GetStatusPhrase(pending.ObjectId).Phrase;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetStatusPhraseChannel(user)))
                         bot.SendMessage(chatId: classRoomDataHandler.GetStatusPhraseChannel(user),
-                            text: "Frase de Estado enviada por: @" + user.Username + "\n\"" + comment + "\"");
+                            text: "Frase de Estado enviada por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.Meme)
                 {
@@ -1846,7 +1881,14 @@ namespace ClassAssistantBot.Controllers
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetMemeChannel(user)))
                         bot.SendPhoto(chatId: classRoomDataHandler.GetMemeChannel(user),
                             photo: meme.FileId,
-                            caption: "Meme enviado por: @" + user.Username);
+                            caption: "Meme enviado por: @" + pending.Student.User.Username);
+                }
+                else if(pending.Type == InteractionType.Miscellaneous)
+                {
+                    comment = miscellaneousDataHandler.GetMiscellaneous(pending.ObjectId).Text;
+                    if (!string.IsNullOrEmpty(classRoomDataHandler.GetMiscellaneousChannel(user)))
+                        bot.SendMessage(chatId: classRoomDataHandler.GetMiscellaneousChannel(user),
+                            text: "Miscelánea enviada por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
             }
             else
