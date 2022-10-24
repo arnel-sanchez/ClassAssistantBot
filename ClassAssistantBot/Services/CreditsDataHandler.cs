@@ -257,9 +257,10 @@ namespace ClassAssistantBot.Services
                 .GroupBy(x => x.User);
 
             var tuple = new List<(User, long)>();
-
+            int k = 0;
             foreach (var credit in credits)
             {
+                Console.WriteLine(k);
                 tuple.Add((credit.Key, credit.Sum(x => x.Value)));
             }
 
