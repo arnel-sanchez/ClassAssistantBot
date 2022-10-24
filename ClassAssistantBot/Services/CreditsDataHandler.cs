@@ -253,6 +253,7 @@ namespace ClassAssistantBot.Services
         {
             var credits = dataAccess.Credits
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
+                .OrderByDescending(x => x.DateTime.Date)
                 .ToList()
                 .GroupBy(x => x.UserId);
 
