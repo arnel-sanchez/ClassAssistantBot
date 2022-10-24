@@ -254,13 +254,11 @@ namespace ClassAssistantBot.Services
             var credits = dataAccess.Credits
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
                 .ToList()
-                .GroupBy(x => x.User);
+                .GroupBy(x => x.UserId);
 
             var tuple = new List<(User, long)>();
-            int k = 0;
             foreach (var credit in credits)
             {
-                Console.WriteLine(k);
                 tuple.Add((credit.Key, credit.Sum(x => x.Value)));
             }
 
