@@ -571,10 +571,13 @@ namespace ClassAssistantBot.Controllers
                     AssignRectificationToTheTeacherChannelCommand(user);
                     break;
                 case "enviarinformaciónatodoslosestudiantesdelaula":
-                    SendStudentsInformation(user);
+                    SendStudentsInformationCommand(user);
                     break;
                 case "editarnombredeclasepráctica":
-                    EditPracticalClassName(user);
+                    EditPracticalClassNameCommand(user);
+                    break;
+                case "verestadodecréditos":
+                    CreditsStatusCommand(user);
                     break;
                 default:
                     DefaultCommand(user, cmd);
@@ -1504,7 +1507,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void SendStudentsInformation(Models.User? user)
+        private void SendStudentsInformationCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -1620,7 +1623,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void EditPracticalClassName(Models.User? user)
+        private void EditPracticalClassNameCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -1640,6 +1643,29 @@ namespace ClassAssistantBot.Controllers
             {
                 var practicalClasses = practicClassDataHandler.EditPracticalClassName(user);
                 Menu.CancelMenu(bot, message, practicalClasses);
+            }
+        }
+
+        private void CreditsStatusCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || user.IsTecaher)
+            {
+                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
+                bot.SendMessage(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var credits = creditsDataHandler.GetCreditListOfUser(user);
+                Menu.StudentMenu(bot, message, credits);
             }
         }
         #endregion

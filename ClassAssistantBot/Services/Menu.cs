@@ -136,23 +136,26 @@ namespace ClassAssistantBot.Services
                     new KeyboardButton[]{
                         new KeyboardButton("*Intervención en Clase*"),
                         new KeyboardButton("*Meme*"),
-                        },
+                    },
                     new KeyboardButton[]{
                         new KeyboardButton("*Rectificar al Profesor*"),
                         new KeyboardButton("*Chiste*")
-                        },
+                    },
                     new KeyboardButton[]{
                         new KeyboardButton("*Diario*"),
                         new KeyboardButton("*Créditos*"),
-                        },
+                    },
                     new KeyboardButton[]{
                         new KeyboardButton("*Frase de Estado*"),
                         new KeyboardButton("*Cambiar Título de Clase*")
-                        },
+                    },
                     new KeyboardButton[]{
                         new KeyboardButton("*Misceláneas*"),
+                        new KeyboardButton("*Ver Estado de Créditos*"),
+                    },
+                    new KeyboardButton[]{
                         new KeyboardButton("*Configuración*"),
-                        },
+                    },
                 },
                 ResizeKeyboard = true
             }; ;

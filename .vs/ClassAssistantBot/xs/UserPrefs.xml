@@ -1,20 +1,21 @@
-﻿<Properties StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default" GitUserInfo="UsingGIT">
+﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default">
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
   <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Controllers/CallBackController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Controllers/CommandController.cs">
     <Files>
-      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="894" Column="28" />
+      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="85" Column="25" />
       <File FileName="ClassAssistantBot/Services/DailyDataHandler.cs" Line="57" Column="75" />
       <File FileName="ClassAssistantBot/Services/Menu.cs" Line="482" Column="58" />
-      <File FileName="ClassAssistantBot/Controllers/CallBackController.cs" Line="86" Column="130" />
+      <File FileName="ClassAssistantBot/Controllers/CallBackController.cs" Line="90" Column="14" />
       <File FileName="ClassAssistantBot/Services/PendingDataHandler.cs" Line="17" Column="151" />
+      <File FileName="ClassAssistantBot/Controllers/EngineController.cs" Line="39" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">

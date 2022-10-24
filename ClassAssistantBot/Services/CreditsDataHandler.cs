@@ -248,5 +248,49 @@ namespace ClassAssistantBot.Services
             dataAccess.Credits.Add(credit);
             dataAccess.SaveChanges();
         }
+
+        public string GetCreditListOfUser(User user)
+        {
+            var credits = dataAccess.Credits
+                .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
+                .ToList()
+                .GroupBy(x => x.User);
+
+            var tuple = new List<(User, long)>();
+
+            foreach (var credit in credits)
+            {
+                tuple.Add((credit.Key, credit.Sum(x => x.Value)));
+            }
+
+            tuple = tuple.OrderByDescending(x => x.Item2).ToList();
+            var me = tuple.Where(x => x.Item1 == user).First();
+            var indexMe = tuple.IndexOf(me);
+            var res = new StringBuilder();
+            if(indexMe - 1 >= 0)
+            {
+                (User, long) previous = tuple[indexMe - 1];
+                res.Append(indexMe);
+                res.Append(": ");
+                res.Append(previous.Item2);
+                res.Append(" -> **********************\n");
+            }
+            res.Append(indexMe + 1);
+            res.Append(": ");
+            res.Append(me.Item2);
+            res.Append(" -> ");
+            res.Append(string.IsNullOrEmpty(me.Item1.Name) ? me.Item1.FirstName + " " + me.Item1.LastName : me.Item1.Name);
+            res.Append("\n");
+            if (indexMe + 1 < tuple.Count())
+            {
+                (User, long) next = tuple[indexMe + 1];
+                res.Append(indexMe);
+                res.Append(": ");
+                res.Append(next.Item2);
+                res.Append(" -> **********************\n");
+            }
+
+            return res.ToString();
+        }
     }
 }
