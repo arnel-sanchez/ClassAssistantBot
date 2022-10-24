@@ -284,7 +284,7 @@ namespace ClassAssistantBot.Services
             if (indexMe + 1 < tuple.Count())
             {
                 (long, long) next = tuple[indexMe + 1];
-                res.Append(indexMe);
+                res.Append(indexMe + 2);
                 res.Append(": ");
                 res.Append(next.Item2);
                 res.Append(" -> **********************\n");
