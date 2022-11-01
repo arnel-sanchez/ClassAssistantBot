@@ -157,7 +157,7 @@ namespace ClassAssistantBot.Services
             {
                 return (false, $"No seleccionó correctamente el ejercicio", "", "");
             }
-            if (dataAccess.Credits.Where(x => x.ObjectId == excercise.Id).Count()!=0)
+            if (dataAccess.Credits.Where(x => x.ObjectId == excercise.Id && x.UserId == student.UserId).Count()!=0)
             {
                 return (false, $"El ejercicio ya fue revisado", "", "");
             }

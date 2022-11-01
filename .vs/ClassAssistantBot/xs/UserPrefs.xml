@@ -1,27 +1,24 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default">
-  <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
   <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
+  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Controllers/CommandController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Services/CreditsDataHandler.cs">
     <Files>
-      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="85" Column="25" />
-      <File FileName="ClassAssistantBot/Services/DailyDataHandler.cs" Line="57" Column="75" />
-      <File FileName="ClassAssistantBot/Services/Menu.cs" Line="482" Column="58" />
-      <File FileName="ClassAssistantBot/Controllers/CallBackController.cs" Line="90" Column="14" />
-      <File FileName="ClassAssistantBot/Services/PendingDataHandler.cs" Line="17" Column="151" />
-      <File FileName="ClassAssistantBot/Controllers/EngineController.cs" Line="39" Column="1" />
+      <File FileName="ClassAssistantBot/Controllers/CommandController.cs" Line="588" Column="9" />
+      <File FileName="ClassAssistantBot/Services/CreditsDataHandler.cs" Line="286" Column="43" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="ClassAssistantBot" expanded="True">
-            <Node name="ClassAssistantBot" expanded="True" />
+            <Node name="ClassAssistantBot" expanded="True">
+              <Node name="Controllers" expanded="True" />
+              <Node name="Services" expanded="True" />
+            </Node>
           </Node>
         </State>
       </Pad>
@@ -30,4 +27,6 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
 </Properties>
