@@ -79,7 +79,7 @@ namespace ClassAssistantBot.Services
                 {
                     type = "Cambio de Título de Clase";
                 }
-                else if (item.Type == InteractionType.Daily)
+                else if (item.Type == InteractionType.Diary)
                 {
                     type = "Actualización al Diario";
                 }
@@ -99,7 +99,7 @@ namespace ClassAssistantBot.Services
                 {
                     type = "Frase de Estado";
                 }
-                else if (item.Type == InteractionType.Daily)
+                else if (item.Type == InteractionType.Diary)
                 {
                     type = "Actualización al Diario";
                 }
@@ -165,13 +165,13 @@ namespace ClassAssistantBot.Services
                 res.Append($"Título: {classTitle.Title}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
             }
-            else if (pending.Type == InteractionType.Daily)
+            else if (pending.Type == InteractionType.Diary)
             {
-                var daily = dataAccess.Dailies
+                var diary = dataAccess.Dailies
                     .Include(x => x.User)
                     .First(x => x.Id == pending.ObjectId);
-                res.Append($"Actualización de Diario de {daily.User.Username}\n");
-                res.Append($"Actualización: {daily.Text}\n");
+                res.Append($"Actualización de Diario de {diary.User.Username}\n");
+                res.Append($"Actualización: {diary.Text}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
             }
             else if (pending.Type == InteractionType.Joke)

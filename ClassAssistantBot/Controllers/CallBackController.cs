@@ -17,7 +17,7 @@ namespace ClassAssistantBot.Controllers
         private UserDataHandler userDataHandler;
         private TeacherDataHandler teacherDataHandler;
         private StudentDataHandler studentDataHandler;
-        private DailyDataHandler dailyDataHandler;
+        private DiaryDataHandler diaryDataHandler;
         private PracticClassDataHandler practicClassDataHandler;
 
         public CallBackController(BotClient bot, DataAccess dataAccess)
@@ -31,7 +31,7 @@ namespace ClassAssistantBot.Controllers
             this.teacherDataHandler = new TeacherDataHandler(dataAccess);
             this.practicClassDataHandler = new PracticClassDataHandler(dataAccess);
             this.studentDataHandler = new StudentDataHandler(dataAccess);
-            this.dailyDataHandler = new DailyDataHandler(dataAccess);
+            this.diaryDataHandler = new DiaryDataHandler(dataAccess);
         }
 
         public void ProcessCallBackQuery(CallbackQuery callbackQuery)
@@ -81,10 +81,10 @@ namespace ClassAssistantBot.Controllers
                     //Error
                     return;
                 var pending = pendingDataHandler.GetPending(code);
-                var diary = dailyDataHandler.GetDaily(pending.ObjectId);
+                var diary = diaryDataHandler.GetDiary(pending.ObjectId);
                 bot.SendMessage(chatId: pending.Student.User.ChatId,
                                     text: $"El profesor @{user.Username} ha Aceptado su solicitud de actualización de diario:\n\n{diary.Text}");
-                dailyDataHandler.AcceptDiary(user, pending.Student.UserId, pending.ObjectId);
+                diaryDataHandler.AcceptDiary(user, pending.Student.UserId, pending.ObjectId);
                 var pendings = pendingDataHandler.GetPendings(user);
                 Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
@@ -231,7 +231,7 @@ namespace ClassAssistantBot.Controllers
                 else if (callbackQuery.Data.Contains("Miscellaneous"))
                     interactionType = Models.InteractionType.Miscellaneous;
                 else if (callbackQuery.Data.Contains("Diary"))
-                    interactionType = Models.InteractionType.Daily;
+                    interactionType = Models.InteractionType.Diary;
                 else if (callbackQuery.Data.Contains("RectificationToTheTeacher"))
                     interactionType = Models.InteractionType.RectificationToTheTeacher;
                 var pendings = pendingDataHandler.GetPendings(user, false, interactionType);

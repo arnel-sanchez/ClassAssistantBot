@@ -4,7 +4,7 @@ namespace ClassAssistantBot.Models
     public enum InteractionType
     {
         ClassTitle,
-        Daily,
+        Diary,
         Joke,
         Meme,
         RectificationToTheTeacher,

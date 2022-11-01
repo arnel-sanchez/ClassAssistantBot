@@ -317,7 +317,7 @@ namespace ClassAssistantBot.Services
                         },
                         new InlineKeyboardButton
                         {
-                            CallbackData = $"Diary//1//{(int)InteractionType.Daily}",
+                            CallbackData = $"Diary//1//{(int)InteractionType.Diary}",
                             Text = "Actualización del Diario"
                         }
                     },
@@ -392,7 +392,7 @@ namespace ClassAssistantBot.Services
                             },
                             new InlineKeyboardButton
                             {
-                                CallbackData = $"Diary//1//{(int)InteractionType.Daily}",
+                                CallbackData = $"Diary//1//{(int)InteractionType.Diary}",
                                 Text = "Actualización del Diario"
                             }
                         },

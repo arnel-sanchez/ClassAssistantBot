@@ -17,7 +17,7 @@ namespace ClassAssistantBot.Models
         ClassInterventionSelect,
         RectificationAtTeacher,
         RectificationToTheTeacherUserName,
-        Daily,
+        Diary,
         StatusPhrase,
         Meme,
         Joke,

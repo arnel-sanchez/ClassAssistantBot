@@ -4,29 +4,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassAssistantBot.Services
 {
-    public class DailyDataHandler
+    public class DiaryDataHandler
     {
         private DataAccess dataAccess { get; set; }
 
-        public DailyDataHandler(DataAccess dataAccess)
+        public DiaryDataHandler(DataAccess dataAccess)
         {
             this.dataAccess = dataAccess;
         }
 
-        public void UpdateDaily(User user)
+        public void UpdateDiary(User user)
         {
-            user.Status = UserStatus.Daily;
+            user.Status = UserStatus.Diary;
             dataAccess.Users.Update(user);
             dataAccess.SaveChanges();
-            Console.WriteLine($"The student {user.Username} is ready to update Daily");
+            Console.WriteLine($"The student {user.Username} is ready to update Diary");
         }
 
-        public void UpdateDaily(long id, string message)
+        public void UpdateDiary(long id, string message)
         {
             var user = dataAccess.Users.First(x => x.Id == id);
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            var daily = new Daily
+            var diary = new Diary
             {
                 DateTime = DateTime.UtcNow,
                 Id = Guid.NewGuid().ToString(),
@@ -34,7 +34,7 @@ namespace ClassAssistantBot.Services
                 UserId = user.Id,
                 ClassRoomId = user.ClassRoomActiveId
             };
-            dataAccess.Dailies.Add(daily);
+            dataAccess.Dailies.Add(diary);
 
             var random = new Random();
             string code = random.Next(100000, 999999).ToString();
@@ -43,9 +43,9 @@ namespace ClassAssistantBot.Services
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = InteractionType.Daily,
+                Type = InteractionType.Diary,
                 ClassRoomId = user.ClassRoomActiveId,
-                ObjectId = daily.Id,
+                ObjectId = diary.Id,
                 StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
                 Code = code
             };
@@ -92,9 +92,9 @@ namespace ClassAssistantBot.Services
             dataAccess.SaveChanges();
         }
 
-        public Daily GetDaily(string dailyId)
+        public Diary GetDiary(string diaryId)
         {
-            return dataAccess.Dailies.First(x => x.Id == dailyId);
+            return dataAccess.Dailies.First(x => x.Id == diaryId);
         }
     }
 }

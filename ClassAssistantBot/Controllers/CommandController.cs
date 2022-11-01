@@ -14,7 +14,7 @@ namespace ClassAssistantBot.Controllers
         private TeacherDataHandler teacherDataHandler;
         private MemeDataHandler memeDataHandler;
         private CreditsDataHandler creditsDataHandler;
-        private DailyDataHandler dailyDataHandler;
+        private DiaryDataHandler diaryDataHandler;
         private JokeDataHandler jokeDataHandler;
         private StatusPhraseDataHandler statusPhraseDataHandler;
         private ClassRoomDataHandler classRoomDataHandler;
@@ -34,7 +34,7 @@ namespace ClassAssistantBot.Controllers
         {
             this.teacherDataHandler = new TeacherDataHandler(dataAccess);
             this.studentDataHandler = new StudentDataHandler(dataAccess);
-            this.dailyDataHandler = new DailyDataHandler(dataAccess);
+            this.diaryDataHandler = new DiaryDataHandler(dataAccess);
             this.memeDataHandler = new MemeDataHandler(dataAccess);
             this.creditsDataHandler = new CreditsDataHandler(dataAccess);
             this.jokeDataHandler = new JokeDataHandler(dataAccess);
@@ -184,8 +184,8 @@ namespace ClassAssistantBot.Controllers
                                     text: "Chiste enviado por: @" + user.Username + "\n\"" + message.Text + "\"");
                             Menu.StudentMenu(bot, message);
                             return;
-                        case UserStatus.Daily:
-                            dailyDataHandler.UpdateDaily(user.Id, message.Text);
+                        case UserStatus.Diary:
+                            diaryDataHandler.UpdateDiary(user.Id, message.Text);
                             if (!string.IsNullOrEmpty(classRoomDataHandler.GetDiaryChannel(user)))
                                 bot.SendMessage(chatId: classRoomDataHandler.GetDiaryChannel(user),
                                     text: "Actualización del Diario enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
@@ -523,7 +523,7 @@ namespace ClassAssistantBot.Controllers
                     JokeCommand(user);
                     break;
                 case "diario":
-                    DailyCommand(user);
+                    DiaryCommand(user);
                     break;
                 case "frasedeestado":
                     StatusPhraseCommand(user);
@@ -909,7 +909,7 @@ namespace ClassAssistantBot.Controllers
                 bool giveMeExplication = false;
                 var pending = pendingDataHandler.GetPendingByCode(command, out file, out giveMeExplication);
 
-                if (pendingDataHandler.GetPending(command).Type == InteractionType.Daily)
+                if (pendingDataHandler.GetPending(command).Type == InteractionType.Diary)
                 {
                     Menu.PendingDiaryCommands(bot, message, pending, giveMeExplication, command, user);
                     return;
@@ -958,7 +958,7 @@ namespace ClassAssistantBot.Controllers
             }
         }
 
-        private void DailyCommand(Models.User? user)
+        private void DiaryCommand(Models.User? user)
         {
             if (user == null)
             {
@@ -976,7 +976,7 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                dailyDataHandler.UpdateDaily(user);
+                diaryDataHandler.UpdateDiary(user);
                 Menu.CancelMenu(bot, message, "Inserte la actualización de su diario:");
             }
         }
@@ -1788,9 +1788,9 @@ namespace ClassAssistantBot.Controllers
                 {
                     comment = classTitleDataHandler.GetClassTitle(pending.ObjectId).Title;
                 }
-                else if (pending.Type == InteractionType.Daily)
+                else if (pending.Type == InteractionType.Diary)
                 {
-                    comment = dailyDataHandler.GetDaily(pending.ObjectId).Text;
+                    comment = diaryDataHandler.GetDiary(pending.ObjectId).Text;
                 }
                 else if (pending.Type == InteractionType.Joke)
                 {
@@ -1818,7 +1818,7 @@ namespace ClassAssistantBot.Controllers
                 {
                     type = "Cambio de Título a la Clase";
                 }
-                else if (pending.Type == InteractionType.Daily)
+                else if (pending.Type == InteractionType.Diary)
                 {
                     type = "Actualización del Diario";
                 }
@@ -1904,9 +1904,9 @@ namespace ClassAssistantBot.Controllers
                         bot.SendMessage(chatId: classRoomDataHandler.GetClassTitleChannel(user),
                             text: "Cambio de Título de Clase enviado por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
-                else if (pending.Type == InteractionType.Daily)
+                else if (pending.Type == InteractionType.Diary)
                 {
-                    comment = dailyDataHandler.GetDaily(pending.ObjectId).Text;
+                    comment = diaryDataHandler.GetDiary(pending.ObjectId).Text;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetDiaryChannel(user)))
                         bot.SendMessage(chatId: classRoomDataHandler.GetDiaryChannel(user),
                             text: "Actualización al Diario enviado por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");

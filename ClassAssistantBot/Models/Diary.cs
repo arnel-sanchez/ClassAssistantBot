@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClassAssistantBot.Models
 {
-    public class Daily
+    public class Diary
     {
         public string Id { get; set; }
 
