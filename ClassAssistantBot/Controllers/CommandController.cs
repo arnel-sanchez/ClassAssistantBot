@@ -909,16 +909,19 @@ namespace ClassAssistantBot.Controllers
                 bool giveMeExplication = false;
                 var pending = pendingDataHandler.GetPendingByCode(command, out file, out giveMeExplication);
 
-                if (pendingDataHandler.GetPending(command).Type == InteractionType.Diary)
+                if (!string.IsNullOrEmpty(pending) && pendingDataHandler.GetPending(command).Type == InteractionType.Diary)
                 {
                     Menu.PendingDiaryCommands(bot, message, pending, giveMeExplication, command, user);
                     return;
                 }
 
                 var teachers = teacherDataHandler.GetTeachers(user);
-                
-                if (Menu.PendingCommands(bot, message, pending, teachers, giveMeExplication, command, user, file))
-                    return;
+
+                if(teachers.Count() != 0)
+                {
+                    if (Menu.PendingCommands(bot, message, pending, teachers, giveMeExplication, command, user, file))
+                        return;
+                }
 
                 var student = creditsDataHandler.GetCreditsByUserName(user.Id, command, true, true);
                 if (!string.IsNullOrEmpty(student))
