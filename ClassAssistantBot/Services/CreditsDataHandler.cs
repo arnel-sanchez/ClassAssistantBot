@@ -292,15 +292,5 @@ namespace ClassAssistantBot.Services
 
             return res.ToString();
         }
-
-        public void ClearCredits()
-        {
-            var credits = dataAccess.Credits.Where(x => dataAccess.Excercises.Where(y => y.Id == x.ObjectId).Count() != 0).ToList();
-            foreach (var credit in credits)
-            {
-                dataAccess.Credits.RemoveRange(credits);
-            }
-            dataAccess.SaveChanges();
-        }
     }
 }
