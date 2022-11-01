@@ -37,7 +37,7 @@ namespace ClassAssistantBot.Services
 
         public DbSet<Credits> Credits { get; set; }
 
-        public DbSet<Daily> Dailies { get; set; }
+        public DbSet<Diary> Dailies { get; set; }
 
         public DbSet<Joke> Jokes { get; set; }
 
