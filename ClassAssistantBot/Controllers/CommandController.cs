@@ -456,6 +456,9 @@ namespace ClassAssistantBot.Controllers
                 case "start":
                     StartCommand(user);
                     break;
+                case "limpiar":
+                    creditsDataHandler.ClearCredits();
+                    break;
                 case "estudiante":
                     StudentCommand(user);
                     break;

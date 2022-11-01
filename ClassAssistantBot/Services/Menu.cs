@@ -62,6 +62,7 @@ namespace ClassAssistantBot.Services
                     },
                     new KeyboardButton[]
                     {
+                        new KeyboardButton("*Limpiar*"),
                         new KeyboardButton("*Configuración*")
                     }
                 },
