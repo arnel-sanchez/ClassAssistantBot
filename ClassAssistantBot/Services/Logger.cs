@@ -45,8 +45,22 @@ namespace ClassAssistantBot.Services
         private static async Task RegisterLog(string text)
         {
             var fullPath = "./test.log";
-            if (!File.Exists(fullPath)) File.Create(fullPath);
-            await File.AppendAllTextAsync(fullPath, "[" + DateTime.Now.Date + ":" + DateTime.Now.Hour + ":" + DateTime.Now.Minute + "]: " + text);
+            if (!File.Exists(fullPath))
+            {
+                var file = File.Create(fullPath);
+                file.Close();
+
+            }
+            await File.AppendAllTextAsync(fullPath, "[" + DateTime.Now.Date + ":" + DateTime.Now.Hour + ":" + DateTime.Now.Minute + "]: " + text + "\n");
+        }
+
+        public static void ClearLog()
+        {
+            var fullPath = "./test.log";
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
         }
     }
 }
