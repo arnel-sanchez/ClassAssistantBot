@@ -35,11 +35,18 @@ namespace ClassAssistantBot.Services
 
         private static void RegisterLog(string text)
         {
-            var fullPath = Path.GetFullPath(path) + "/test.log";
+            var fullPath = "./test.log";
             if (!File.Exists(fullPath)) File.Create(fullPath);
             TextWriter Tw = File.AppendText(fullPath);
             Tw.Write("[" + DateTime.Now.Date + ":" + DateTime.Now.Hour + ":" + DateTime.Now.Minute + "]: ");
             Tw.WriteLine(text);
+            Tw.Close();
+        }
+
+        public static void ClearLog()
+        {
+            var fullPath = "./test.log";
+            if (File.Exists(fullPath)) File.Delete(fullPath);
         }
     }
 }
