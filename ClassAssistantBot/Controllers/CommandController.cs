@@ -954,7 +954,7 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                var status = statusPhraseDataHandler.ChangeStatusPhrase(user);
+                var status = await statusPhraseDataHandler.ChangeStatusPhrase(user);
                 await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: $"Su frase de estado actual es: {status}",
                             replyMarkup: new ReplyKeyboardRemove());
