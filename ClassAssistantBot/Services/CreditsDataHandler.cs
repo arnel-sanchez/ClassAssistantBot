@@ -14,7 +14,7 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public string GetCreditsByUserName(long id, string userName, bool usercode = false, bool showTeacher = false)
+        public async Task<string> GetCreditsByUserName(long id, string userName, bool usercode = false, bool showTeacher = false)
         {
             var teacher = dataAccess.Teachers.Where(x => x.UserId == id).First();
             var student = dataAccess.StudentsByClassRooms
@@ -25,7 +25,7 @@ namespace ClassAssistantBot.Services
             var user = dataAccess.Users.Where(x => x.Id == id).First();
             user.Status = UserStatus.Ready;
             dataAccess.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             if (usercode && student == null)
                 return "";
             if (student == null)
@@ -117,21 +117,21 @@ namespace ClassAssistantBot.Services
             return res.ToString();
         }
 
-        public void CreditByTeacher(User user)
+        public async Task CreditByTeacher(User user)
         {
             user.Status = UserStatus.Credits;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void AssignCredit(User user)
+        public async Task AssignCredit(User user)
         {
             user.Status = UserStatus.AssignCreditsStudent;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public bool AssignCredit(User user, string username)
+        public async Task<bool> AssignCredit(User user, string username)
         {
             user.Status = UserStatus.AssignCredits;
             dataAccess.Users.Update(user);
@@ -144,7 +144,7 @@ namespace ClassAssistantBot.Services
             {
                 user.Status = UserStatus.Ready;
                 dataAccess.Users.Update(user);
-                dataAccess.SaveChanges();
+                await dataAccess.SaveChangesAsync();
                 return false;
             }
 
@@ -171,11 +171,11 @@ namespace ClassAssistantBot.Services
             };
             dataAccess.Miscellaneous.Add(misc);
             dataAccess.Credits.Add(credit);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             return true;
         }
 
-        public (string, long, long) AssignCreditMessage(User user, string message)
+        public async Task<(string, long, long)> AssignCreditMessage(User user, string message)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
@@ -194,12 +194,12 @@ namespace ClassAssistantBot.Services
             credit.Text = text;
 
             dataAccess.Credits.Update(credit);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
 
             return (text, credit.User.ChatId, credit.Value);
         }
 
-        public string GetCreditsById(long id)
+        public async Task<string> GetCreditsById(long id)
         {
             var student = dataAccess.Students.Where(x => x.UserId == id).First();
             var classRoom = dataAccess.ClassRooms.Where(x => x.Id == student.User.ClassRoomActiveId).First();
@@ -208,7 +208,7 @@ namespace ClassAssistantBot.Services
             var user = dataAccess.Users.Where(x => x.Id == id).First();
             user.Status = UserStatus.Ready;
             dataAccess.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             var res = new StringBuilder($"Créditos en el aula {classRoom.Name}:\n");
 
             for (int i = 0; i < credits.Count; i++)
@@ -230,7 +230,7 @@ namespace ClassAssistantBot.Services
             return res.ToString();
         }
 
-        public void AddCredits(long value, long teacherId, string objectId, long userId, long classRoomId, string recomendation)
+        public async Task AddCredits(long value, long teacherId, string objectId, long userId, long classRoomId, string recomendation)
         {
             var random = new Random();
             var credit = new Credits
@@ -246,7 +246,7 @@ namespace ClassAssistantBot.Services
                 Code = random.Next(10000, 99999)
             };
             dataAccess.Credits.Add(credit);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public string GetCreditListOfUser(User user)

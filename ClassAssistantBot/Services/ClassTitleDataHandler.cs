@@ -12,14 +12,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public List<Class> GetClasses(User user)
+        public async Task<List<Class>> GetClasses(User user)
         {
             var res = dataAccess.Classes.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
             if(res.Count == 0)
             {
                 user.Status = UserStatus.Ready;
                 dataAccess.Users.Update(user);
-                dataAccess.SaveChanges();
+                await dataAccess.SaveChangesAsync();
             }
             return res;
         }
@@ -29,14 +29,14 @@ namespace ClassAssistantBot.Services
             return dataAccess.ClassTitles.First(x => x.Id == classTitleId);
         }
 
-        public void ChangeClassTitle(User user)
+        public async Task ChangeClassTitle(User user)
         {
             user.Status = UserStatus.ClassTitle;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void ChangeClassTitle(User user, long classID)
+        public async Task ChangeClassTitle(User user, long classID)
         {
             user.Status = UserStatus.ClassTitleSelect;
 
@@ -51,10 +51,10 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Users.Update(user);
             dataAccess.ClassTitles.Add(classTitle);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void ChangeClassTitle(User user, string newTitle)
+        public async Task ChangeClassTitle(User user, string newTitle)
         {
             user.Status = UserStatus.Ready;
 
@@ -79,17 +79,17 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Users.Update(user);
             dataAccess.ClassTitles.Update(classTitle);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void CreateClass(User user)
+        public async Task CreateClass(User user)
         {
             user.Status = UserStatus.CreateClass;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void CreateClass(User user, string title)
+        public async Task CreateClass(User user, string title)
         {
             user.Status = UserStatus.Ready;
 
@@ -102,7 +102,7 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Users.Update(user);
             dataAccess.Classes.Add(class1);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
     }
 }

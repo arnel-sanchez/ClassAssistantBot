@@ -52,12 +52,12 @@ namespace ClassAssistantBot.Controllers
             this.appUser = new Telegram.BotAPI.AvailableTypes.User();
         }
 
-        public void ProcessCommand(Message message)
+        public async Task ProcessCommand(Message message)
         {
             if (message.From == null)
             {
-                Logger.Error($"Error: Mensaje con usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Mensaje con usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
@@ -66,19 +66,19 @@ namespace ClassAssistantBot.Controllers
             {
                 return;
             }
-            Logger.Warning($"New message from chat id: {(string.IsNullOrEmpty(message.From.Username) ? message.Chat.Id : message.From.Username )}");
+            await Logger.Warning($"New message from chat id: {(string.IsNullOrEmpty(message.From.Username) ? message.Chat.Id : message.From.Username )}");
 
             appUser = message.From; // Save current user;
             this.message = message; // Save current message;
             hasText = !string.IsNullOrEmpty(message.Text); // True if message has text;
 
-            Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
-            var user = userDataHandler.GetUser(appUser);
+            await Logger.Warning($"Message Text: {(hasText ? message.Text : "|:O")}");
+            var user = await userDataHandler.GetUser(appUser);
 
             if (user != null && user.ClassRoomActiveId == 0 && user.Status!=UserStatus.Verified && user.Status!=UserStatus.StudentEnteringClass && user.Status!=UserStatus.CreatingTecaher && user.Status!=UserStatus.TeacherCreatingClass && user.Status!=UserStatus.TeacherEnteringClass)
             {
-                userDataHandler.VerifyUser(user);
-                Menu.RegisterMenu(bot, message);
+                await userDataHandler.VerifyUser(user);
+                await Menu.RegisterMenu(bot, message);
                 return;
             }
 
@@ -95,8 +95,8 @@ namespace ClassAssistantBot.Controllers
                     if (match.Success)
                     {
                         command = match.Groups.Values.Last().Value; // Get command name
-                        Logger.Warning($"New command: {command}");
-                        OnCommand(command, parameters, user);
+                        await Logger.Command($"New command: {command}");
+                        await OnCommand(command, parameters, user);
                     }
                 }
                 else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && message.Text.Length >= 4 && !message.Text.Contains("*//*"))
@@ -109,8 +109,8 @@ namespace ClassAssistantBot.Controllers
                         command.Append(item);
                     }
 
-                    Logger.Warning($"New command: {command}");
-                    OnCommand(command.ToString(), new string[0], user);
+                    await Logger.Command($"New command: {command}");
+                    await OnCommand(command.ToString(), new string[0], user);
                 }
                 else if (message.Text.StartsWith("*") && message.Text.EndsWith("*") && message.Text.Length >= 4 && message.Text.ToString().Contains("*//*"))
                 {
@@ -122,23 +122,23 @@ namespace ClassAssistantBot.Controllers
                         command.Append(item);
                     }
 
-                    Logger.Warning($"New command: {command}");
+                    await Logger.Command($"New command: {command}");
                     if (user.Status == UserStatus.RectificationAtTeacher)
                     {
-                        OnRectificationToTheTeacherAtTeacherUserName(user, command.ToString().Split("*//*")[1]);
+                        await OnRectificationToTheTeacherAtTeacherUserName(user, command.ToString().Split("*//*")[1]);
                     }
                     else if(user.Status == UserStatus.ClassIntervention)
                     {
-                        OnClassIntervention(user, long.Parse(command.ToString().Split("*//*")[0]));
+                        await OnClassIntervention(user, long.Parse(command.ToString().Split("*//*")[0]));
                     }
                     else if(user.Status == UserStatus.ClassTitle)
                     {
-                        OnChangeClassTitle(user, long.Parse(command.ToString().Split("*//*")[0]));
+                        await OnChangeClassTitle(user, long.Parse(command.ToString().Split("*//*")[0]));
                     }
                     else
                     {
-                        Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
-                        bot.SendMessage(chatId: message.Chat.Id,
+                        await Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
+                        await bot.SendMessageAsync(chatId: message.Chat.Id,
                                         text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
                     }
                 }
@@ -147,53 +147,54 @@ namespace ClassAssistantBot.Controllers
                     switch (user.Status)
                     {
                         case UserStatus.Created:
-                            OnRegister(user, message.Text);
+                            await OnRegister(user, message.Text);
                             return;
                         case UserStatus.StudentEnteringClass:
-                            var assignedStudentSuccesfully = OnAssignStudentAtClass(appUser.Id, message.Text);
+                            var assignedStudentSuccesfully = await OnAssignStudentAtClass(appUser.Id, message.Text);
                             if(assignedStudentSuccesfully)
-                                Menu.StudentMenu(bot, message);
+                                await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.Pending:
-                            OnPendings(user, message);
+                            await OnPendings(user, message);
                             return;
                         case UserStatus.TeacherEnteringClass:
-                            var assignedTeacherSuccesfully = OnAssignTeacherAtClass(appUser.Id, message.Text);
+                            var assignedTeacherSuccesfully = await OnAssignTeacherAtClass(appUser.Id, message.Text);
                             if(assignedTeacherSuccesfully)
-                                Menu.TeacherMenu(bot, message);
+                                await Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.TeacherCreatingClass:
-                            OnCreateClassRoom(appUser.Id, message.Text);
-                            Menu.TeacherMenu(bot, message);
+                            await OnCreateClassRoom(appUser.Id, message.Text);
+                            await Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.Credits:
-                            var res1 = creditsDataHandler.GetCreditsByUserName(user.Id, message.Text, false, true);
-                            Menu.TeacherMenu(bot, message, res1);
+                            var res1 = await creditsDataHandler.GetCreditsByUserName(user.Id, message.Text, false, true);
+                            await Menu.TeacherMenu(bot, message, res1);
                             return;
                         case UserStatus.StatusPhrase:
-                            statusPhraseDataHandler.ChangeStatusPhrase(user.Id, message.Text);
+                            await statusPhraseDataHandler.ChangeStatusPhrase(user.Id, message.Text);
                             if (!string.IsNullOrEmpty(classRoomDataHandler.GetStatusPhraseChannel(user)))
-                                bot.SendMessage(chatId: classRoomDataHandler.GetStatusPhraseChannel(user),
+                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetStatusPhraseChannel(user),
                                     text: "Frase de Estado enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
-                            Menu.StudentMenu(bot, message);
+                            await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.Joke:
-                            jokeDataHandler.DoJoke(user.Id, message.Text);
+                            await jokeDataHandler.DoJoke(user.Id, message.Text);
                             if (!string.IsNullOrEmpty(classRoomDataHandler.GetJokesChannel(user)))
-                                bot.SendMessage(chatId: classRoomDataHandler.GetJokesChannel(user),
+                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetJokesChannel(user),
                                     text: "Chiste enviado por: @" + user.Username + "\n\"" + message.Text + "\"");
-                            Menu.StudentMenu(bot, message);
+                            await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.Diary:
-                            diaryDataHandler.UpdateDiary(user.Id, message.Text);
+                            await diaryDataHandler.UpdateDiary(user.Id, message.Text);
                             if (!string.IsNullOrEmpty(classRoomDataHandler.GetDiaryChannel(user)))
-                                bot.SendMessage(chatId: classRoomDataHandler.GetDiaryChannel(user),
+                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetDiaryChannel(user),
                                     text: "Actualización del Diario enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
-                            Menu.StudentMenu(bot, message);
+                            await Logger.Success($"The student {user.Username} is ready to update Diary");
+                            await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.RemoveStudentFromClassRoom:
-                            var res = studentDataHandler.RemoveStudentFromClassRoom(user.Id, message.Text);
-                            bot.SendMessage(chatId: res.Item2,
+                            var res = await studentDataHandler.RemoveStudentFromClassRoom(user.Id, message.Text);
+                            await bot.SendMessageAsync(chatId: res.Item2,
                                     text: $"El profesor @{user.Username} le ha sacado del aula.",
                                     replyMarkup: new ReplyKeyboardMarkup
                                     {
@@ -205,211 +206,211 @@ namespace ClassAssistantBot.Controllers
                                         },
                                         ResizeKeyboard = true
                                     });
-                            Menu.TeacherMenu(bot, message, res.Item1);
+                            await Menu.TeacherMenu(bot, message, res.Item1);
                             return;
                         case UserStatus.ClassIntervention:
-                            classInterventionDataHandler.CreateIntervention(user, message.Text);
-                            Menu.StudentMenu(bot, message);
+                            await classInterventionDataHandler.CreateIntervention(user, message.Text);
+                            await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.RectificationToTheTeacherUserName:
-                            OnRectificationToTheTeacherAtText(user, message.Text);
+                            await OnRectificationToTheTeacherAtText(user, message.Text);
                             if (!string.IsNullOrEmpty(classRoomDataHandler.GetRectificationToTheTeacherChannel(user)))
-                                bot.SendMessage(chatId: classRoomDataHandler.GetRectificationToTheTeacherChannel(user),
+                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetRectificationToTheTeacherChannel(user),
                                     text: "Rectificación al Profesor enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
-                            Menu.StudentMenu(bot, message);
+                            await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.CreateClass:
-                            OnStartClass(user, message.Text);
-                            Menu.TeacherMenu(bot, message);
+                            await OnStartClass(user, message.Text);
+                            await Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.ClassTitleSelect:
                             if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassTitleChannel(user)))
-                                bot.SendMessage(chatId: classRoomDataHandler.GetClassTitleChannel(user),
+                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetClassTitleChannel(user),
                                     text: "Cambio de Título de Clase enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
-                            OnChangeClassTitle(user, message.Text);
-                            Menu.StudentMenu(bot, message);
+                            await OnChangeClassTitle(user, message.Text);
+                            await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.ClassInterventionSelect:
-                            OnClassIntervention(user, message.Text);
+                            await OnClassIntervention(user, message.Text);
                             if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassInterventionChannel(user)))
-                                bot.SendMessage(chatId: classRoomDataHandler.GetClassInterventionChannel(user),
+                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetClassInterventionChannel(user),
                                     text: "Intervención en Clase enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
-                            Menu.StudentMenu(bot, message);
+                            await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.AssignCreditsStudent:
-                            OnAssignCredits(user, message.Text);
+                            await OnAssignCredits(user, message.Text);
                             return;
                         case UserStatus.AssignCredits:
-                            OnAssignCreditsMessage(user, message.Text);
-                            Menu.TeacherMenu(bot, message);
+                            await OnAssignCreditsMessage(user, message.Text);
+                            await Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.ChangeClassRoom:
                             var outPut = 0;
                             var canParser = int.TryParse(message.Text, out outPut);
                             if (!canParser)
                             {
-                                bot.SendMessage(chatId: message.Chat.Id,
+                                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                                 text: "Por favor, atienda lo que hace, necesito un ID de una clase.");
                                 return;
                             }
-                            classRoomDataHandler.ChangeClassRoom(user.Id, outPut);
+                            await classRoomDataHandler.ChangeClassRoom(user.Id, outPut);
                               if (user.IsTecaher)
-                                Menu.TeacherMenu(bot, message);
+                                await Menu.TeacherMenu(bot, message);
                             else
-                                Menu.StudentMenu(bot, message);
+                                await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.AssignMemeChannel:
-                            classRoomDataHandler.AssignMemeChannel(user, message.Text);
+                            await classRoomDataHandler.AssignMemeChannel(user, message.Text);
                             var memeChannelConfigurationText = "Canal de Meme asignado satisfactoriamente";
                             try
                             {
-                                bot.SendMessage(chatId: message.Text,
+                                await bot.SendMessageAsync(chatId: message.Text,
                                     text: "Bot configurado satisfactoriamente.");
                             }
                             catch
                             {
                                 memeChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
                             }
-                            Menu.TeacherConfigurationMenu(bot, message, memeChannelConfigurationText);
+                            await Menu.TeacherConfigurationMenu(bot, message, memeChannelConfigurationText);
                             return;
                         case UserStatus.AssignJokeChannel:
-                            classRoomDataHandler.AssignJokesChannel(user, message.Text);
+                            await classRoomDataHandler.AssignJokesChannel(user, message.Text);
                             var jokeChannelConfigurationText = "Canal de Chistes asignado satisfactoriamente";
                             try
                             {
-                                bot.SendMessage(chatId: message.Text,
+                                await bot.SendMessageAsync(chatId: message.Text,
                                     text: "Bot configurado satisfactoriamente.");
                             }
                             catch
                             {
                                 jokeChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
                             }
-                            Menu.TeacherConfigurationMenu(bot, message, jokeChannelConfigurationText);
+                            await Menu.TeacherConfigurationMenu(bot, message, jokeChannelConfigurationText);
                             return;
                         case UserStatus.AssignClassInterventionChannel:
-                            classRoomDataHandler.AssignClassInterventionChannel(user, message.Text);
+                            await classRoomDataHandler.AssignClassInterventionChannel(user, message.Text);
                             var classInterventionsChannelConfigurationText = "Canal de Intervenciones en Clases asignado satisfactoriamente";
                             try
                             {
-                                bot.SendMessage(chatId: message.Text,
+                                await bot.SendMessageAsync(chatId: message.Text,
                                     text: "Bot configurado satisfactoriamente.");
                             }
                             catch
                             {
                                 classInterventionsChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
                             }
-                            Menu.TeacherConfigurationMenu(bot, message, classInterventionsChannelConfigurationText);
+                            await Menu.TeacherConfigurationMenu(bot, message, classInterventionsChannelConfigurationText);
                             return;
                         case UserStatus.AssignClassTitleChannel:
-                            classRoomDataHandler.AssignClassTitleChannel(user, message.Text);
+                            await classRoomDataHandler.AssignClassTitleChannel(user, message.Text);
                             var classTitlesChannelConfigurationText = "Canal de propuestas de Títulos de Clases asignado satisfactoriamente";
                             try
                             {
-                                bot.SendMessage(chatId: message.Text,
+                                await bot.SendMessageAsync(chatId: message.Text,
                                     text: "Bot configurado satisfactoriamente.");
                             }
                             catch
                             {
                                 classTitlesChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
                             }
-                            Menu.TeacherConfigurationMenu(bot, message, classTitlesChannelConfigurationText);
+                            await Menu.TeacherConfigurationMenu(bot, message, classTitlesChannelConfigurationText);
                             return;
                         case UserStatus.AssignDiaryChannel:
-                            classRoomDataHandler.AssignDiaryChannel(user, message.Text);
+                            await classRoomDataHandler.AssignDiaryChannel(user, message.Text);
                             var diaryChannelConfigurationText = "Canal de Actualizaciones de Diario asignado satisfactoriamente";
                             try
                             {
-                                bot.SendMessage(chatId: message.Text,
+                                await bot.SendMessageAsync(chatId: message.Text,
                                     text: "Bot configurado satisfactoriamente.");
                             }
                             catch
                             {
                                 diaryChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
                             }
-                            Menu.TeacherConfigurationMenu(bot, message, diaryChannelConfigurationText);
+                            await Menu.TeacherConfigurationMenu(bot, message, diaryChannelConfigurationText);
                             return;
                         case UserStatus.AssignRectificationToTheTeacherChannel:
-                            classRoomDataHandler.AssignRectificationToTheTeacherChannel(user, message.Text);
+                            await classRoomDataHandler.AssignRectificationToTheTeacherChannel(user, message.Text);
                             var rectificationToTheTeacherChannelConfigurationText = "Canal de Rectificaciones a los profesores asignado satisfactoriamente";
                             try
                             {
-                                bot.SendMessage(chatId: message.Text,
+                                await bot.SendMessageAsync(chatId: message.Text,
                                     text: "Bot configurado satisfactoriamente.");
                             }
                             catch
                             {
                                 rectificationToTheTeacherChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
                             }
-                            Menu.TeacherConfigurationMenu(bot, message, rectificationToTheTeacherChannelConfigurationText);
+                            await Menu.TeacherConfigurationMenu(bot, message, rectificationToTheTeacherChannelConfigurationText);
                             return;
                         case UserStatus.AssignStatusPhraseChannel:
-                            classRoomDataHandler.AssignStatusPhraseChannel(user, message.Text);
+                            await classRoomDataHandler.AssignStatusPhraseChannel(user, message.Text);
                             var statusPhraseChannelConfigurationText = "Canal de Frases de Estado asignado satisfactoriamente";
                             try
                             {
-                                bot.SendMessage(chatId: message.Text,
+                                await bot.SendMessageAsync(chatId: message.Text,
                                     text: "Bot configurado satisfactoriamente.");
                             }
                             catch
                             {
                                 statusPhraseChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
                             }
-                            Menu.TeacherConfigurationMenu(bot, message, statusPhraseChannelConfigurationText);
+                            await Menu.TeacherConfigurationMenu(bot, message, statusPhraseChannelConfigurationText);
                             return;
                         case UserStatus.AssignMiscellaneousChannel:
-                            classRoomDataHandler.AssignMiscellaneousChannel(user, message.Text);
+                            await classRoomDataHandler.AssignMiscellaneousChannel(user, message.Text);
                             var miscellaneousChannelConfigurationText = "Canal de Misceláneas asignado satisfactoriamente";
                             try
                             {
-                                bot.SendMessage(chatId: message.Text,
+                                await bot.SendMessageAsync(chatId: message.Text,
                                     text: "Bot configurado satisfactoriamente.");
                             }
                             catch
                             {
                                 miscellaneousChannelConfigurationText = "El nombre de usuario del bot insertado no existe";
                             }
-                            Menu.TeacherConfigurationMenu(bot, message, miscellaneousChannelConfigurationText);
+                            await Menu.TeacherConfigurationMenu(bot, message, miscellaneousChannelConfigurationText);
                             return;
                         case UserStatus.SendInformation:
-                            var students = classRoomDataHandler.GetStudentsOnClassRoom(user);
+                            var students = await classRoomDataHandler.GetStudentsOnClassRoom(user);
                             foreach (var student in students)
                             {
-                                bot.SendMessage(chatId: student.Student.User.ChatId,
+                                await bot.SendMessageAsync(chatId: student.Student.User.ChatId,
                                     text: message.Text);
                             }
-                            var teachers = classRoomDataHandler.GetTeachersOnClassRoom(user);
+                            var teachers = await classRoomDataHandler.GetTeachersOnClassRoom(user);
                             foreach (var teacher in teachers)
                             {
-                                bot.SendMessage(chatId: teacher.Teacher.User.ChatId,
+                                await bot.SendMessageAsync(chatId: teacher.Teacher.User.ChatId,
                                     text: message.Text);
                             }
-                            Menu.TeacherMenu(bot, message);
+                            await Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.EditPracticalClasss:
-                            var editPracticalClassRes = practicClassDataHandler.EditPracticalClassName(user, message.Text);
-                            Menu.TeacherMenu(bot, message, editPracticalClassRes);
+                            var editPracticalClassRes = await practicClassDataHandler.EditPracticalClassName(user, message.Text);
+                            await Menu.TeacherMenu(bot, message, editPracticalClassRes);
                             return;
                         case UserStatus.Miscellaneous:
-                            miscellaneousDataHandler.CreateMiscellaneous(user, message.Text);
+                            await miscellaneousDataHandler.CreateMiscellaneous(user, message.Text);
                             if (!string.IsNullOrEmpty(classRoomDataHandler.GetMiscellaneousChannel(user)))
-                                bot.SendMessage(chatId: classRoomDataHandler.GetMiscellaneousChannel(user),
+                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetMiscellaneousChannel(user),
                                     text: "Miscelánea enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
-                            Menu.StudentMenu(bot, message);
+                            await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.CreatePracticClass:
-                            var canCreateClass = practicClassDataHandler.CreatePracticClass(user, message.Text);
+                            var canCreateClass = await practicClassDataHandler.CreatePracticClass(user, message.Text);
                             if(canCreateClass)
                             {
-                                Menu.TeacherMenu(bot, message);
+                                await Menu.TeacherMenu(bot, message);
                             }
                             else
                             {
-                                Menu.CancelMenu(bot, message, "Clase Práctica con Formato Incorrecto");
+                                await Menu.CancelMenu(bot, message, "Clase Práctica con Formato Incorrecto");
                             }
                             return;
                     }
-                    Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
-                    bot.SendMessage(chatId: message.Chat.Id,
+                    await Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
+                    await bot.SendMessageAsync(chatId: message.Chat.Id,
                                     text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
                 }
             }
@@ -417,13 +418,13 @@ namespace ClassAssistantBot.Controllers
             {
                 if (user.Status == UserStatus.Meme)
                 {
-                    memeDataHandler.SendMeme(user.Id, message.Document);
-                    Menu.StudentMenu(bot, message);
+                    await memeDataHandler.SendMeme(user.Id, message.Document);
+                    await Menu.StudentMenu(bot, message);
                 }
                 else
                 {
-                    Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
-                    bot.SendMessage(chatId: message.Chat.Id,
+                    await Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
+                    await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
                 }
             }
@@ -431,167 +432,167 @@ namespace ClassAssistantBot.Controllers
             {
                 if (user.Status == UserStatus.Meme )
                 {
-                    memeDataHandler.SendMeme(user.Id, message.Photo[0]);
-                    Menu.StudentMenu(bot, message);
+                    await memeDataHandler.SendMeme(user.Id, message.Photo[0]);
+                    await Menu.StudentMenu(bot, message);
                 }
                 else
                 {
-                    Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
-                    bot.SendMessage(chatId: message.Chat.Id,
+                    await Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
+                    await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
                 }
             }
             else
             {
-                Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
             }
         }
 
-        private void OnCommand(string cmd, string[] args, ClassAssistantBot.Models.User user)
+        private async Task OnCommand(string cmd, string[] args, ClassAssistantBot.Models.User user)
         {
             switch (cmd)
             {
                 case "start":
-                    StartCommand(user);
+                    await StartCommand(user);
                     break;
                 case "estudiante":
-                    StudentCommand(user);
+                    await StudentCommand(user);
                     break;
                 case "profesor":
-                    TeacherCommand(user);
+                    await TeacherCommand(user);
                     break;
                 case "crear":
-                    CreateCommand(user);
+                    await CreateCommand(user);
                     break;
                 case "entrar":
-                    EnterCommand(user);
+                    await EnterCommand(user);
                     break;
                 case "estudiantes":
-                    StudentsCommand(user);
+                    await StudentsCommand(user);
                     break;
                 case "créditos":
-                    CreditsCommand(user);
+                    await CreditsCommand(user);
                     break;
                 case "revisarclasepráctica":
-                    ReviewPracticClassCommand(user);
+                    await ReviewPracticClassCommand(user);
                     break;
                 case "crearclasepráctica":
-                    CreatePracticClassCommand(user);
+                    await CreatePracticClassCommand(user);
                     break;
                 case "pendientesdirectos":
-                    DirectPendingCommand(user);
+                    await DirectPendingCommand(user);
                     break;
                 case "misceláneas":
-                    CreateMiscellaneousCommand(user);
+                    await CreateMiscellaneousCommand(user);
                     break;
                 case "pendientes":
-                    PendingsCommand(user);
+                    await PendingsCommand(user);
                     break;
                 case "todaslasaulasconpendientes":
-                    AllClassRoomWithPendingsCommand(user);
+                    await AllClassRoomWithPendingsCommand(user);
                     break;
                 case "llavedelestudiante":
-                    StudentAccessKeyCommand(user);
+                    await StudentAccessKeyCommand(user);
                     break;
                 case "llavedelprofesor":
-                    TeacherAccessKeyCommand(user);
+                    await TeacherAccessKeyCommand(user);
                     break;
                 case "cambiardeaula":
-                    ChangeClassRoomCommand(user);
+                    await ChangeClassRoomCommand(user);
                     break;
                 case "rectificaralprofesor":
-                    RectificationToTheTeacherCommand(user);
+                    await RectificationToTheTeacherCommand(user);
                     break;
                 case "asignarcréditos":
-                    AssignCreditsCommand(user);
+                    await AssignCreditsCommand(user);
                     break;
                 case "eliminarestudiantedelaula":
-                    RemoveStudentFromClassRoomCommand(user);
+                    await RemoveStudentFromClassRoomCommand(user);
                     break;
                 case "cancelar":
-                    CancelCommand(user);
+                    await CancelCommand(user);
                     break;
                 case "intervenciónenclase":
-                    ClassInterventionCommand(user);
+                    await ClassInterventionCommand(user);
                     break;
                 case "meme":
-                    MemeCommand(user);
+                    await MemeCommand(user);
                     break;
                 case "chiste":
-                    JokeCommand(user);
+                    await JokeCommand(user);
                     break;
                 case "diario":
-                    DiaryCommand(user);
+                    await DiaryCommand(user);
                     break;
                 case "frasedeestado":
-                    StatusPhraseCommand(user);
+                    await StatusPhraseCommand(user);
                     break;
                 case "cambiartítulodeclase":
-                    ClassTitleCommand(user);
+                    await ClassTitleCommand(user);
                     break;
                 case "configuración":
-                    ConfigurationCommand(user);
+                    await ConfigurationCommand(user);
                     break;
                 case "asignarcanaldemisceláneas":
-                    AssignMiscellaneousChannelCommand(user);
+                    await AssignMiscellaneousChannelCommand(user);
                     break;
                 case "iniciarclase":
-                    StartClassCommand(user);
+                    await StartClassCommand(user);
                     break;
                 case "registrar":
-                    Menu.RegisterMenu(bot, message);
+                    await Menu.RegisterMenu(bot, message);
                     break;
                 case "veraulaactual":
-                    SeeClassRoomActiveCommand(user);
+                    await SeeClassRoomActiveCommand(user);
                     break;
                 case "verclasesinscritas":
-                    SeeListClass(user);
+                    await SeeListClass(user);
                     break;
                 case "asignarcanaldememes":
-                    AssignMemeChannelCommand(user);
+                    await AssignMemeChannelCommand(user);
                     break;
                 case "asignarcanaldechistes":
-                    AssignJokesChannelCommand(user);
+                    await AssignJokesChannelCommand(user);
                     break;
                 case "asignarcanaldeintervecionesenclases":
-                    AssignClassInterventionChannelCommand(user);
+                    await AssignClassInterventionChannelCommand(user);
                     break;
                 case "asignarcanaldeactulizacióndediario":
-                    AssignDiaryChannelCommand(user);
+                    await AssignDiaryChannelCommand(user);
                     break;
                 case "asignarcanaldefrasesdeestado":
-                    AssignStatusPhraseChannelCommand(user);
+                    await AssignStatusPhraseChannelCommand(user);
                     break;
                 case "asignarcanaldetítulosdeclases":
-                    AssignClassTitleChannelCommand(user);
+                    await AssignClassTitleChannelCommand(user);
                     break;
                 case "asignarcanalderectificacionesdeprofesores":
-                    AssignRectificationToTheTeacherChannelCommand(user);
+                    await AssignRectificationToTheTeacherChannelCommand(user);
                     break;
                 case "enviarinformaciónatodoslosestudiantesdelaula":
-                    SendStudentsInformationCommand(user);
+                    await SendStudentsInformationCommand(user);
                     break;
                 case "editarnombredeclasepráctica":
-                    EditPracticalClassNameCommand(user);
+                    await EditPracticalClassNameCommand(user);
                     break;
                 case "verestadodecréditos":
-                    CreditsStatusCommand(user);
+                    await CreditsStatusCommand(user);
                     break;
                 default:
-                    DefaultCommand(user, cmd);
+                    await DefaultCommand(user, cmd);
                     break;
             }
         }
 
         #region Comandos
-        private void StartCommand(Models.User? user)
+        private async Task StartCommand(Models.User? user)
         {
             if (user == null)
             {
-                userDataHandler.CreateUser(appUser, message.Chat.Id);
-                bot.SendMessage(chatId: message.Chat.Id,
+                await userDataHandler.CreateUser(appUser, message.Chat.Id);
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Inserte su nombre y dos apellidos, por favor.",
                                 replyMarkup: new ReplyKeyboardRemove());
                 return;
@@ -600,59 +601,59 @@ namespace ClassAssistantBot.Controllers
             {
                 if(user.Status == UserStatus.Ready)
                 {
-                    Logger.Error($"Error: El usuario {user.Username} está intentando registrarse nuevamente en el bot.");
+                    await Logger.Error($"Error: El usuario {user.Username} está intentando registrarse nuevamente en el bot.");
                     if (user.IsTecaher)
                     {
-                        Menu.TeacherMenu(bot, message);
+                        await Menu.TeacherMenu(bot, message);
                     }
                     else
                     {
-                        Menu.StudentMenu(bot, message);
+                        await Menu.StudentMenu(bot, message);
                     }
                 }
             }
         }
 
-        private void StudentCommand(Models.User? user)
+        private async Task StudentCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Verified && user.Status != UserStatus.ChangeClassRoom)
             {
-                Logger.Error($"Error: El estudiante {user.Username} está intentando unirse a un aula sin estar verificado.");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El estudiante {user.Username} está intentando unirse a un aula sin estar verificado.");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Por favor, atienda lo que hace, no me haga perder tiempo, inserte su nombre y 2 apellidos.");
                 return;
             }
-            studentDataHandler.StudentEnterClass(user);
-            bot.SendMessage(chatId: message.Chat.Id,
+            await studentDataHandler.StudentEnterClass(user);
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Inserte el código que le dio su profesor.",
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void TeacherCommand(Models.User? user)
+        private async Task TeacherCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Verified && user.Status != UserStatus.ChangeClassRoom)
             {
-                Logger.Error($"Error: El usuario {user.Username} está intentando convertirse en profesor sin estar verificado.");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} está intentando convertirse en profesor sin estar verificado.");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Por favor, atienda lo que hace, no me haga perder tiempo, inserte su nombre y 2 apellidos.");
                 return;
             }
             if(user.Status == UserStatus.Verified)
-                teacherDataHandler.CreateTeacher(user);
+                await teacherDataHandler.CreateTeacher(user);
             var keyboard = new ReplyKeyboardMarkup
             {
                 Keyboard = new KeyboardButton[][]{
@@ -663,145 +664,145 @@ namespace ClassAssistantBot.Controllers
                                         },
                 ResizeKeyboard = true
             };
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Va a crear un aula nueva o va a entrar a una existente?",
                             replyMarkup: keyboard);
         }
 
-        private void CreateCommand(Models.User? user)
+        private async Task CreateCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.CreatingTecaher && user.Status != UserStatus.ChangeClassRoom)
             {
-                Logger.Error($"Error: El profesor {user.Username} está intentando crear un aula sin haber creado el profesor.");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El profesor {user.Username} está intentando crear un aula sin haber creado el profesor.");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
                 return;
             }
-            classRoomDataHandler.CreateClassRoom(user);
-            bot.SendMessage(chatId: message.Chat.Id,
+            await classRoomDataHandler.CreateClassRoom(user);
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Inserte el nombre de la clase.",
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void EnterCommand(Models.User? user)
+        private async Task EnterCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.CreatingTecaher && user.Status != UserStatus.ChangeClassRoom)
             {
-                Logger.Error($"Error: El profesor {user.Username} está intentando entrar a un aula sin creado el profesor.");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El profesor {user.Username} está intentando entrar a un aula sin creado el profesor.");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
                 return;
             }
-            teacherDataHandler.TeacherEnterClass(user);
-            bot.SendMessage(chatId: message.Chat.Id,
+            await teacherDataHandler.TeacherEnterClass(user);
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Inserte el código que le dio su profesor.",
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void StudentsCommand(Models.User? user)
+        private async Task StudentsCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con los comandos avanzados");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con los comandos avanzados");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else if (!user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} está intentando solicitar un listado de estudiantes pero no es profesor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} está intentando solicitar un listado de estudiantes pero no es profesor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
                 var res = studentDataHandler.GetStudentsOnClassByTeacherId(user.Id);
-                Menu.TeacherMenu(bot, message, res);
+                await Menu.TeacherMenu(bot, message, res);
             }
         }
 
-        private void CreditsCommand(Models.User? user)
+        private async Task CreditsCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else if (!user.IsTecaher)
             {
-                var text = creditsDataHandler.GetCreditsById(user.Id);
-                Menu.StudentMenu(bot, message, text);
+                var text = await creditsDataHandler.GetCreditsById(user.Id);
+                await Menu.StudentMenu(bot, message, text);
                 return;
             }
         }
 
-        private void PendingsCommand(Models.User? user)
+        private async Task PendingsCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                var pendings = pendingDataHandler.GetPendings(user);
-                Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
+                var pendings = await pendingDataHandler.GetPendings(user);
+                await Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
         }
 
-        private void AllClassRoomWithPendingsCommand(Models.User? user)
+        private async Task AllClassRoomWithPendingsCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
@@ -810,97 +811,97 @@ namespace ClassAssistantBot.Controllers
                 var res = pendingDataHandler.GetAllClassRoomWithPendings(user);
                 if (string.IsNullOrEmpty(res))
                     res = "No tienen pendientes en ninguna de sus aulas";
-                Menu.TeacherConfigurationMenu(bot, message, res);
+                await Menu.TeacherConfigurationMenu(bot, message, res);
             }
         }
 
-        private void StudentAccessKeyCommand(Models.User? user)
+        private async Task StudentAccessKeyCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
                 var accessKey = teacherDataHandler.GetStudentAccessKey(user.Id);
-                Menu.TeacherConfigurationMenu(bot, message, $"La clave de acceso para sus estudianes es {accessKey}.");
+                await Menu.TeacherConfigurationMenu(bot, message, $"La clave de acceso para sus estudianes es {accessKey}.");
             }
         }
 
-        private void ConfigurationCommand(Models.User? user)
+        private async Task ConfigurationCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para solicitar la configuración de su cuenta");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para solicitar la configuración de su cuenta");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else if (!user.IsTecaher)
             {
-                Menu.StudentConfigurationMenu(bot, message,"Menú de configuración");
+                await Menu.StudentConfigurationMenu(bot, message,"Menú de configuración");
                 return;
             }
             else
             {
-                Menu.TeacherConfigurationMenu(bot, message, "Menú de configuración");
+                await Menu.TeacherConfigurationMenu(bot, message, "Menú de configuración");
             }
         }
 
-        private void ClassTitleCommand(Models.User? user)
+        private async Task ClassTitleCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                var classes = classTitleDataHandler.GetClasses(user);
-                classTitleDataHandler.ChangeClassTitle(user);
-                Menu.ClassesList(bot, message, classes);
+                var classes = await classTitleDataHandler.GetClasses(user);
+                await classTitleDataHandler.ChangeClassTitle(user);
+                await Menu.ClassesList(bot, message, classes);
             }
         }
 
-        private void DefaultCommand(Models.User? user, string command)
+        private async Task DefaultCommand(Models.User? user, string command)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (!user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} está interactuando con un comando que no existe");
-                Menu.StudentMenu(bot, message, "El comando insertado no existe, por favor, no me haga perder tiempo.");
+                await Logger.Error($"Error: El usuario {user.Username} está interactuando con un comando que no existe");
+                await Menu.StudentMenu(bot, message, "El comando insertado no existe, por favor, no me haga perder tiempo.");
                 return;
             }
             else
@@ -911,7 +912,7 @@ namespace ClassAssistantBot.Controllers
 
                 if (!string.IsNullOrEmpty(pending) && pendingDataHandler.GetPending(command).Type == InteractionType.Diary)
                 {
-                    Menu.PendingDiaryCommands(bot, message, pending, giveMeExplication, command, user);
+                    await Menu.PendingDiaryCommands(bot, message, pending, giveMeExplication, command, user);
                     return;
                 }
 
@@ -919,319 +920,319 @@ namespace ClassAssistantBot.Controllers
 
                 if(teachers.Count() != 0)
                 {
-                    if (Menu.PendingCommands(bot, message, pending, teachers, giveMeExplication, command, user, file))
+                    if (await Menu.PendingCommands(bot, message, pending, teachers, giveMeExplication, command, user, file))
                         return;
                 }
 
-                var student = creditsDataHandler.GetCreditsByUserName(user.Id, command, true, true);
+                var student = await creditsDataHandler.GetCreditsByUserName(user.Id, command, true, true);
                 if (!string.IsNullOrEmpty(student))
                 {
-                    Menu.TeacherMenu(bot, message, student);
+                    await Menu.TeacherMenu(bot, message, student);
                     return;
                 }
-                Logger.Error($"Error: El usuario {user.Username} está interactuando con un comando que no existe");
-                Menu.TeacherMenu(bot, message, "El comando insertado no existe, por favor, no me haga perder tiempo.");
+                await Logger.Error($"Error: El usuario {user.Username} está interactuando con un comando que no existe");
+                await Menu.TeacherMenu(bot, message, "El comando insertado no existe, por favor, no me haga perder tiempo.");
                 return;
             }
         }
 
-        private void StatusPhraseCommand(Models.User? user)
+        private async Task StatusPhraseCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
                 var status = statusPhraseDataHandler.ChangeStatusPhrase(user);
-                bot.SendMessage(chatId: message.Chat.Id,
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: $"Su frase de estado actual es: {status}",
                             replyMarkup: new ReplyKeyboardRemove());
-                Menu.CancelMenu(bot, message, "Inserte la nueva frase de estado:");
+                await Menu.CancelMenu(bot, message, "Inserte la nueva frase de estado:");
             }
         }
 
-        private void DiaryCommand(Models.User? user)
+        private async Task DiaryCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                diaryDataHandler.UpdateDiary(user);
-                Menu.CancelMenu(bot, message, "Inserte la actualización de su diario:");
+                await diaryDataHandler.UpdateDiary(user);
+                await Menu.CancelMenu(bot, message, "Inserte la actualización de su diario:");
             }
         }
 
-        private void RectificationToTheTeacherCommand(Models.User? user)
+        private async Task RectificationToTheTeacherCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                rectificationToTheTeacherDataHandler.DoRectificationToTheTaecher(user);
+                await rectificationToTheTeacherDataHandler.DoRectificationToTheTaecher(user);
                 var teachers = teacherDataHandler.GetTeachers(user);
-                Menu.TeachersList(bot, message, teachers, "Seleccione el profesor al que desea rectificar:");
+                await Menu.TeachersList(bot, message, teachers, "Seleccione el profesor al que desea rectificar:");
             }
         }
 
-        private void JokeCommand(Models.User? user)
+        private async Task JokeCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                jokeDataHandler.DoJoke(user);
-                Menu.CancelMenu(bot, message, "Haga el chiste:");
+                await jokeDataHandler.DoJoke(user);
+                await Menu.CancelMenu(bot, message, "Haga el chiste:");
             }
         }
 
-        private void MemeCommand(Models.User? user)
+        private async Task MemeCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                memeDataHandler.SendMeme(user);
-                Menu.CancelMenu(bot, message, "Inserte un meme:");
+                await memeDataHandler.SendMeme(user);
+                await Menu.CancelMenu(bot, message, "Inserte un meme:");
             }
         }
 
-        private void ClassInterventionCommand(Models.User? user)
+        private async Task ClassInterventionCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classInterventionDataHandler.CreateIntervention(user);
-                var classes = classTitleDataHandler.GetClasses(user);
-                Menu.ClassesList(bot, message, classes);
+                await classInterventionDataHandler.CreateIntervention(user);
+                var classes = await classTitleDataHandler.GetClasses(user);
+                await Menu.ClassesList(bot, message, classes);
             }
         }
 
-        private void RemoveStudentFromClassRoomCommand(Models.User? user)
+        private async Task RemoveStudentFromClassRoomCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                var res = studentDataHandler.RemoveStudentFromClassRoom(user.Id);
-                Menu.CancelMenu(bot, message, res);
+                var res = await studentDataHandler.RemoveStudentFromClassRoom(user.Id);
+                await Menu.CancelMenu(bot, message, res);
             }
         }
 
-        private void CancelCommand(Models.User? user)
+        private async Task CancelCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
-            userDataHandler.CancelAction(user);
+            await userDataHandler.CancelAction(user);
             if (user.IsTecaher)
-                Menu.TeacherMenu(bot, message);
+                await Menu.TeacherMenu(bot, message);
             else
-                Menu.StudentMenu(bot, message);
+                await Menu.StudentMenu(bot, message);
         }
 
-        private void ChangeClassRoomCommand(Models.User? user)
+        private async Task ChangeClassRoomCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando changeclass");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando changeclass");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                var res = classRoomDataHandler.ChangeClassRoom(user.Id);
+                var res = await classRoomDataHandler.ChangeClassRoom(user.Id);
                 user.Status = UserStatus.ChangeClassRoom;
-                userDataHandler.VerifyUser(user);
-                Menu.ChangeClassRoomMenu(bot, message, res);
+                await userDataHandler.VerifyUser(user);
+                await Menu.ChangeClassRoomMenu(bot, message, res);
             }
         }
 
-        private void TeacherAccessKeyCommand(Models.User? user)
+        private async Task TeacherAccessKeyCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
                 var accessKey = teacherDataHandler.GetTeacherAccessKey(user.Id);
-                Menu.TeacherConfigurationMenu(bot, message, $"La clave de acceso para sus profesores es {accessKey}.");
+                await Menu.TeacherConfigurationMenu(bot, message, $"La clave de acceso para sus profesores es {accessKey}.");
             }
         }
 
-        private void StartClassCommand(Models.User? user)
+        private async Task StartClassCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready && !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classTitleDataHandler.CreateClass(user);
-                Menu.CancelMenu(bot, message, "Inserte el título de la clase:");
+                await classTitleDataHandler.CreateClass(user);
+                await Menu.CancelMenu(bot, message, "Inserte el título de la clase:");
             }
         }
 
-        private void AssignCreditsCommand(Models.User? user)
+        private async Task AssignCreditsCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else if (user.IsTecaher)
             {
-                creditsDataHandler.AssignCredit(user);
-                Menu.CancelMenu(bot, message, "Inserte el nombre de usuario del estudiante:");
+                await creditsDataHandler.AssignCredit(user);
+                await Menu.CancelMenu(bot, message, "Inserte el nombre de usuario del estudiante:");
                 return;
             }
             else
             {
-                Logger.Error($"Error: El usuario {user.Username} está intentando intentando registrar su nombre y apellidos en formato incorrecto.");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} está intentando intentando registrar su nombre y apellidos en formato incorrecto.");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Por favor, no me haga perder el tiempo, inserte su nombre y sus 2 apellidos.");
                 return;
             }
         }
 
-        private void SeeClassRoomActiveCommand(Models.User? user)
+        private async Task SeeClassRoomActiveCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
@@ -1239,26 +1240,26 @@ namespace ClassAssistantBot.Controllers
             {
                 var res = classRoomDataHandler.SeeClassRoomActive(user);
                 if (user.IsTecaher)
-                    Menu.TeacherMenu(bot, message, "Se encuentra en el aula: " + res);
+                    await Menu.TeacherMenu(bot, message, "Se encuentra en el aula: " + res);
                 else
-                    Menu.StudentMenu(bot, message, "Se encuentra en el aula: " + res);
+                    await Menu.StudentMenu(bot, message, "Se encuentra en el aula: " + res);
                 return;
             }
         }
 
-        private void SeeListClass(Models.User? user)
+        private async Task SeeListClass(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
@@ -1267,32 +1268,32 @@ namespace ClassAssistantBot.Controllers
                 var res = classRoomDataHandler.GetClassesCreated(user);
                 var classRoom = classRoomDataHandler.SeeClassRoomActive(user);
                 if (user.IsTecaher)
-                    Menu.TeacherMenu(bot, message, $"El aula {classRoom} tiene creadas las clases:\n{res}");
+                    await Menu.TeacherMenu(bot, message, $"El aula {classRoom} tiene creadas las clases:\n{res}");
                 else
-                    Menu.StudentMenu(bot, message, $"El aula {classRoom} tiene creadas las clases:\n{res}");
+                    await Menu.StudentMenu(bot, message, $"El aula {classRoom} tiene creadas las clases:\n{res}");
                 return;
             }
         }
 
-        private void DirectPendingCommand(Models.User? user)
+        private async Task DirectPendingCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                var pendings = pendingDataHandler.GetPendings(user, true);
+                var pendings = await pendingDataHandler.GetPendings(user, true);
                 var inline = new List<InlineKeyboardButton>();
                 if (2 <= pendings.Item2)
                     inline.Add(new InlineKeyboardButton
@@ -1342,432 +1343,432 @@ namespace ClassAssistantBot.Controllers
                         },
                     }
                 };
-                Menu.CancelMenu(bot, message, "Menú:");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Menu.CancelMenu(bot, message, "Menú:");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: pendings.Item1,
                                 replyMarkup: keyboard);
             }
         }
 
-        private void AssignMemeChannelCommand(Models.User? user)
+        private async Task AssignMemeChannelCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classRoomDataHandler.AssignMemeChannel(user);
-                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán los memes(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+                await classRoomDataHandler.AssignMemeChannel(user);
+                await Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán los memes(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
 
-        private void AssignJokesChannelCommand(Models.User? user)
+        private async Task AssignJokesChannelCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classRoomDataHandler.AssignJokesChannel(user);
-                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán los chistes(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+                await classRoomDataHandler.AssignJokesChannel(user);
+                await Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán los chistes(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
 
-        private void AssignClassInterventionChannelCommand(Models.User? user)
+        private async Task AssignClassInterventionChannelCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classRoomDataHandler.AssignClassInterventionChannel(user);
-                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las intervenciones en clase(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+                await classRoomDataHandler.AssignClassInterventionChannel(user);
+                await Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las intervenciones en clase(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
 
-        private void AssignDiaryChannelCommand(Models.User? user)
+        private async Task AssignDiaryChannelCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classRoomDataHandler.AssignDiaryChannel(user);
-                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las actualizaciones a los diarios(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+                await classRoomDataHandler.AssignDiaryChannel(user);
+                await Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las actualizaciones a los diarios(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
 
-        private void AssignStatusPhraseChannelCommand(Models.User? user)
+        private async Task AssignStatusPhraseChannelCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classRoomDataHandler.AssignStatusPhraseChannel(user);
-                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las frases de estado(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+                await classRoomDataHandler.AssignStatusPhraseChannel(user);
+                await Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las frases de estado(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
 
-        private void AssignClassTitleChannelCommand(Models.User? user)
+        private async Task AssignClassTitleChannelCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classRoomDataHandler.AssignClassTitleChannel(user);
-                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las propuestas de títulos de clases(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+                await classRoomDataHandler.AssignClassTitleChannel(user);
+                await Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las propuestas de títulos de clases(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
 
-        private void AssignRectificationToTheTeacherChannelCommand(Models.User? user)
+        private async Task AssignRectificationToTheTeacherChannelCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classRoomDataHandler.AssignRectificationToTheTeacherChannel(user);
-                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las rectificaciones a los profesores(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+                await classRoomDataHandler.AssignRectificationToTheTeacherChannel(user);
+                await Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las rectificaciones a los profesores(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
 
-        private void SendStudentsInformationCommand(Models.User? user)
+        private async Task SendStudentsInformationCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classRoomDataHandler.SendInformationToTheStudents(user);
-                Menu.CancelMenu(bot, message, "Inserte la información que le quiere enviar a sus estudiantes:");
+                await classRoomDataHandler.SendInformationToTheStudents(user);
+                await Menu.CancelMenu(bot, message, "Inserte la información que le quiere enviar a sus estudiantes:");
             }
         }
 
-        private void CreateMiscellaneousCommand(Models.User? user)
+        private async Task CreateMiscellaneousCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando credits");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                miscellaneousDataHandler.CreateMiscellaneous(user);
-                Menu.CancelMenu(bot, message, "Inserte la miscelánea que quiere proponer:");
+                await miscellaneousDataHandler.CreateMiscellaneous(user);
+                await Menu.CancelMenu(bot, message, "Inserte la miscelánea que quiere proponer:");
             }
         }
 
-        private void AssignMiscellaneousChannelCommand(Models.User? user)
+        private async Task AssignMiscellaneousChannelCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Asignar Canal de Misceláneas");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Asignar Canal de Misceláneas");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                classRoomDataHandler.AssignMiscellaneousChannel(user);
-                Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las misceláneas(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
+                await classRoomDataHandler.AssignMiscellaneousChannel(user);
+                await Menu.CancelMenu(bot, message, "Inserte el Username del canal en el que se publicarán las misceláneas(Tenga presente que el bot debe ser miembro del canal y con privilegios de Administrador):");
             }
         }
 
-        private void CreatePracticClassCommand(Models.User? user)
+        private async Task CreatePracticClassCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                practicClassDataHandler.CreatePracticClass(user);
-                Menu.CancelMenu(bot, message, "Inserte la Clase Práctica en el formato siguiente: \n CP1 1 10000 1a 20000 2a 400000 ......");
+                await practicClassDataHandler.CreatePracticClass(user);
+                await Menu.CancelMenu(bot, message, "Inserte la Clase Práctica en el formato siguiente: \n CP1 1 10000 1a 20000 2a 400000 ......");
             }
         }
 
-        private void ReviewPracticClassCommand(Models.User? user)
+        private async Task ReviewPracticClassCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
                 var practicalClasses = practicClassDataHandler.GetPracticClasses(user);
-                Menu.CancelMenu(bot, message);
-                Menu.PracticalClassList(bot, message, practicalClasses, "Seleccione una Clase Práctica:");
+                await Menu.CancelMenu(bot, message);
+                await Menu.PracticalClassList(bot, message, practicalClasses, "Seleccione una Clase Práctica:");
             }
         }
 
-        private void EditPracticalClassNameCommand(Models.User? user)
+        private async Task EditPracticalClassNameCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || !user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
-                var practicalClasses = practicClassDataHandler.EditPracticalClassName(user);
-                Menu.CancelMenu(bot, message, practicalClasses);
+                var practicalClasses = await practicClassDataHandler.EditPracticalClassName(user);
+                await Menu.CancelMenu(bot, message, practicalClasses);
             }
         }
 
-        private void CreditsStatusCommand(Models.User? user)
+        private async Task CreditsStatusCommand(Models.User? user)
         {
             if (user == null)
             {
-                Logger.Error($"Error: Usuario nulo, problemas en el servidor");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
             if (user.Status != UserStatus.Ready || user.IsTecaher)
             {
-                Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
-                bot.SendMessage(chatId: message.Chat.Id,
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
             }
             else
             {
                 var credits = creditsDataHandler.GetCreditListOfUser(user);
-                Menu.StudentMenu(bot, message, credits);
+                await Menu.StudentMenu(bot, message, credits);
             }
         }
         #endregion
 
         #region Procesos que completan comandos de varias operaciones
-        private void OnRegister(Models.User user, string text)
+        private async Task OnRegister(Models.User user, string text)
         {
             var list = text.Split(' ');
 
             user.Name = text;
-            userDataHandler.VerifyUser(user);
-            Logger.Success($"Verifying the user {user.Username}");
+            await userDataHandler.VerifyUser(user);
+            await Logger.Success($"Verifying the user {user.Username}");
 
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Bienvenido " + text,
                             replyMarkup: new ReplyKeyboardRemove());
 
-            Menu.RegisterMenu(bot, message);
+            await Menu.RegisterMenu(bot, message);
         }
 
-        private bool OnAssignStudentAtClass(long id, string text)
+        private async Task<bool> OnAssignStudentAtClass(long id, string text)
         {
             var success = false;
             var res = studentDataHandler.AssignStudentAtClass(id, text, out success);
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: res,
                             replyMarkup: new ReplyKeyboardRemove());
             return success;
         }
 
-        private bool OnAssignTeacherAtClass(long id, string text)
+        private async Task<bool> OnAssignTeacherAtClass(long id, string text)
         {
             bool success = false;
             var res = teacherDataHandler.AssignTeacherAtClass(id, text, out success);
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: res,
                             replyMarkup: new ReplyKeyboardRemove());
             return success;
         }
 
-        private void OnCreateClassRoom(long id, string name)
+        private async Task OnCreateClassRoom(long id, string name)
         {
-            var res = classRoomDataHandler.CreateClassRoom(id, name);
-            bot.SendMessage(chatId: message.Chat.Id,
+            var res = await classRoomDataHandler.CreateClassRoom(id, name);
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: res,
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void OnRectificationToTheTeacherAtTeacherUserName(Models.User user, string teacherUserName)
+        private async Task OnRectificationToTheTeacherAtTeacherUserName(Models.User user, string teacherUserName)
         {
-            rectificationToTheTeacherDataHandler.DoRectificationToTheTaecherUserName(user, teacherUserName);
-            Menu.CancelMenu(bot, message, "Explique a grosso modo en qué se equivocó el profesor y su correción:");
+            await rectificationToTheTeacherDataHandler.DoRectificationToTheTaecherUserName(user, teacherUserName);
+            await Menu.CancelMenu(bot, message, "Explique a grosso modo en qué se equivocó el profesor y su correción:");
         }
 
-        private void OnRectificationToTheTeacherAtText(Models.User user, string text)
+        private async Task OnRectificationToTheTeacherAtText(Models.User user, string text)
         {
-            var res = rectificationToTheTeacherDataHandler.DoRectificationToTheTaecherText(user, text);
-            bot.SendMessage(chatId: message.Chat.Id,
+            var res = await rectificationToTheTeacherDataHandler.DoRectificationToTheTaecherText(user, text);
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: res,
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void OnStartClass(Models.User user, string classTitle)
+        private async Task OnStartClass(Models.User user, string classTitle)
         {
-            classTitleDataHandler.CreateClass(user, classTitle);
-            bot.SendMessage(chatId: message.Chat.Id,
+            await classTitleDataHandler.CreateClass(user, classTitle);
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Clase creada satisfactoriamente.",
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void OnChangeClassTitle(Models.User user, long classId)
+        private async Task OnChangeClassTitle(Models.User user, long classId)
         {
-            classTitleDataHandler.ChangeClassTitle(user, classId);
-            Menu.CancelMenu(bot, message, "Inserte el nombre la clase:");
+            await classTitleDataHandler.ChangeClassTitle(user, classId);
+            await Menu.CancelMenu(bot, message, "Inserte el nombre la clase:");
         }
 
-        private void OnChangeClassTitle(Models.User user, string classTitle)
+        private async Task OnChangeClassTitle(Models.User user, string classTitle)
         {
-            classTitleDataHandler.ChangeClassTitle(user, classTitle);
-            bot.SendMessage(chatId: message.Chat.Id,
+            await classTitleDataHandler.ChangeClassTitle(user, classTitle);
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Título propuesto satisfactoriamente.",
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void OnClassIntervention(Models.User user, long classId)
+        private async Task OnClassIntervention(Models.User user, long classId)
         {
-            classInterventionDataHandler.CreateIntervention(user, classId);
-            Menu.CancelMenu(bot, message, "Inserte su intervención:");
+            await classInterventionDataHandler.CreateIntervention(user, classId);
+            await Menu.CancelMenu(bot, message, "Inserte su intervención:");
         }
 
-        private void OnClassIntervention(Models.User user, string classIntervention)
+        private async Task OnClassIntervention(Models.User user, string classIntervention)
         {
-            classInterventionDataHandler.CreateIntervention(user, classIntervention);
-            bot.SendMessage(chatId: message.Chat.Id,
+            await classInterventionDataHandler.CreateIntervention(user, classIntervention);
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: "Intervención hecha satisfactoriamente.",
                             replyMarkup: new ReplyKeyboardRemove());
         }
 
-        private void OnPendings(Models.User user, Message message)
+        private async Task OnPendings(Models.User user, Message message)
         {
             var response = message.Text.Split(' ');
             long credits = 0;
@@ -1870,7 +1871,7 @@ namespace ClassAssistantBot.Controllers
                     text = $"Ha recibido {credits} créditos por su {type} ({comment}).";
                 else
                     text = $"Ha recibido {credits} créditos por su {type}.";
-                bot.SendMessage(chatId: pending.Student.User.ChatId,
+                await bot.SendMessageAsync(chatId: pending.Student.User.ChatId,
                                 text: text);
                 string credit_information = "";
                 if (response.Length != 1)
@@ -1880,9 +1881,9 @@ namespace ClassAssistantBot.Controllers
                         credit_information += response[i] + " ";
                     }
                 }
-                creditsDataHandler.AddCredits(credits, user.Id, pending.ObjectId, pending.Student.User.Id, pending.ClassRoomId, credit_information);
-                pendingDataHandler.RemovePending(pending);
-                PendingsCommand(user);
+                await creditsDataHandler.AddCredits(credits, user.Id, pending.ObjectId, pending.Student.User.Id, pending.ClassRoomId, credit_information);
+                await pendingDataHandler.RemovePending(pending);
+                await PendingsCommand(user);
 
                 if (pending.Type == InteractionType.Meme)
                 {
@@ -1897,49 +1898,49 @@ namespace ClassAssistantBot.Controllers
                 {
                     comment = classInterventionDataHandler.GetClassIntenvention(pending.ObjectId).Text;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassInterventionChannel(user)))
-                        bot.SendMessage(chatId: classRoomDataHandler.GetClassInterventionChannel(user),
+                        await bot.SendMessageAsync(chatId: classRoomDataHandler.GetClassInterventionChannel(user),
                             text: "Intervención en Clase enviada por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.ClassTitle)
                 {
                     comment = classTitleDataHandler.GetClassTitle(pending.ObjectId).Title;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassTitleChannel(user)))
-                        bot.SendMessage(chatId: classRoomDataHandler.GetClassTitleChannel(user),
+                        await bot.SendMessageAsync(chatId: classRoomDataHandler.GetClassTitleChannel(user),
                             text: "Cambio de Título de Clase enviado por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.Diary)
                 {
                     comment = diaryDataHandler.GetDiary(pending.ObjectId).Text;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetDiaryChannel(user)))
-                        bot.SendMessage(chatId: classRoomDataHandler.GetDiaryChannel(user),
+                        await bot.SendMessageAsync(chatId: classRoomDataHandler.GetDiaryChannel(user),
                             text: "Actualización al Diario enviado por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.Joke)
                 {
                     comment = jokeDataHandler.GetJoke(pending.ObjectId).Text;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetJokesChannel(user)))
-                        bot.SendMessage(chatId: classRoomDataHandler.GetJokesChannel(user),
+                        await bot.SendMessageAsync(chatId: classRoomDataHandler.GetJokesChannel(user),
                             text: "Chiste enviado por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.RectificationToTheTeacher)
                 {
                     comment = rectificationToTheTeacherDataHandler.GetRectificationToTheTeacher(pending.ObjectId).Text;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetRectificationToTheTeacherChannel(user)))
-                        bot.SendMessage(chatId: classRoomDataHandler.GetRectificationToTheTeacherChannel(user),
+                        await bot.SendMessageAsync(chatId: classRoomDataHandler.GetRectificationToTheTeacherChannel(user),
                             text: "Rectificación al Profesor enviada por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if (pending.Type == InteractionType.StatusPhrase)
                 {
                     comment = statusPhraseDataHandler.GetStatusPhrase(pending.ObjectId).Phrase;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetStatusPhraseChannel(user)))
-                        bot.SendMessage(chatId: classRoomDataHandler.GetStatusPhraseChannel(user),
+                        await bot.SendMessageAsync(chatId: classRoomDataHandler.GetStatusPhraseChannel(user),
                             text: "Frase de Estado enviada por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }
                 else if(pending.Type == InteractionType.Miscellaneous)
                 {
                     comment = miscellaneousDataHandler.GetMiscellaneous(pending.ObjectId).Text;
                     if (!string.IsNullOrEmpty(classRoomDataHandler.GetMiscellaneousChannel(user)))
-                        bot.SendMessage(chatId: classRoomDataHandler.GetMiscellaneousChannel(user),
+                        await bot.SendMessageAsync(chatId: classRoomDataHandler.GetMiscellaneousChannel(user),
                             text: "Miscelánea enviada por: @" + pending.Student.User.Username + "\n\"" + comment + "\"");
                 }*/
             }
@@ -1955,36 +1956,36 @@ namespace ClassAssistantBot.Controllers
                 {
                     if (teacherDataHandler.ExistTeacher(username))
                     {
-                        var teacherChatId = pendingDataHandler.AddDirectPending(username, pending.Id);
-                        bot.SendMessage(chatId: teacherChatId,
+                        var teacherChatId = await pendingDataHandler.AddDirectPending(username, pending.Id);
+                        await bot.SendMessageAsync(chatId: teacherChatId,
                             text: "Le han asignado un pendiente que tiene que revisar.");
                     }
                     else
                     {
-                        bot.SendMessage(chatId: user.ChatId,
+                        await bot.SendMessageAsync(chatId: user.ChatId,
                             text: $"No existe un usuario con el user name {username}.");
                     }
                 }
-                PendingsCommand(user);
+                await PendingsCommand(user);
             }
         }
 
-        private void OnAssignCredits(Models.User user, string username)
+        private async Task OnAssignCredits(Models.User user, string username)
         {
-            if(!creditsDataHandler.AssignCredit(user, username))
+            if(!await creditsDataHandler.AssignCredit(user, username))
             {
-                Menu.TeacherMenu(bot, message);
+                await Menu.TeacherMenu(bot, message);
             }
             else
-                Menu.CancelMenu(bot, message, "Inserte los créditos y su mensaje:");
+                await Menu.CancelMenu(bot, message, "Inserte los créditos y su mensaje:");
         }
 
-        private void OnAssignCreditsMessage(Models.User user, string text)
+        private async Task OnAssignCreditsMessage(Models.User user, string text)
         {
-            var res = creditsDataHandler.AssignCreditMessage(user, text);
-            bot.SendMessage(chatId: res.Item2,
+            var res = await creditsDataHandler.AssignCreditMessage(user, text);
+            await bot.SendMessageAsync(chatId: res.Item2,
                             text: $"Ha recibido {res.Item3} créditos y su profesor le dijo \"{res.Item1}\".");
-            Menu.TeacherMenu(bot, message, "Créditos asignados satisfactoriamente.");
+            await Menu.TeacherMenu(bot, message, "Créditos asignados satisfactoriamente.");
         }
         #endregion
     }

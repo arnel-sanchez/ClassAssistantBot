@@ -23,7 +23,7 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public (string, string) RemoveStudentFromClassRoom(long id, string userName)
+        public async Task<(string, string)> RemoveStudentFromClassRoom(long id, string userName)
         {
             var teacher = dataAccess.Users.First(x => x.Id == id);
             var user = dataAccess.Users.FirstOrDefault(x => x.Username == userName.Substring(1) || x.Username == userName);
@@ -39,17 +39,17 @@ namespace ClassAssistantBot.Services
                 dataAccess.Users.Update(user);
                 dataAccess.StudentsByClassRooms.RemoveRange(userByClassRoom);
                 dataAccess.Users.Update(teacher);
-                dataAccess.SaveChanges();
+                await dataAccess.SaveChangesAsync();
                 return ("Estudiante sacado del aula con éxito", user.ChatId.ToString());
             }
         }
 
-        public string RemoveStudentFromClassRoom(long id)
+        public async Task<string> RemoveStudentFromClassRoom(long id)
         {
             var user = dataAccess.Users.Where(x => x.Id == id).First();
             user.Status = UserStatus.RemoveStudentFromClassRoom;
             dataAccess.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             var list = dataAccess.StudentsByClassRooms
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
                 .Include(x => x.Student.User).ToList();
@@ -73,11 +73,11 @@ namespace ClassAssistantBot.Services
             return res.ToString();
         }
 
-        public void StudentEnterClass(User user)
+        public async Task StudentEnterClass(User user)
         {
             user.Status = UserStatus.StudentEnteringClass;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             Console.WriteLine($"The student {user.Username} is entering class");
         }
 

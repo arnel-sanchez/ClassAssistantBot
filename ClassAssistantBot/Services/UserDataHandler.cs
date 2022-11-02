@@ -12,7 +12,7 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public void CreateUser(Telegram.BotAPI.AvailableTypes.User appUser, long chatId)
+        public async Task CreateUser(Telegram.BotAPI.AvailableTypes.User appUser, long chatId)
         {
             var user = new ClassAssistantBot.Models.User
             {
@@ -30,30 +30,30 @@ namespace ClassAssistantBot.Services
             };
 
             dataAccess.Users.Add(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             Console.WriteLine($"Inserting the new user {appUser.Username}");
         }
 
-        public User GetUser(Telegram.BotAPI.AvailableTypes.User user)
+        public async Task<User> GetUser(Telegram.BotAPI.AvailableTypes.User user)
         {
             var userRes = dataAccess.Users.Where(x => x.TelegramId == user.Id).FirstOrDefault();
             if(userRes!=null && userRes.Username != user.Username)
             {
                 userRes.Username = user.Username;
                 dataAccess.Users.Update(userRes);
-                dataAccess.SaveChanges();
+                await dataAccess.SaveChangesAsync();
             }
             return userRes;
         }
 
-        public void VerifyUser(User user)
+        public async Task VerifyUser(User user)
         {
             user.Status = UserStatus.Verified;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void CancelAction(User user)
+        public async Task CancelAction(User user)
         {
             if(user.Status == UserStatus.AssignCredits)
             {
@@ -82,7 +82,7 @@ namespace ClassAssistantBot.Services
             }
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
     }
 }

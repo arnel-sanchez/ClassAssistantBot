@@ -12,11 +12,11 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public string ChangeStatusPhrase(User user)
+        public async Task<string> ChangeStatusPhrase(User user)
         {
             user.Status = UserStatus.StatusPhrase;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             var res = dataAccess.StatusPhrases.Where(x => x.UserId == user.Id).ToList().MaxBy(x => x.DateTime);
             if (res == null)
                 return "";
@@ -24,7 +24,7 @@ namespace ClassAssistantBot.Services
                 return res.Phrase;
         }
 
-        public void ChangeStatusPhrase(long id, string message)
+        public async Task ChangeStatusPhrase(long id, string message)
         {
             var user = dataAccess.Users.First(x => x.Id == id);
             user.Status = UserStatus.Ready;
@@ -52,7 +52,7 @@ namespace ClassAssistantBot.Services
                 Code = code
             };
             dataAccess.Pendings.Add(pending);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public StatusPhrase GetStatusPhrase(string id)

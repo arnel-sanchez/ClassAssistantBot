@@ -12,15 +12,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public void DoJoke(User user)
+        public async Task DoJoke(User user)
         {
             user.Status = UserStatus.Joke;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
-            Console.WriteLine($"The student {user.Username} is redy to do a Joke");
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void DoJoke(long id, string message)
+        public async Task DoJoke(long id, string message)
         {
             var user = dataAccess.Users.First(x => x.Id == id);
             user.Status = UserStatus.Ready;
@@ -48,7 +47,7 @@ namespace ClassAssistantBot.Services
                 Code = code
             };
             dataAccess.Pendings.Add(pending);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public Joke GetJoke(string id)

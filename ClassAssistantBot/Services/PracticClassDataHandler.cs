@@ -14,14 +14,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public void CreatePracticClass(User user)
+        public async Task CreatePracticClass(User user)
         {
             user.Status = UserStatus.CreatePracticClass;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public bool CreatePracticClass(User user, string cpFormat)
+        public async Task<bool> CreatePracticClass(User user, string cpFormat)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace ClassAssistantBot.Services
                 }
                 cp.Excercises = exercises;
                 dataAccess.PracticClasses.Add(cp);
-                dataAccess.SaveChanges();
+                await dataAccess.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -88,7 +88,7 @@ namespace ClassAssistantBot.Services
             return res;
         }
 
-        public string EditPracticalClassName(User user)
+        public async Task<string> EditPracticalClassName(User user)
         {
             user.Status = UserStatus.EditPracticalClasss;
             dataAccess.Users.Update(user);
@@ -108,11 +108,11 @@ namespace ClassAssistantBot.Services
             }
 
             res.Append("\n\n**Para editar el nombre de la Clase Práctica debe escribir el código entre paréntesis seguido de un espacio y luego el nuevo nombre**");
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             return res.ToString();
         }
 
-        public string EditPracticalClassName(User user, string text)
+        public async Task<string> EditPracticalClassName(User user, string text)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
@@ -136,11 +136,11 @@ namespace ClassAssistantBot.Services
 
             practicalClass.Name = name;
             dataAccess.PracticClasses.Update(practicalClass);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             return "Clase Práctica Editada Satisfactoriamente";
         }
 
-        public (bool, string, string, string) ReviewPrecticalClass(User user, string excerciseCode, string studentUserName, string practicalClassCode, bool @double)
+        public async Task<(bool, string, string, string)> ReviewPrecticalClass(User user, string excerciseCode, string studentUserName, string practicalClassCode, bool @double)
         {
             var student = dataAccess.Students.Where(x => x.User.Username == studentUserName).Include(x => x.User).FirstOrDefault();
             if (student == null)
@@ -182,7 +182,7 @@ namespace ClassAssistantBot.Services
                 user.Status = UserStatus.Ready;
                 dataAccess.Credits.Add(credit);
                 dataAccess.Users.Update(user);
-                dataAccess.SaveChanges();
+                await dataAccess.SaveChangesAsync();
                 return (true, $"Le han revisado el ejercicio {excercise.Code} en la Clase Práctica {practicalClass.Name}.", practicalClass.Name, student.User.ChatId.ToString());
             }
             catch

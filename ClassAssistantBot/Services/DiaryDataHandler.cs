@@ -13,15 +13,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public void UpdateDiary(User user)
+        public async Task UpdateDiary(User user)
         {
             user.Status = UserStatus.Diary;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
-            Console.WriteLine($"The student {user.Username} is ready to update Diary");
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void UpdateDiary(long id, string message)
+        public async Task UpdateDiary(long id, string message)
         {
             var user = dataAccess.Users.First(x => x.Id == id);
             user.Status = UserStatus.Ready;
@@ -51,10 +50,10 @@ namespace ClassAssistantBot.Services
             };
             dataAccess.Pendings.Add(pending);
 
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void AcceptDiary(User user, long studentId, string diaryId)
+        public async Task AcceptDiary(User user, long studentId, string diaryId)
         {
             var dailies = dataAccess.Dailies.Where(x => x.UserId == studentId).OrderByDescending(x => x.DateTime).ToList();
             int count = 0;
@@ -89,7 +88,7 @@ namespace ClassAssistantBot.Services
 
             var pending = dataAccess.Pendings.Where(x => x.ObjectId == diaryId).First();
             dataAccess.Remove(pending);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public Diary GetDiary(string diaryId)

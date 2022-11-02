@@ -14,14 +14,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public void CreateClassRoom(User user)
+        public async Task CreateClassRoom(User user)
         {
             user.Status = UserStatus.TeacherCreatingClass;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public string CreateClassRoom(long id, string name)
+        public async Task<string> CreateClassRoom(long id, string name)
         {
             var teacher = dataAccess.Teachers.Where(x => x.User.TelegramId == id).FirstOrDefault();
 
@@ -48,8 +48,8 @@ namespace ClassAssistantBot.Services
                 MemeChannel = ""
             };
 
-            dataAccess.Add(classRoom);
-            dataAccess.SaveChanges();
+            await dataAccess.AddAsync(classRoom);
+            await dataAccess.SaveChangesAsync();
 
             classRoom = dataAccess.ClassRooms.Where(x => x.TeacherAccessKey == teacherAccessKey && x.StudentAccessKey == studentAccessKey).FirstOrDefault();
 
@@ -78,18 +78,18 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Users.Update(user);
 
-            dataAccess.Add(teacherByClassRoom);
-            dataAccess.SaveChanges();
+            await dataAccess.AddAsync(teacherByClassRoom);
+            await dataAccess.SaveChangesAsync();
 
             return $"El código de acceso para sus estudiantes {classRoom.StudentAccessKey}\n\nEl código de acceso para los demás profesores es {classRoom.TeacherAccessKey}";
         }
 
-        public string ChangeClassRoom(long id)
+        public async Task<string> ChangeClassRoom(long id)
         {
             var user = dataAccess.Users.Where(x => x.Id == id).First();
             user.Status = UserStatus.ChangeClassRoom;
             dataAccess.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             var list = dataAccess.TeachersByClassRooms.Where(x => x.Teacher.UserId == id).Include(x => x.ClassRoom).ToList();
             var res = new StringBuilder();
             foreach (var item in list)
@@ -102,7 +102,7 @@ namespace ClassAssistantBot.Services
             return res.ToString();
         }
 
-        public void ChangeClassRoom(long id, long classRoomID)
+        public async Task ChangeClassRoom(long id, long classRoomID)
         {
             var user = dataAccess.Users.Where(x => x.Id == id).First();
             var classRoom = dataAccess.ClassRooms.Where(x => x.Id == classRoomID).FirstOrDefault();
@@ -111,7 +111,7 @@ namespace ClassAssistantBot.Services
                 user.ClassRoomActiveId = classRoom.Id;
                 user.Status = UserStatus.Ready;
                 dataAccess.Users.Update(user);
-                dataAccess.SaveChanges();
+                await dataAccess.SaveChangesAsync();
             }
         }
 
@@ -136,21 +136,21 @@ namespace ClassAssistantBot.Services
             return stringBuilder.ToString();
         }
 
-        public void AssignMemeChannel(User user)
+        public async Task AssignMemeChannel(User user)
         {
             user.Status = UserStatus.AssignMemeChannel;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void AssignMemeChannel(User user, string chanelName)
+        public async Task AssignMemeChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
             var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.MemeChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public string GetMemeChannel(User user)
@@ -158,21 +158,21 @@ namespace ClassAssistantBot.Services
             return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().MemeChannel;
         }
 
-        public void AssignJokesChannel(User user)
+        public async Task AssignJokesChannel(User user)
         {
             user.Status = UserStatus.AssignJokeChannel;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void AssignJokesChannel(User user, string chanelName)
+        public async Task AssignJokesChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
             var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.JokesChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public string GetJokesChannel(User user)
@@ -180,21 +180,21 @@ namespace ClassAssistantBot.Services
             return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().JokesChannel;
         }
 
-        public void AssignClassInterventionChannel(User user)
+        public async Task AssignClassInterventionChannel(User user)
         {
             user.Status = UserStatus.AssignClassInterventionChannel;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void AssignClassInterventionChannel(User user, string chanelName)
+        public async Task AssignClassInterventionChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
             var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.ClassInterventionChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public string GetClassInterventionChannel(User user)
@@ -202,21 +202,21 @@ namespace ClassAssistantBot.Services
             return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().ClassInterventionChannel;
         }
 
-        public void AssignDiaryChannel(User user)
+        public async Task AssignDiaryChannel(User user)
         {
             user.Status = UserStatus.AssignDiaryChannel;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void AssignDiaryChannel(User user, string chanelName)
+        public async Task AssignDiaryChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
             var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.DiaryChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public string GetDiaryChannel(User user)
@@ -224,21 +224,21 @@ namespace ClassAssistantBot.Services
             return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().DiaryChannel;
         }
 
-        public void AssignStatusPhraseChannel(User user)
+        public async Task AssignStatusPhraseChannel(User user)
         {
             user.Status = UserStatus.AssignStatusPhraseChannel;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void AssignStatusPhraseChannel(User user, string chanelName)
+        public async Task AssignStatusPhraseChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
             var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.StatusPhraseChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public string GetStatusPhraseChannel(User user)
@@ -246,21 +246,21 @@ namespace ClassAssistantBot.Services
             return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().StatusPhraseChannel;
         }
 
-        public void AssignClassTitleChannel(User user)
+        public async Task AssignClassTitleChannel(User user)
         {
             user.Status = UserStatus.AssignClassTitleChannel;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void AssignClassTitleChannel(User user, string chanelName)
+        public async Task AssignClassTitleChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
             var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.ClassTitleChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public string GetClassTitleChannel(User user)
@@ -268,21 +268,21 @@ namespace ClassAssistantBot.Services
             return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().ClassTitleChannel;
         }
 
-        public void AssignRectificationToTheTeacherChannel(User user)
+        public async Task AssignRectificationToTheTeacherChannel(User user)
         {
             user.Status = UserStatus.AssignRectificationToTheTeacherChannel;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void AssignRectificationToTheTeacherChannel(User user, string chanelName)
+        public async Task AssignRectificationToTheTeacherChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
             var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.RectificationToTheTeacherChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public string GetRectificationToTheTeacherChannel(User user)
@@ -290,18 +290,18 @@ namespace ClassAssistantBot.Services
             return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().RectificationToTheTeacherChannel;
         }
 
-        public void SendInformationToTheStudents(User user)
+        public async Task SendInformationToTheStudents(User user)
         {
             user.Status = UserStatus.SendInformation;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public List<StudentByClassRoom> GetStudentsOnClassRoom(User user)
+        public async Task<List<StudentByClassRoom>> GetStudentsOnClassRoom(User user)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             return dataAccess.StudentsByClassRooms
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
                 .Include(x => x.Student)
@@ -309,11 +309,11 @@ namespace ClassAssistantBot.Services
                 .ToList();
         }
 
-        public List<TeacherByClassRoom> GetTeachersOnClassRoom(User user)
+        public async Task<List<TeacherByClassRoom>> GetTeachersOnClassRoom(User user)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             return dataAccess.TeachersByClassRooms
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId && x.Teacher.UserId != user.Id)
                 .Include(x => x.Teacher)
@@ -321,21 +321,21 @@ namespace ClassAssistantBot.Services
                 .ToList();
         }
 
-        public void AssignMiscellaneousChannel(User user)
+        public async Task AssignMiscellaneousChannel(User user)
         {
             user.Status = UserStatus.AssignMiscellaneousChannel;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void AssignMiscellaneousChannel(User user, string chanelName)
+        public async Task AssignMiscellaneousChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
             var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.MiscelaneousChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public string GetMiscellaneousChannel(User user)

@@ -12,14 +12,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public void SendMeme(User user)
+        public async Task SendMeme(User user)
         {
             user.Status = UserStatus.Meme;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void SendMeme(long id, Telegram.BotAPI.AvailableTypes.Document document)
+        public async Task SendMeme(long id, Telegram.BotAPI.AvailableTypes.Document document)
         {
             var user = dataAccess.Users.First(x => x.Id == id);
             user.Status = UserStatus.Ready;
@@ -53,10 +53,10 @@ namespace ClassAssistantBot.Services
                 Code = code
             };
             dataAccess.Pendings.Add(pending);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void SendMeme(long id, Telegram.BotAPI.AvailableTypes.PhotoSize photo)
+        public async Task SendMeme(long id, Telegram.BotAPI.AvailableTypes.PhotoSize photo)
         {
             var user = dataAccess.Users.First(x => x.Id == id);
             user.Status = UserStatus.Ready;
@@ -91,7 +91,7 @@ namespace ClassAssistantBot.Services
                 Code = code
             };
             dataAccess.Pendings.Add(pending);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
         public Meme GetMeme(string memeId)

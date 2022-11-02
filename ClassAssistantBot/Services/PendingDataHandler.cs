@@ -14,7 +14,7 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public (string, int) GetPendings(User user, bool directPendings = false, InteractionType interactionType = InteractionType.None, int page = 1)
+        public async Task<(string, int)> GetPendings(User user, bool directPendings = false, InteractionType interactionType = InteractionType.None, int page = 1)
         {
             var pendings = new List<Pending>();
             if (!directPendings)
@@ -61,7 +61,7 @@ namespace ClassAssistantBot.Services
 
             user.Status = UserStatus.Pending;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             int count = pendings.Count/10;
             if (pendings.Count % 10 != 0)
                 count++;
@@ -228,15 +228,15 @@ namespace ClassAssistantBot.Services
                 .First();
         }
 
-        public void RemovePending(Pending pending)
+        public async Task RemovePending(Pending pending)
         {
             var directPendings = dataAccess.DirectPendings.Where(x => x.PendingId == pending.Id).ToList();
             dataAccess.Pendings.Remove(pending);
             dataAccess.DirectPendings.RemoveRange(directPendings);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public long AddDirectPending(string username, string pendingId)
+        public async Task<long> AddDirectPending(string username, string pendingId)
         {
             var user = dataAccess.Users.Where(x => x.Username == username || x.Username == username.Substring(1)).First();
 
@@ -247,7 +247,7 @@ namespace ClassAssistantBot.Services
                 UserId = user.Id
             };
             dataAccess.DirectPendings.Add(directPending);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             return user.ChatId;
         }
 
@@ -273,11 +273,11 @@ namespace ClassAssistantBot.Services
             return res.ToString();
         }
 
-        public (string, string) GetPendingExplicationData(Pending pending, string teacherUsername)
+        public async Task<(string, string)> GetPendingExplicationData(Pending pending, string teacherUsername)
         {
             pending.GiveMeAnExplication = true;
             dataAccess.Pendings.Update(pending);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             if (pending.Type == InteractionType.ClassIntervention)
             {
                 var classIntervention = dataAccess.ClassInterventions

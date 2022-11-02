@@ -11,14 +11,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public void DoRectificationToTheTaecher(User user)
+        public async Task DoRectificationToTheTaecher(User user)
         {
             user.Status = UserStatus.RectificationAtTeacher;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void DoRectificationToTheTaecherUserName(User user, string teacherUserName)
+        public async Task DoRectificationToTheTaecherUserName(User user, string teacherUserName)
         {
             user.Status = UserStatus.RectificationToTheTeacherUserName;
             var teacher = dataAccess.Teachers.Where(x => x.User.Username == teacherUserName).First();
@@ -36,10 +36,10 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Users.Update(user);
             dataAccess.RectificationToTheTeachers.Add(rectification);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public string DoRectificationToTheTaecherText(User user, string text)
+        public async Task<string> DoRectificationToTheTaecherText(User user, string text)
         {
             user.Status = UserStatus.Ready;
             var rectification = dataAccess.RectificationToTheTeachers.Where(x => x.UserId == user.Id).OrderByDescending(x => x.DateTime).First();
@@ -62,7 +62,7 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Users.Update(user);
             dataAccess.RectificationToTheTeachers.Update(rectification);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             return "Rectificación al profesor hecha satisfactoriamente.";
         }
 

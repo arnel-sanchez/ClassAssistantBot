@@ -11,14 +11,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public void CreateIntervention(User user)
+        public async Task CreateIntervention(User user)
         {
             user.Status = UserStatus.ClassIntervention;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void CreateIntervention(User user, long classId)
+        public async Task CreateIntervention(User user, long classId)
         {
             user.Status = UserStatus.ClassInterventionSelect;
             dataAccess.Users.Update(user);
@@ -31,11 +31,11 @@ namespace ClassAssistantBot.Services
                 DateTime = DateTime.UtcNow,
                 Finished = false
             };
-            dataAccess.ClassInterventions.Add(classIntervention);
-            dataAccess.SaveChanges();
+            await dataAccess.ClassInterventions.AddAsync(classIntervention);
+            await dataAccess.SaveChangesAsync();
         }
 
-        public void CreateIntervention(User user, string intervention)
+        public async Task CreateIntervention(User user, string intervention)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
@@ -58,8 +58,8 @@ namespace ClassAssistantBot.Services
                 StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
                 Code = code
             };
-            dataAccess.Pendings.Add(pending);
-            dataAccess.SaveChanges();
+            await dataAccess.Pendings.AddAsync(pending);
+            await dataAccess.SaveChangesAsync();
         }
 
         public ClassIntervention GetClassIntenvention(string id)

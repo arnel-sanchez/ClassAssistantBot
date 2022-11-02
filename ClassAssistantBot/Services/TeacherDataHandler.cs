@@ -17,19 +17,19 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public void CreateTeacher(User user)
+        public async Task CreateTeacher(User user)
         {
             user.Status = UserStatus.CreatingTecaher;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             Console.WriteLine($"The user {user.Username} is creating a teacher");
         }
 
-        public void TeacherEnterClass(User user)
+        public async Task TeacherEnterClass(User user)
         {
             user.Status = UserStatus.TeacherEnteringClass;
             dataAccess.Users.Update(user);
-            dataAccess.SaveChanges();
+            await dataAccess.SaveChangesAsync();
             Console.WriteLine($"The teacher {user.Username} is entering class");
         }
 

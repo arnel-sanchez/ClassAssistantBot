@@ -8,7 +8,7 @@ namespace ClassAssistantBot.Services
 {
     public static class Menu
     {
-        public static void RegisterMenu(BotClient bot, Message message, string text = "")
+        public static async Task RegisterMenu(BotClient bot, Message message, string text = "")
         {
             if (string.IsNullOrEmpty(text))
                 text = "Es estudiante o profesor?";
@@ -23,12 +23,12 @@ namespace ClassAssistantBot.Services
                                         },
                 ResizeKeyboard = true
             };
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
         }
 
-        public static void TeacherMenu(BotClient bot, Message message, string text = "")
+        public static async Task TeacherMenu(BotClient bot, Message message, string text = "")
         {
             if (string.IsNullOrEmpty(text))
                 text = "Menú";
@@ -67,12 +67,12 @@ namespace ClassAssistantBot.Services
                 },
                 ResizeKeyboard = true
             }; ;
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
         }
 
-        public static void TeacherConfigurationMenu(BotClient bot, Message message, string text = "")
+        public static async Task TeacherConfigurationMenu(BotClient bot, Message message, string text = "")
         {
             if (string.IsNullOrEmpty(text))
                 text = "Menú";
@@ -121,12 +121,12 @@ namespace ClassAssistantBot.Services
                 },
                 ResizeKeyboard = true
             }; ;
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
         }
 
-        public static void StudentMenu(BotClient bot, Message message, string text = "")
+        public static async Task StudentMenu(BotClient bot, Message message, string text = "")
         {
             if (string.IsNullOrEmpty(text))
                 text = "Menú";
@@ -159,17 +159,17 @@ namespace ClassAssistantBot.Services
                 },
                 ResizeKeyboard = true
             }; ;
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
         }
 
-        public static void StudentConfigurationMenu(BotClient bot, Message message, string text = "")
+        public static async Task StudentConfigurationMenu(BotClient bot, Message message, string text = "")
         {
 
         }
 
-        public static void CancelMenu(BotClient bot, Message message, string text = "")
+        public static async Task CancelMenu(BotClient bot, Message message, string text = "")
         {
             var keyboard = new ReplyKeyboardMarkup
             {
@@ -182,12 +182,12 @@ namespace ClassAssistantBot.Services
             }; ;
             if (string.IsNullOrEmpty(text))
                 text = "Cancelar";
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
         }
 
-        public static void ChangeClassRoomMenu(BotClient bot, Message message, string text)
+        public static async Task ChangeClassRoomMenu(BotClient bot, Message message, string text)
         {
             var keyboard = new ReplyKeyboardMarkup
             {
@@ -202,12 +202,12 @@ namespace ClassAssistantBot.Services
                 },
                 ResizeKeyboard = true
             }; ;
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
         }
 
-        public static void TeachersList(BotClient bot, Message message,List<Teacher> teachers, string text = "")
+        public static async Task TeachersList(BotClient bot, Message message,List<Teacher> teachers, string text = "")
         {
             var listButton = new KeyboardButton[teachers.Count+1][];
 
@@ -228,12 +228,12 @@ namespace ClassAssistantBot.Services
                 ResizeKeyboard = true
             };
             if (string.IsNullOrEmpty(text)) text = "Lista de Profesores:";
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
         }
 
-        public static void ClassesList(BotClient bot, Message message, List<Class> classes, string text = "")
+        public static async Task ClassesList(BotClient bot, Message message, List<Class> classes, string text = "")
         {
             if (string.IsNullOrEmpty(text)) text = "Lista de Clases:";
             var listButton = new KeyboardButton[classes.Count+1][];
@@ -255,12 +255,12 @@ namespace ClassAssistantBot.Services
                 Keyboard = listButton,
                 ResizeKeyboard = true
             };
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
         }
 
-        public static void PendingsFilters(BotClient bot, Message message, string text, int countPages, InteractionType interactionType = InteractionType.None)
+        public static async Task PendingsFilters(BotClient bot, Message message, string text, int countPages, InteractionType interactionType = InteractionType.None)
         {
             var inline = new List<InlineKeyboardButton>();
             if (2 <= countPages)
@@ -324,12 +324,12 @@ namespace ClassAssistantBot.Services
                 }
             };
             Menu.CancelMenu(bot, message, "Menú:");
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
         }
 
-        public static void PendingsPaginators(BotClient bot, Message message, string text, int countPages, int thisPage, InteractionType interactionType = InteractionType.None)
+        public static async Task PendingsPaginators(BotClient bot, Message message, string text, int countPages, int thisPage, InteractionType interactionType = InteractionType.None)
         {
             var inline = new List<InlineKeyboardButton>();
             if (thisPage - 1 >= 1)
@@ -399,12 +399,12 @@ namespace ClassAssistantBot.Services
                     }
             };
             Menu.CancelMenu(bot, message, "Menú:");
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                             text: text,
                             replyMarkup: keyboard);
         }
 
-        public static bool PendingCommands(BotClient bot, Message message, string pending, List<Teacher> teachers, bool giveMeExplication, string command, User user, string file)
+        public static async Task<bool> PendingCommands(BotClient bot, Message message, string pending, List<Teacher> teachers, bool giveMeExplication, string command, User user, string file)
         {
             var buttonGiveMeExplication = new List<InlineKeyboardButton>();
             if (giveMeExplication)
@@ -447,16 +447,16 @@ namespace ClassAssistantBot.Services
             };
             if (!string.IsNullOrEmpty(pending))
             {
-                Menu.CancelMenu(bot, message);
+                await Menu.CancelMenu(bot, message);
                 if (string.IsNullOrEmpty(file))
                 {
-                    bot.SendMessage(chatId: message.Chat.Id,
+                    await bot.SendMessageAsync(chatId: message.Chat.Id,
                         text: pending,
                         replyMarkup: keyboard);
                 }
                 else
                 {
-                    bot.SendPhoto(chatId: message.Chat.Id,
+                    await bot.SendPhotoAsync(chatId: message.Chat.Id,
                         photo: file,
                         caption: pending,
                         replyMarkup: keyboard);
@@ -466,7 +466,7 @@ namespace ClassAssistantBot.Services
             return false;
         }
 
-        public static bool PendingDiaryCommands(BotClient bot, Message message, string pending, bool giveMeExplication, string command, User user)
+        public static async Task<bool> PendingDiaryCommands(BotClient bot, Message message, string pending, bool giveMeExplication, string command, User user)
         {
             var buttonGiveMeExplication = new List<InlineKeyboardButton>();
             if (giveMeExplication)
@@ -499,14 +499,14 @@ namespace ClassAssistantBot.Services
             {
                 InlineKeyboard = buttonTeachers.ToArray()
             };
-            Menu.CancelMenu(bot, message);
-            bot.SendMessage(chatId: message.Chat.Id,
+            await Menu.CancelMenu(bot, message);
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                     text: pending,
                     replyMarkup: keyboard);
             return false;
         }
 
-        public static void PracticalClassList(BotClient bot, Message message, List<PracticClass> practicClasses, string text = "")
+        public static async Task PracticalClassList(BotClient bot, Message message, List<PracticClass> practicClasses, string text = "")
         {
             var buttonTeachers = new List<InlineKeyboardButton[]>();
             for (int i = 0; i < practicClasses.Count; i++)
@@ -525,12 +525,12 @@ namespace ClassAssistantBot.Services
             {
                 InlineKeyboard = buttonTeachers.ToArray()
             };
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                         text: text,
                         replyMarkup: keyboard);
         }
 
-        public static void PracticalClassStudentsList(BotClient bot, Message message, List<Student> students, string practicalClassCode, string text = "")
+        public static async Task PracticalClassStudentsList(BotClient bot, Message message, List<Student> students, string practicalClassCode, string text = "")
         {
             var buttonTeachers = new List<InlineKeyboardButton[]>();
             for (int i = 0; i < students.Count; i++)
@@ -549,12 +549,12 @@ namespace ClassAssistantBot.Services
             {
                 InlineKeyboard = buttonTeachers.ToArray()
             };
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                         text: text,
                         replyMarkup: keyboard);
         }
 
-        public static void PracticalClassExcersicesList(BotClient bot, Message message, List<Excercise> excercises, string practicalClassCode, string studentUserName, string text = "")
+        public static async Task PracticalClassExcersicesList(BotClient bot, Message message, List<Excercise> excercises, string practicalClassCode, string studentUserName, string text = "")
         {
             var buttonTeachers = new List<InlineKeyboardButton[]>();
             for (int i = 0; i < excercises.Count; i++)
@@ -581,12 +581,12 @@ namespace ClassAssistantBot.Services
             {
                 InlineKeyboard = buttonTeachers.ToArray()
             };
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                         text: text,
                         replyMarkup: keyboard);
         }
 
-        public static void PracticalClassIsDouble(BotClient bot, Message message, string excerciseCode, string practicalClassCode, string studentUserName, string text = "")
+        public static async Task PracticalClassIsDouble(BotClient bot, Message message, string excerciseCode, string practicalClassCode, string studentUserName, string text = "")
         {
             var keyboard = new InlineKeyboardMarkup()
             {
@@ -606,7 +606,7 @@ namespace ClassAssistantBot.Services
                     }
                 }
             };
-            bot.SendMessage(chatId: message.Chat.Id,
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
                         text: text,
                         replyMarkup: keyboard);
         }
