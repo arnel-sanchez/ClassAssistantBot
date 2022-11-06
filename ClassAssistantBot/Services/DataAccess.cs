@@ -56,5 +56,7 @@ namespace ClassAssistantBot.Services
         public DbSet<PracticClass> PracticClasses { get; set; }
 
         public DbSet<Excercise> Excercises { get; set; }
+
+        public DbSet<Guild> Guilds { get; set; }
     }
 }

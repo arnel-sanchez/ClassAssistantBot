@@ -1,3 +1,39 @@
-[11/2/2022 12:00:00 AM:12:34]: New message from chat id: Hiperion123
-[11/2/2022 12:00:00 AM:12:34]: Message Text: *Estudiantes*
-[11/2/2022 12:00:00 AM:12:34]: New command: estudiantes
+[11/5/2022 12:00:00 AM:23:11]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:11]: Message Text: *Asignar Estudiante al Gremio*
+[11/5/2022 12:00:00 AM:23:11]: New command: asignarestudiantealgremio
+[11/5/2022 12:00:00 AM:23:11]: Error: El usuario Hiperion123 no está listo para comenzar a interactuar con el comando Asignar Estudiante al Gremio
+[11/5/2022 12:00:00 AM:23:11]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:11]: Message Text: *Cancelar*
+[11/5/2022 12:00:00 AM:23:11]: New command: cancelar
+[11/5/2022 12:00:00 AM:23:11]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:11]: Message Text: *Gremios*
+[11/5/2022 12:00:00 AM:23:11]: New command: gremios
+[11/5/2022 12:00:00 AM:23:11]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:11]: Message Text: *Asignar Estudiante al Gremio*
+[11/5/2022 12:00:00 AM:23:11]: New command: asignarestudiantealgremio
+[11/5/2022 12:00:00 AM:23:11]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:11]: Message Text: SelectGuilds//3
+[11/5/2022 12:00:00 AM:23:11]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:11]: Message Text: SelectStudentOnGuilds//3//361cb76e-cc76-458c-ac3d-20d9e421834b
+[11/5/2022 12:00:00 AM:23:11]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:11]: Message Text: SelectStudentOnGuilds//3//06ebd9fb-dfc2-485b-ae1b-fcd88d35f736
+[11/5/2022 12:00:00 AM:23:11]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:11]: Message Text: *Asignar Estudiante al Gremio*
+[11/5/2022 12:00:00 AM:23:11]: New command: asignarestudiantealgremio
+[11/5/2022 12:00:00 AM:23:11]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:11]: Message Text: SelectGuilds//3
+[11/5/2022 12:00:00 AM:23:11]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:11]: Message Text: SelectStudentOnGuilds//3//06ebd9fb-dfc2-485b-ae1b-fcd88d35f736
+[11/5/2022 12:00:00 AM:23:12]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:12]: Message Text: *Asignar Créditos al Gremio*
+[11/5/2022 12:00:00 AM:23:12]: New command: asignarcréditosalgremio
+[11/5/2022 12:00:00 AM:23:12]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:12]: Message Text: SelectGuilds//3
+[11/5/2022 12:00:00 AM:23:12]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:12]: Message Text: 3 10000 por estar probando
+[11/5/2022 12:00:00 AM:23:12]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:12]: Message Text: *Cancelar*
+[11/5/2022 12:00:00 AM:23:12]: New command: cancelar
+[11/5/2022 12:00:00 AM:23:12]: New message from chat id: Hiperion123
+[11/5/2022 12:00:00 AM:23:12]: Message Text: *Estudiantes*
+[11/5/2022 12:00:00 AM:23:12]: New command: estudiantes

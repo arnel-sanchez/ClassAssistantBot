@@ -19,6 +19,7 @@ namespace ClassAssistantBot.Controllers
         private StudentDataHandler studentDataHandler;
         private DiaryDataHandler diaryDataHandler;
         private PracticClassDataHandler practicClassDataHandler;
+        private GuildDataHandler guildDataHandler;
 
         public CallBackController(BotClient bot, DataAccess dataAccess)
         {
@@ -32,6 +33,7 @@ namespace ClassAssistantBot.Controllers
             this.practicClassDataHandler = new PracticClassDataHandler(dataAccess);
             this.studentDataHandler = new StudentDataHandler(dataAccess);
             this.diaryDataHandler = new DiaryDataHandler(dataAccess);
+            this.guildDataHandler = new GuildDataHandler(dataAccess);
         }
 
         public async Task ProcessCallBackQuery(CallbackQuery callbackQuery)
@@ -53,6 +55,10 @@ namespace ClassAssistantBot.Controllers
             this.appUser = callbackQuery.From;
 
             var user = await userDataHandler.GetUser(appUser);
+
+            await Logger.Warning($"New message from chat id: {(string.IsNullOrEmpty(user.Username) ? user.ChatId : user.Username)}");
+            await Logger.Warning($"Message Text: {callbackQuery.Data}");
+
             if (callbackQuery.Data.Contains("NextPending//"))
             {
                 var data = callbackQuery.Data.Split("//");
@@ -213,6 +219,63 @@ namespace ClassAssistantBot.Controllers
                 {
                     var students = studentDataHandler.GetStudents(user);
                     await Menu.PracticalClassStudentsList(bot, message, students, data[2], $"Ocurrió el siguiente error: {res.Item2}.\n\nVuelva a seleccionar el estudiante:");
+                }
+            }
+            else if (callbackQuery.Data.Contains("SelectGuilds//"))
+            {
+                var data = callbackQuery.Data.Split("//");
+                long guildId = long.Parse(data[1]);
+                if (user.Status == UserStatus.DeleteGuild)
+                {
+                    var students = await guildDataHandler.DeleteGuild(user, guildId);
+                    await Menu.GuildMenu(bot, message, "Gremio eliminado con éxito");
+                    foreach (var student in students.Item2)
+                    {
+                        await bot.SendMessageAsync(chatId: student.User.ChatId,
+                        text: $"Ha sido eliminado del Gremio {students.Item1}");
+                    }
+                }
+                else if(user.Status == UserStatus.DetailsGuild)
+                {
+                    var res = await guildDataHandler.DetailsGuild(user, guildId);
+                    await Menu.GuildMenu(bot, message, res);
+                }
+                else if(user.Status == UserStatus.AssignStudentAtGuild)
+                {
+                    var students = await guildDataHandler.AssignStudentAtGuild(user, guildId);
+                    await Menu.StudentGuildList(bot, message, students, guildId, "Seleccione el estudiante a agregar al Gremio");
+                }
+                else if (user.Status == UserStatus.DeleteStudentFromGuild)
+                {
+                    var students = await guildDataHandler.DeleteStudentFromGuild(user, guildId);
+                    await Menu.StudentGuildList(bot, message, students, guildId, "Seleccione el estudiante a eliminar del Gremio");
+                }
+                else if (user.Status == UserStatus.AssignCreditsAtGuild)
+                {
+                    await bot.SendMessageAsync(chatId: user.ChatId,
+                        text: $"Envíe un mensaje en el siguiente formato:\n\n<Id del Gremio> <Cantidad de créditos> <Explicación de por qué son los créditos>");
+                    await bot.SendMessageAsync(chatId: user.ChatId,
+                        text: $"Id del Gremio: {guildId}");
+                }
+            }
+            else if (callbackQuery.Data.Contains("SelectStudentOnGuilds//"))
+            {
+                var data = callbackQuery.Data.Split("//");
+                long guildId = long.Parse(data[1]);
+                string studentId = data[2];
+                if (user.Status == UserStatus.AssignStudentAtGuild)
+                {
+                    var res = await guildDataHandler.AssignStudentAtGuild(user, guildId, studentId);
+                    await Menu.GuildMenu(bot, message);
+                    await bot.SendMessageAsync(chatId: res.Item2,
+                        text: $"Ha sido agregado al Gremio {res.Item1}");
+                }
+                else if (user.Status == UserStatus.DeleteStudentFromGuild)
+                {
+                    var res = await guildDataHandler.DeleteStudentFromGuild(user, guildId, studentId);
+                    await Menu.GuildMenu(bot, message);
+                    await bot.SendMessageAsync(chatId: res.Item2,
+                        text: $"Ha sido eliminado del Gremio {res.Item1}");
                 }
             }
             else

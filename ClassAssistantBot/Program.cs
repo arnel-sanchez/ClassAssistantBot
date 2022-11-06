@@ -8,5 +8,12 @@ DataAccess dataAccess = new DataAccess();
 Logger.ClearLog();
 Console.WriteLine("Start!");
 Console.WriteLine("Telegram API Key:" + configuration.TelegramApiKey);
-Engine.StartPolling(dataAccess, configuration.TelegramApiKey);
+try
+{
+    Engine.StartPolling(dataAccess, configuration.TelegramApiKey);
+}
+catch (Exception ex)
+{
+    await Logger.Error(ex.Message);
+}
 Console.Read();

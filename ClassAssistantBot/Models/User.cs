@@ -41,7 +41,13 @@ namespace ClassAssistantBot.Models
         AssignMiscellaneousChannel,
         CreatePracticClass,
         ReviewPracticClass,
-        EditPracticalClasss
+        EditPracticalClasss,
+        CreateGuild,
+        DeleteGuild,
+        AssignStudentAtGuild,
+        AssignCreditsAtGuild,
+        DeleteStudentFromGuild,
+        DetailsGuild
     }
 
     public class User : Telegram.BotAPI.AvailableTypes.ITelegramUser

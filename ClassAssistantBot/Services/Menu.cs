@@ -62,6 +62,7 @@ namespace ClassAssistantBot.Services
                     },
                     new KeyboardButton[]
                     {
+                        new KeyboardButton("*Gremios*"),
                         new KeyboardButton("*Configuración*")
                     }
                 },
@@ -113,6 +114,40 @@ namespace ClassAssistantBot.Services
                     {
                         new KeyboardButton("*Eliminar Estudiante del Aula*"),
                         new KeyboardButton("*Editar Nombre De Clase Práctica*")
+                    },
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Cancelar*")
+                    }
+                },
+                ResizeKeyboard = true
+            }; ;
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
+                            text: text,
+                            replyMarkup: keyboard);
+        }
+
+        public static async Task GuildMenu(BotClient bot, Message message, string text = "")
+        {
+            if (string.IsNullOrEmpty(text))
+                text = "Menú de Gremios";
+            var keyboard = new ReplyKeyboardMarkup
+            {
+                Keyboard = new KeyboardButton[][]{
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Crear Gremio*"),
+                        new KeyboardButton("*Detalles del Gremio*")
+                    },
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Asignar Créditos al Gremio*"),
+                        new KeyboardButton("*Asignar Estudiante al Gremio*")
+                    },
+                    new KeyboardButton[]
+                    {
+                        new KeyboardButton("*Eliminar Gremio*"),
+                        new KeyboardButton("*Eliminar estudiante del Gremio*")
                     },
                     new KeyboardButton[]
                     {
@@ -540,7 +575,7 @@ namespace ClassAssistantBot.Services
                         new InlineKeyboardButton
                         {
                             CallbackData = $"StudentUserName//{students[i].User.Username}//{practicalClassCode}",
-                            Text = $"{(string.IsNullOrEmpty(students[i].User.FirstName) ? students[i].User.Name : students[i].User.FirstName + students[i].User.LastName )}"
+                            Text = $"{(string.IsNullOrEmpty(students[i].User.FirstName) ? students[i].User.Name : students[i].User.FirstName + " " + students[i].User.LastName )}"
                         }
                     };
                 buttonTeachers.Add(temp.ToArray());
@@ -605,6 +640,54 @@ namespace ClassAssistantBot.Services
                         },
                     }
                 }
+            };
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
+                        text: text,
+                        replyMarkup: keyboard);
+        }
+
+        public static async Task GuildList(BotClient bot, Message message, List<Guild> guilds, string text)
+        {
+            var buttonTeachers = new List<InlineKeyboardButton[]>();
+            for (int i = 0; i < guilds.Count; i++)
+            {
+                var temp = new List<InlineKeyboardButton>()
+                    {
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"SelectGuilds//{guilds[i].Id}",
+                            Text = $"{guilds[i].Name}"
+                        }
+                    };
+                buttonTeachers.Add(temp.ToArray());
+            }
+            var keyboard = new InlineKeyboardMarkup()
+            {
+                InlineKeyboard = buttonTeachers.ToArray()
+            };
+            await bot.SendMessageAsync(chatId: message.Chat.Id,
+                        text: text,
+                        replyMarkup: keyboard);
+        }
+
+        public static async Task StudentGuildList(BotClient bot, Message message, List<Student> students, long guildId, string text)
+        {
+            var buttonTeachers = new List<InlineKeyboardButton[]>();
+            for (int i = 0; i < students.Count; i++)
+            {
+                var temp = new List<InlineKeyboardButton>()
+                    {
+                        new InlineKeyboardButton
+                        {
+                            CallbackData = $"SelectStudentOnGuilds//{guildId}//{students[i].Id}",
+                            Text = $"{(string.IsNullOrEmpty(students[i].User.FirstName) ? students[i].User.Name : students[i].User.FirstName + " " + students[i].User.LastName )}"
+                        }
+                    };
+                buttonTeachers.Add(temp.ToArray());
+            }
+            var keyboard = new InlineKeyboardMarkup()
+            {
+                InlineKeyboard = buttonTeachers.ToArray()
             };
             await bot.SendMessageAsync(chatId: message.Chat.Id,
                         text: text,

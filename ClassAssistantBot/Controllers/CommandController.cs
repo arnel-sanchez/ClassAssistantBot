@@ -25,6 +25,7 @@ namespace ClassAssistantBot.Controllers
         private ClassTitleDataHandler classTitleDataHandler;
         private MiscellaneousDataHandler miscellaneousDataHandler;
         private PracticClassDataHandler practicClassDataHandler;
+        private GuildDataHandler guildDataHandler;
         private BotClient bot;
         private Message message;
         private bool hasText = false;
@@ -46,7 +47,8 @@ namespace ClassAssistantBot.Controllers
             this.rectificationToTheTeacherDataHandler = new RectificationToTheTeacherDataHandler(dataAccess);
             this.classTitleDataHandler = new ClassTitleDataHandler(dataAccess);
             this.miscellaneousDataHandler = new MiscellaneousDataHandler(dataAccess);
-            this.practicClassDataHandler = new PracticClassDataHandler(dataAccess); 
+            this.practicClassDataHandler = new PracticClassDataHandler(dataAccess);
+            this.guildDataHandler = new GuildDataHandler(dataAccess);
             this.bot = bot;
             this.message = new Message();
             this.appUser = new Telegram.BotAPI.AvailableTypes.User();
@@ -408,6 +410,19 @@ namespace ClassAssistantBot.Controllers
                                 await Menu.CancelMenu(bot, message, "Clase Práctica con Formato Incorrecto");
                             }
                             return;
+                        case UserStatus.CreateGuild:
+                            await guildDataHandler.CreateGuild(user, message.Text);
+                            await Menu.GuildMenu(bot, message);
+                            return;
+                        case UserStatus.AssignCreditsAtGuild:
+                            var data = await guildDataHandler.AssignCreditsAtGuild(user, message.Text);
+                            foreach (var student in data.Item1)
+                            {
+                                await bot.SendMessageAsync(chatId: student.User.ChatId,
+                                    text: $"Ha recibido {data.Item2} créditos y su profesor le dijo \"{data.Item3}\".");
+                            }
+                            await Menu.GuildMenu(bot, message);
+                            return;
                     }
                     await Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
                     await bot.SendMessageAsync(chatId: message.Chat.Id,
@@ -544,6 +559,9 @@ namespace ClassAssistantBot.Controllers
                 case "registrar":
                     await Menu.RegisterMenu(bot, message);
                     break;
+                case "gremios":
+                    await Menu.GuildMenu(bot, message);
+                    break;
                 case "veraulaactual":
                     await SeeClassRoomActiveCommand(user);
                     break;
@@ -579,6 +597,24 @@ namespace ClassAssistantBot.Controllers
                     break;
                 case "verestadodecréditos":
                     await CreditsStatusCommand(user);
+                    break;
+                case "creargremio":
+                    await CreateGuildCommand(user);
+                    break;
+                case "asignarestudiantealgremio":
+                    await AssignStudentsAtGuildCommand(user);
+                    break;
+                case "asignarcréditosalgremio":
+                    await AssignCretidAtGuildCommand(user);
+                    break;
+                case "eliminarestudiantedelgremio":
+                    await DeleteStudentFromGuildCommand(user);
+                    break;
+                case "eliminargremio":
+                    await DeleteGuildCommand(user);
+                    break;
+                case "detallesdelgremio":
+                    await DetailsGuildCommand(user);
                     break;
                 default:
                     await DefaultCommand(user, cmd);
@@ -1661,7 +1697,7 @@ namespace ClassAssistantBot.Controllers
             }
             if (user.Status != UserStatus.Ready || user.IsTecaher)
             {
-                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Clase Práctica");
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Estado de Creditos");
                 await bot.SendMessageAsync(chatId: message.Chat.Id,
                                 text: "No tiene acceso al comando, por favor no lo repita.");
                 return;
@@ -1670,6 +1706,149 @@ namespace ClassAssistantBot.Controllers
             {
                 var credits = creditsDataHandler.GetCreditListOfUser(user);
                 await Menu.StudentMenu(bot, message, credits);
+            }
+        }
+
+        private async Task CreateGuildCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Crear Gremio");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                await guildDataHandler.CreateGuild(user);
+                await Menu.CancelMenu(bot, message, "Inserte el nombre del Gremio:");
+            }
+        }
+
+        private async Task AssignStudentsAtGuildCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Asignar Estudiante al Gremio");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var guilds = await guildDataHandler.AssignStudentAtGuild(user);
+                await Menu.CancelMenu(bot, message);
+                await Menu.GuildList(bot, message, guilds, "Selecciona el Gremio a dónde va a añadir el estudiante");
+            }
+        }
+
+        private async Task AssignCretidAtGuildCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Asignar Créditos al Gremio");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var guilds = await guildDataHandler.AssignCreditsAtGuild(user);
+                await Menu.CancelMenu(bot, message);
+                await Menu.GuildList(bot, message, guilds, "Selecciona el Gremio que desea asignar créditos");
+            }
+        }
+
+        private async Task DeleteStudentFromGuildCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Eliminar Estudiante del Gremio");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var guilds = await guildDataHandler.DeleteStudentFromGuild(user);
+                await Menu.CancelMenu(bot, message);
+                await Menu.GuildList(bot, message, guilds, "Selecciona el Gremio donde está el estudiante que desea elminar");
+            }
+        }
+
+        private async Task DeleteGuildCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Eliminar Gremio");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var guilds = await guildDataHandler.DeleteGuild(user);
+                await Menu.CancelMenu(bot, message);
+                await Menu.GuildList(bot, message, guilds, "Selecciona el Gremio que desea elminar");
+            }
+        }
+
+        private async Task DetailsGuildCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Detalles del Gremio");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var guilds = await guildDataHandler.DetailsGuild(user);
+                await Menu.CancelMenu(bot, message);
+                await Menu.GuildList(bot, message, guilds, "Seleccione un Gremio para consultar sus detalles");
             }
         }
         #endregion
