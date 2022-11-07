@@ -1874,7 +1874,7 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                var practicalClasses = await practicClassDataHandler.GetPracticClasses(user);
+                var practicalClasses = await practicClassDataHandler.DeletePracticClasses(user);
                 await Menu.CancelMenu(bot, message);
                 await Menu.PracticalClassList(bot, message, practicalClasses, "Seleccione una Clase Práctica:");
             }
