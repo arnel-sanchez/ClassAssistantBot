@@ -33,21 +33,21 @@ namespace ClassAssistantBot.Services
             Console.WriteLine($"The teacher {user.Username} is entering class");
         }
 
-        public string AssignTeacherAtClass(long id, string codeText, out bool success)
+        public async Task<(string, bool)> AssignTeacherAtClass(long id, string codeText, bool success)
         {
             int code = 0;
             success = false;
             bool canParse = int.TryParse(codeText, out code);
 
             if (!canParse)
-                return $"No hay aula creada con el código de acceso {codeText}";
-            var user = dataAccess.Users.Where(x => x.TelegramId == id).FirstOrDefault();
-            var classRoom = dataAccess.ClassRooms.Where(x => x.TeacherAccessKey == code).FirstOrDefault();
+                return ($"No hay aula creada con el código de acceso {codeText}", success);
+            var user = await dataAccess.Users.Where(x => x.TelegramId == id).FirstOrDefaultAsync();
+            var classRoom = await dataAccess.ClassRooms.Where(x => x.TeacherAccessKey == code).FirstOrDefaultAsync();
             if (classRoom == null)
-                return $"No hay aula creada con el código de acceso {code}";
+                return ($"No hay aula creada con el código de acceso {code}", success);
             else
             {
-                var teacher = dataAccess.Teachers.Where(x => x.UserId == user.Id).FirstOrDefault();
+                var teacher = await dataAccess.Teachers.Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
 
                 if (teacher == null)
                 {
@@ -72,33 +72,36 @@ namespace ClassAssistantBot.Services
 
                 dataAccess.Users.Update(user);
                 dataAccess.Add(teacherByClassRoom);
-                dataAccess.SaveChanges();
+                await dataAccess.SaveChangesAsync();
                 Console.WriteLine($"The teacher {user.Username} has entered class");
                 success = true;
-                return $"Ha entrado en el aula satiscatoriamente";
+                return ($"Ha entrado en el aula satiscatoriamente", success);
             }
         }
 
-        public int GetStudentAccessKey(long id)
+        public async Task<int> GetStudentAccessKey(long id)
         {
-            var user = dataAccess.Users.Where(x => x.Id == id).First();
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().StudentAccessKey;
+            var user = await dataAccess.Users.Where(x => x.Id == id).FirstAsync();
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+
+            return res.StudentAccessKey;
         }
 
-        public int GetTeacherAccessKey(long id)
+        public async Task<int> GetTeacherAccessKey(long id)
         {
-            var user = dataAccess.Users.Where(x => x.Id == id).First();
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().TeacherAccessKey;
+            var user = await dataAccess.Users.Where(x => x.Id == id).FirstAsync();
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            return res.TeacherAccessKey;
         }
 
-        public List<Teacher> GetTeachers(User user)
+        public async Task<List<Teacher>> GetTeachers(User user)
         {
-            var teacherByClassRoom = dataAccess.TeachersByClassRooms
+            var teacherByClassRoom = await dataAccess.TeachersByClassRooms
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
                 .Include(x => x.ClassRoom)
                 .Include(x => x.Teacher)
                 .ThenInclude(x => x.User)
-                .ToList();
+                .ToListAsync();
             var res = new List<Teacher>();
             foreach (var item in teacherByClassRoom)
             {
@@ -108,9 +111,9 @@ namespace ClassAssistantBot.Services
             return res;
         }
 
-        public bool ExistTeacher(string username)
+        public async Task<bool> ExistTeacher(string username)
         {
-            var teacher = dataAccess.Teachers.Where(x => x.User.Username == username || x.User.Username == username.Substring(1)).FirstOrDefault();
+            var teacher = await dataAccess.Teachers.Where(x => x.User.Username == username || x.User.Username == username.Substring(1)).FirstOrDefaultAsync();
 
             return teacher != null;
         }

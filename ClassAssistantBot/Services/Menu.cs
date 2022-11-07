@@ -117,6 +117,7 @@ namespace ClassAssistantBot.Services
                     },
                     new KeyboardButton[]
                     {
+                        new KeyboardButton("*Eliminar Clase Práctica*"),
                         new KeyboardButton("*Cancelar*")
                     }
                 },

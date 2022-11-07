@@ -174,22 +174,22 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.StatusPhrase:
                             await statusPhraseDataHandler.ChangeStatusPhrase(user.Id, message.Text);
-                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetStatusPhraseChannel(user)))
-                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetStatusPhraseChannel(user),
+                            if (!string.IsNullOrEmpty(await classRoomDataHandler.GetStatusPhraseChannel(user)))
+                                await bot.SendMessageAsync(chatId: await classRoomDataHandler.GetStatusPhraseChannel(user),
                                     text: "Frase de Estado enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.Joke:
                             await jokeDataHandler.DoJoke(user.Id, message.Text);
-                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetJokesChannel(user)))
-                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetJokesChannel(user),
+                            if (!string.IsNullOrEmpty(await classRoomDataHandler.GetJokesChannel(user)))
+                                await bot.SendMessageAsync(chatId: await classRoomDataHandler.GetJokesChannel(user),
                                     text: "Chiste enviado por: @" + user.Username + "\n\"" + message.Text + "\"");
                             await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.Diary:
                             await diaryDataHandler.UpdateDiary(user.Id, message.Text);
-                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetDiaryChannel(user)))
-                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetDiaryChannel(user),
+                            if (!string.IsNullOrEmpty(await classRoomDataHandler.GetDiaryChannel(user)))
+                                await bot.SendMessageAsync(chatId: await classRoomDataHandler.GetDiaryChannel(user),
                                     text: "Actualización del Diario enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             await Logger.Success($"The student {user.Username} is ready to update Diary");
                             await Menu.StudentMenu(bot, message);
@@ -216,8 +216,8 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.RectificationToTheTeacherUserName:
                             await OnRectificationToTheTeacherAtText(user, message.Text);
-                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetRectificationToTheTeacherChannel(user)))
-                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetRectificationToTheTeacherChannel(user),
+                            if (!string.IsNullOrEmpty(await classRoomDataHandler.GetRectificationToTheTeacherChannel(user)))
+                                await bot.SendMessageAsync(chatId: await classRoomDataHandler.GetRectificationToTheTeacherChannel(user),
                                     text: "Rectificación al Profesor enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             await Menu.StudentMenu(bot, message);
                             return;
@@ -226,16 +226,16 @@ namespace ClassAssistantBot.Controllers
                             await Menu.TeacherMenu(bot, message);
                             return;
                         case UserStatus.ClassTitleSelect:
-                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassTitleChannel(user)))
-                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetClassTitleChannel(user),
+                            if (!string.IsNullOrEmpty(await classRoomDataHandler.GetClassTitleChannel(user)))
+                                await bot.SendMessageAsync(chatId: await classRoomDataHandler.GetClassTitleChannel(user),
                                     text: "Cambio de Título de Clase enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             await OnChangeClassTitle(user, message.Text);
                             await Menu.StudentMenu(bot, message);
                             return;
                         case UserStatus.ClassInterventionSelect:
                             await OnClassIntervention(user, message.Text);
-                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetClassInterventionChannel(user)))
-                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetClassInterventionChannel(user),
+                            if (!string.IsNullOrEmpty(await classRoomDataHandler.GetClassInterventionChannel(user)))
+                                await bot.SendMessageAsync(chatId: await classRoomDataHandler.GetClassInterventionChannel(user),
                                     text: "Intervención en Clase enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             await Menu.StudentMenu(bot, message);
                             return;
@@ -394,8 +394,8 @@ namespace ClassAssistantBot.Controllers
                             return;
                         case UserStatus.Miscellaneous:
                             await miscellaneousDataHandler.CreateMiscellaneous(user, message.Text);
-                            if (!string.IsNullOrEmpty(classRoomDataHandler.GetMiscellaneousChannel(user)))
-                                await bot.SendMessageAsync(chatId: classRoomDataHandler.GetMiscellaneousChannel(user),
+                            if (!string.IsNullOrEmpty(await classRoomDataHandler.GetMiscellaneousChannel(user)))
+                                await bot.SendMessageAsync(chatId: await classRoomDataHandler.GetMiscellaneousChannel(user),
                                     text: "Miscelánea enviada por: @" + user.Username + "\n\"" + message.Text + "\"");
                             await Menu.StudentMenu(bot, message);
                             return;
@@ -616,6 +616,9 @@ namespace ClassAssistantBot.Controllers
                 case "detallesdelgremio":
                     await DetailsGuildCommand(user);
                     break;
+                case "eliminarclasepráctica":
+                    await PracticalClassDeleteCommand(user);
+                    break;
                 default:
                     await DefaultCommand(user, cmd);
                     break;
@@ -774,7 +777,7 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                var res = studentDataHandler.GetStudentsOnClassByTeacherId(user.Id);
+                var res = await studentDataHandler.GetStudentsOnClassByTeacherId(user.Id);
                 await Menu.TeacherMenu(bot, message, res);
             }
         }
@@ -844,7 +847,7 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                var res = pendingDataHandler.GetAllClassRoomWithPendings(user);
+                var res = await pendingDataHandler.GetAllClassRoomWithPendings(user);
                 if (string.IsNullOrEmpty(res))
                     res = "No tienen pendientes en ninguna de sus aulas";
                 await Menu.TeacherConfigurationMenu(bot, message, res);
@@ -944,19 +947,20 @@ namespace ClassAssistantBot.Controllers
             {
                 string file = "";
                 bool giveMeExplication = false;
-                var pending = pendingDataHandler.GetPendingByCode(command, out file, out giveMeExplication);
+                var pending = await pendingDataHandler.GetPendingByCode(command, file, giveMeExplication);
+                var type = await pendingDataHandler.GetPending(command);
 
-                if (!string.IsNullOrEmpty(pending) && pendingDataHandler.GetPending(command).Type == InteractionType.Diary)
+                if (!string.IsNullOrEmpty(pending.Item1) && type.Type == InteractionType.Diary)
                 {
-                    await Menu.PendingDiaryCommands(bot, message, pending, giveMeExplication, command, user);
+                    await Menu.PendingDiaryCommands(bot, message, pending.Item1, pending.Item3, command, user);
                     return;
                 }
 
-                var teachers = teacherDataHandler.GetTeachers(user);
+                var teachers = await teacherDataHandler.GetTeachers(user);
 
                 if(teachers.Count() != 0)
                 {
-                    if (await Menu.PendingCommands(bot, message, pending, teachers, giveMeExplication, command, user, file))
+                    if (await Menu.PendingCommands(bot, message, pending.Item1, teachers, pending.Item3, command, user, pending.Item2))
                         return;
                 }
 
@@ -1040,7 +1044,7 @@ namespace ClassAssistantBot.Controllers
             else
             {
                 await rectificationToTheTeacherDataHandler.DoRectificationToTheTaecher(user);
-                var teachers = teacherDataHandler.GetTeachers(user);
+                var teachers = await teacherDataHandler.GetTeachers(user);
                 await Menu.TeachersList(bot, message, teachers, "Seleccione el profesor al que desea rectificar:");
             }
         }
@@ -1197,7 +1201,7 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                var accessKey = teacherDataHandler.GetTeacherAccessKey(user.Id);
+                var accessKey = await teacherDataHandler.GetTeacherAccessKey(user.Id);
                 await Menu.TeacherConfigurationMenu(bot, message, $"La clave de acceso para sus profesores es {accessKey}.");
             }
         }
@@ -1301,8 +1305,8 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                var res = classRoomDataHandler.GetClassesCreated(user);
-                var classRoom = classRoomDataHandler.SeeClassRoomActive(user);
+                var res =await classRoomDataHandler.GetClassesCreated(user);
+                var classRoom = await classRoomDataHandler.SeeClassRoomActive(user);
                 if (user.IsTecaher)
                     await Menu.TeacherMenu(bot, message, $"El aula {classRoom} tiene creadas las clases:\n{res}");
                 else
@@ -1657,7 +1661,7 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                var practicalClasses = practicClassDataHandler.GetPracticClasses(user);
+                var practicalClasses = await practicClassDataHandler.GetPracticClasses(user);
                 await Menu.CancelMenu(bot, message);
                 await Menu.PracticalClassList(bot, message, practicalClasses, "Seleccione una Clase Práctica:");
             }
@@ -1704,7 +1708,7 @@ namespace ClassAssistantBot.Controllers
             }
             else
             {
-                var credits = creditsDataHandler.GetCreditListOfUser(user);
+                var credits = await creditsDataHandler.GetCreditListOfUser(user);
                 await Menu.StudentMenu(bot, message, credits);
             }
         }
@@ -1851,6 +1855,30 @@ namespace ClassAssistantBot.Controllers
                 await Menu.GuildList(bot, message, guilds, "Seleccione un Gremio para consultar sus detalles");
             }
         }
+
+        private async Task PracticalClassDeleteCommand(Models.User? user)
+        {
+            if (user == null)
+            {
+                await Logger.Error($"Error: Usuario nulo, problemas en el servidor");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
+                return;
+            }
+            if (user.Status != UserStatus.Ready || !user.IsTecaher)
+            {
+                await Logger.Error($"Error: El usuario {user.Username} no está listo para comenzar a interactuar con el comando Estado de Creditos");
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                                text: "No tiene acceso al comando, por favor no lo repita.");
+                return;
+            }
+            else
+            {
+                var practicalClasses = await practicClassDataHandler.GetPracticClasses(user);
+                await Menu.CancelMenu(bot, message);
+                await Menu.PracticalClassList(bot, message, practicalClasses, "Seleccione una Clase Práctica:");
+            }
+        }
         #endregion
 
         #region Procesos que completan comandos de varias operaciones
@@ -1872,21 +1900,21 @@ namespace ClassAssistantBot.Controllers
         private async Task<bool> OnAssignStudentAtClass(long id, string text)
         {
             var success = false;
-            var res = studentDataHandler.AssignStudentAtClass(id, text, out success);
+            var res = await studentDataHandler.AssignStudentAtClass(id, text, success);
             await bot.SendMessageAsync(chatId: message.Chat.Id,
-                            text: res,
+                            text: res.Item1,
                             replyMarkup: new ReplyKeyboardRemove());
-            return success;
+            return res.Item2;
         }
 
         private async Task<bool> OnAssignTeacherAtClass(long id, string text)
         {
             bool success = false;
-            var res = teacherDataHandler.AssignTeacherAtClass(id, text, out success);
+            var res = await teacherDataHandler.AssignTeacherAtClass(id, text, success);
             await bot.SendMessageAsync(chatId: message.Chat.Id,
-                            text: res,
+                            text: res.Item1,
                             replyMarkup: new ReplyKeyboardRemove());
-            return success;
+            return res.Item2;
         }
 
         private async Task OnCreateClassRoom(long id, string name)
@@ -1960,36 +1988,43 @@ namespace ClassAssistantBot.Controllers
                     pendingCode = message.ReplyToMessage.Text.Split(" /")[1];
                 else
                     pendingCode = message.ReplyToMessage.Caption.Split(" /")[1];
-                var pending = pendingDataHandler.GetPending(pendingCode);
+                var pending = await pendingDataHandler.GetPending(pendingCode);
                 var comment = "";
 
                 if (pending.Type == InteractionType.ClassIntervention)
                 {
-                    comment = classInterventionDataHandler.GetClassIntenvention(pending.ObjectId).Text;
+                    var data = await classInterventionDataHandler.GetClassIntenvention(pending.ObjectId);
+                    comment = data.Text;
                 }
                 else if (pending.Type == InteractionType.ClassTitle)
                 {
-                    comment = classTitleDataHandler.GetClassTitle(pending.ObjectId).Title;
+                    var data = await classTitleDataHandler.GetClassTitle(pending.ObjectId);
+                    comment = data.Title;
                 }
                 else if (pending.Type == InteractionType.Diary)
                 {
-                    comment = diaryDataHandler.GetDiary(pending.ObjectId).Text;
+                    var data = await diaryDataHandler.GetDiary(pending.ObjectId);
+                    comment = data.Text;
                 }
                 else if (pending.Type == InteractionType.Joke)
                 {
-                    comment = jokeDataHandler.GetJoke(pending.ObjectId).Text;
+                    var data = await jokeDataHandler.GetJoke(pending.ObjectId);
+                    comment = data.Text;
                 }
                 else if (pending.Type == InteractionType.RectificationToTheTeacher)
                 {
-                    comment = rectificationToTheTeacherDataHandler.GetRectificationToTheTeacher(pending.ObjectId).Text;
+                    var data = await rectificationToTheTeacherDataHandler.GetRectificationToTheTeacher(pending.ObjectId);
+                    comment = data.Text;
                 }
                 else if (pending.Type == InteractionType.StatusPhrase)
                 {
-                    comment = statusPhraseDataHandler.GetStatusPhrase(pending.ObjectId).Phrase;
+                    var data = await statusPhraseDataHandler.GetStatusPhrase(pending.ObjectId);
+                    comment = data.Phrase;
                 }
                 else if(pending.Type == InteractionType.Miscellaneous)
                 {
-                    comment = miscellaneousDataHandler.GetMiscellaneous(pending.ObjectId).Text;
+                    var data = await miscellaneousDataHandler.GetMiscellaneous(pending.ObjectId);
+                    comment = data.Text;
                 }
                 string type = "";
 
@@ -2066,9 +2101,9 @@ namespace ClassAssistantBot.Controllers
 
                 if (pending.Type == InteractionType.Meme)
                 {
-                    var meme = memeDataHandler.GetMeme(pending.ObjectId);
-                    if (!string.IsNullOrEmpty(classRoomDataHandler.GetMemeChannel(user)))
-                        bot.SendPhoto(chatId: classRoomDataHandler.GetMemeChannel(user),
+                    var meme = await memeDataHandler.GetMeme(pending.ObjectId);
+                    if (!string.IsNullOrEmpty(await classRoomDataHandler.GetMemeChannel(user)))
+                        bot.SendPhoto(chatId: await classRoomDataHandler.GetMemeChannel(user),
                             photo: meme.FileId,
                             caption: "Meme enviado por: @" + pending.Student.User.Username);
                 }
@@ -2130,10 +2165,10 @@ namespace ClassAssistantBot.Controllers
                     pendingCode = message.ReplyToMessage.Text.Split(" /")[1];
                 else
                     pendingCode = message.ReplyToMessage.Caption.Split(" /")[1];
-                var pending = pendingDataHandler.GetPending(pendingCode);
+                var pending = await pendingDataHandler.GetPending(pendingCode);
                 foreach (var username in response)
                 {
-                    if (teacherDataHandler.ExistTeacher(username))
+                    if (await teacherDataHandler.ExistTeacher(username))
                     {
                         var teacherChatId = await pendingDataHandler.AddDirectPending(username, pending.Id);
                         await bot.SendMessageAsync(chatId: teacherChatId,

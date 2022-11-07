@@ -1,5 +1,6 @@
 ﻿using System;
 using ClassAssistantBot.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClassAssistantBot.Services
 {
@@ -24,9 +25,9 @@ namespace ClassAssistantBot.Services
             return res;
         }
 
-        public ClassTitle GetClassTitle(string classTitleId)
+        public async Task<ClassTitle> GetClassTitle(string classTitleId)
         {
-            return dataAccess.ClassTitles.First(x => x.Id == classTitleId);
+            return await dataAccess.ClassTitles.FirstAsync(x => x.Id == classTitleId);
         }
 
         public async Task ChangeClassTitle(User user)

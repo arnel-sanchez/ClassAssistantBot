@@ -1,5 +1,6 @@
 ﻿using System;
 using ClassAssistantBot.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClassAssistantBot.Services
 {
@@ -94,9 +95,9 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public Meme GetMeme(string memeId)
+        public async Task<Meme> GetMeme(string memeId)
         {
-            return dataAccess.Memes.Where(x => x.Id == memeId).First();
+            return await dataAccess.Memes.Where(x => x.Id == memeId).FirstAsync();
         }
     }
 }

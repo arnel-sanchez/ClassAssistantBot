@@ -91,9 +91,9 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public Diary GetDiary(string diaryId)
+        public async Task<Diary> GetDiary(string diaryId)
         {
-            return dataAccess.Dailies.First(x => x.Id == diaryId);
+            return await dataAccess.Dailies.FirstAsync(x => x.Id == diaryId);
         }
     }
 }

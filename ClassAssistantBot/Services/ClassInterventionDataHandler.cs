@@ -1,4 +1,5 @@
 ﻿using ClassAssistantBot.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClassAssistantBot.Services
 {
@@ -62,9 +63,9 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public ClassIntervention GetClassIntenvention(string id)
+        public async Task<ClassIntervention> GetClassIntenvention(string id)
         {
-            return dataAccess.ClassInterventions.First(x => x.Id == id);
+            return await dataAccess.ClassInterventions.Where(x => x.Id == id).FirstAsync();
         }
     }
 }

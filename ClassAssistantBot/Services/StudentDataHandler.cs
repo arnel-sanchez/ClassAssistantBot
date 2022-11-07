@@ -81,22 +81,22 @@ namespace ClassAssistantBot.Services
             Console.WriteLine($"The student {user.Username} is entering class");
         }
 
-        public string AssignStudentAtClass(long id, string codeText, out bool success)
+        public async Task<(string, bool)> AssignStudentAtClass(long id, string codeText, bool success)
         {
             success = false;
             int code = 0;
             bool canParse = int.TryParse(codeText, out code);
 
             if (!canParse)
-                return $"No hay aula creada con el código de acceso {codeText}";
+                return ($"No hay aula creada con el código de acceso {codeText}", success);
 
-            var user = dataAccess.Users.Where(x => x.TelegramId == id).FirstOrDefault();
-            var classRoom = dataAccess.ClassRooms.Where(x => x.StudentAccessKey == code).FirstOrDefault();
+            var user = await dataAccess.Users.Where(x => x.TelegramId == id).FirstOrDefaultAsync();
+            var classRoom = await dataAccess.ClassRooms.Where(x => x.StudentAccessKey == code).FirstOrDefaultAsync();
             if (classRoom == null)
-                return $"No hay aula creada con el código de acceso {code}";
+                return ($"No hay aula creada con el código de acceso {code}", success);
             else
             {
-                var student = dataAccess.Students.Where(x => x.UserId == user.Id).FirstOrDefault();
+                var student = await dataAccess.Students.Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
 
                 if (student == null)
                 {
@@ -121,23 +121,23 @@ namespace ClassAssistantBot.Services
 
                 dataAccess.Users.Update(user);
                 dataAccess.StudentsByClassRooms.Add(studentByClassRoom);
-                dataAccess.SaveChanges();
+                await dataAccess.SaveChangesAsync();
                 Console.WriteLine($"The student {user.Username} has entered class");
                 success = true;
-                return $"Ha entrado en el aula satisfactoriamente";
+                return ($"Ha entrado en el aula satisfactoriamente", success);
             }
         }
 
-        public string GetStudentsOnClassByTeacherId(long id)
+        public async Task<string> GetStudentsOnClassByTeacherId(long id)
         {
-            var teacher = dataAccess.Teachers.Where(x => x.UserId == id).Include(x => x.User).First();
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == teacher.User.ClassRoomActiveId).First();
-            var students = dataAccess.StudentsByClassRooms
+            var teacher = await dataAccess.Teachers.Where(x => x.UserId == id).Include(x => x.User).FirstAsync();
+            var classRoom = await dataAccess.ClassRooms.Where(x => x.Id == teacher.User.ClassRoomActiveId).FirstAsync();
+            var students = await dataAccess.StudentsByClassRooms
                 .Where(x => x.ClassRoomId == teacher.User.ClassRoomActiveId)
                 .Include(x => x.ClassRoom)
                 .Include(x => x.Student)
                 .ThenInclude(x => x.User)
-                .ToList();
+                .ToListAsync();
 
             List<StudentResult> studentResults = new List<StudentResult>();
 
@@ -145,7 +145,7 @@ namespace ClassAssistantBot.Services
             {
                 studentResults.Add(new StudentResult
                 {
-                    Credits = dataAccess.Credits.Where(x => x.UserId == student.Student.UserId && x.ClassRoomId == student.Student.User.ClassRoomActiveId).Sum(x => x.Value),
+                    Credits = await dataAccess.Credits.Where(x => x.UserId == student.Student.UserId && x.ClassRoomId == student.Student.User.ClassRoomActiveId).SumAsync(x => x.Value),
                     Username = student.Student.User.Username,
                     Name = string.IsNullOrEmpty(student.Student.User.Name) ? student.Student.User.FirstName + " " + student.Student.User.LastName : student.Student.User.Name
                 });
@@ -167,15 +167,15 @@ namespace ClassAssistantBot.Services
             return res.ToString();
         }
 
-        public List<Student> GetStudents(User teacher)
+        public async Task<List<Student>> GetStudents(User teacher)
         {
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == teacher.ClassRoomActiveId).First();
-            var students = dataAccess.StudentsByClassRooms
+            var classRoom = await dataAccess.ClassRooms.Where(x => x.Id == teacher.ClassRoomActiveId).FirstAsync();
+            var students = await dataAccess.StudentsByClassRooms
                 .Where(x => x.ClassRoomId == teacher.ClassRoomActiveId)
                 .Include(x => x.ClassRoom)
                 .Include(x => x.Student)
                 .ThenInclude(x => x.User)
-                .ToList();
+                .ToListAsync();
 
             var list = new List<Student>();
 

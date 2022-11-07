@@ -1,4 +1,5 @@
 ﻿using ClassAssistantBot.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClassAssistantBot.Services
 {
@@ -21,7 +22,7 @@ namespace ClassAssistantBot.Services
         public async Task DoRectificationToTheTaecherUserName(User user, string teacherUserName)
         {
             user.Status = UserStatus.RectificationToTheTeacherUserName;
-            var teacher = dataAccess.Teachers.Where(x => x.User.Username == teacherUserName).First();
+            var teacher = await dataAccess.Teachers.Where(x => x.User.Username == teacherUserName).FirstAsync();
             var rectification = new RectificationToTheTeacher
             {
                 Id = Guid.NewGuid().ToString(),
@@ -42,20 +43,21 @@ namespace ClassAssistantBot.Services
         public async Task<string> DoRectificationToTheTaecherText(User user, string text)
         {
             user.Status = UserStatus.Ready;
-            var rectification = dataAccess.RectificationToTheTeachers.Where(x => x.UserId == user.Id).OrderByDescending(x => x.DateTime).First();
+            var rectification = await dataAccess.RectificationToTheTeachers.Where(x => x.UserId == user.Id).OrderByDescending(x => x.DateTime).FirstAsync();
             rectification.Text = text;
 
             var random = new Random();
             string code = random.Next(100000, 999999).ToString();
             while (dataAccess.Pendings.Where(x => x.Code == code).Count() != 0)
                 code = random.Next(100000, 999999).ToString();
+            var student = await dataAccess.Students.Where(x => x.UserId == user.Id).FirstAsync();
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
                 Type = InteractionType.RectificationToTheTeacher,
                 ClassRoomId = user.ClassRoomActiveId,
                 ObjectId = rectification.Id,
-                StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
+                StudentId = student.Id,
                 Code = code
             };
             dataAccess.Pendings.Add(pending);
@@ -66,9 +68,9 @@ namespace ClassAssistantBot.Services
             return "Rectificación al profesor hecha satisfactoriamente.";
         }
 
-        public RectificationToTheTeacher GetRectificationToTheTeacher(string id)
+        public async Task<RectificationToTheTeacher> GetRectificationToTheTeacher(string id)
         {
-            return dataAccess.RectificationToTheTeachers.First(x => x.Id == id);
+            return await dataAccess.RectificationToTheTeachers.FirstAsync(x => x.Id == id);
         }
     }
 }

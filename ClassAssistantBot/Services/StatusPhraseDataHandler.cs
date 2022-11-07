@@ -1,5 +1,6 @@
 ﻿using System;
 using ClassAssistantBot.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClassAssistantBot.Services
 {
@@ -17,11 +18,12 @@ namespace ClassAssistantBot.Services
             user.Status = UserStatus.StatusPhrase;
             dataAccess.Users.Update(user);
             await dataAccess.SaveChangesAsync();
-            var res = dataAccess.StatusPhrases.Where(x => x.UserId == user.Id).ToList().MaxBy(x => x.DateTime);
-            if (res == null)
+            var res = await dataAccess.StatusPhrases.Where(x => x.UserId == user.Id).ToListAsync();
+            var res1 = res.MaxBy(x => x.DateTime);
+            if (res1 == null)
                 return "";
             else
-                return res.Phrase;
+                return res1.Phrase;
         }
 
         public async Task ChangeStatusPhrase(long id, string message)
@@ -55,9 +57,9 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public StatusPhrase GetStatusPhrase(string id)
+        public async Task<StatusPhrase> GetStatusPhrase(string id)
         {
-            return dataAccess.StatusPhrases.First(x => x.Id == id);
+            return await dataAccess.StatusPhrases.FirstAsync(x => x.Id == id);
         }
     }
 }

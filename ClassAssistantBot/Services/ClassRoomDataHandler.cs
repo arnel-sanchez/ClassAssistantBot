@@ -115,14 +115,15 @@ namespace ClassAssistantBot.Services
             }
         }
 
-        public string SeeClassRoomActive(User user)
+        public async Task<string> SeeClassRoomActive(User user)
         {
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().Name;
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            return res.Name;
         }
 
-        public string GetClassesCreated(User user)
+        public async Task<string> GetClassesCreated(User user)
         {
-            var classes = dataAccess.Classes.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
+            var classes = await dataAccess.Classes.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToListAsync();
 
             StringBuilder stringBuilder = new StringBuilder();
 
@@ -153,9 +154,10 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public string GetMemeChannel(User user)
+        public async Task<string> GetMemeChannel(User user)
         {
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().MemeChannel;
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            return res.MemeChannel;
         }
 
         public async Task AssignJokesChannel(User user)
@@ -175,9 +177,11 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public string GetJokesChannel(User user)
+        public async Task<string> GetJokesChannel(User user)
         {
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().JokesChannel;
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+
+            return res.JokesChannel;
         }
 
         public async Task AssignClassInterventionChannel(User user)
@@ -197,9 +201,11 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public string GetClassInterventionChannel(User user)
+        public async Task<string> GetClassInterventionChannel(User user)
         {
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().ClassInterventionChannel;
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+
+            return res.ClassInterventionChannel;
         }
 
         public async Task AssignDiaryChannel(User user)
@@ -219,9 +225,11 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public string GetDiaryChannel(User user)
+        public async Task<string> GetDiaryChannel(User user)
         {
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().DiaryChannel;
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+
+            return res.DiaryChannel;
         }
 
         public async Task AssignStatusPhraseChannel(User user)
@@ -241,9 +249,11 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public string GetStatusPhraseChannel(User user)
+        public async Task<string> GetStatusPhraseChannel(User user)
         {
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().StatusPhraseChannel;
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+
+            return res.StatusPhraseChannel;
         }
 
         public async Task AssignClassTitleChannel(User user)
@@ -263,9 +273,11 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public string GetClassTitleChannel(User user)
+        public async Task<string> GetClassTitleChannel(User user)
         {
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().ClassTitleChannel;
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+
+            return res.ClassTitleChannel;
         }
 
         public async Task AssignRectificationToTheTeacherChannel(User user)
@@ -285,9 +297,11 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public string GetRectificationToTheTeacherChannel(User user)
+        public async Task<string> GetRectificationToTheTeacherChannel(User user)
         {
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().RectificationToTheTeacherChannel;
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+
+            return res.RectificationToTheTeacherChannel;
         }
 
         public async Task SendInformationToTheStudents(User user)
@@ -338,9 +352,11 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public string GetMiscellaneousChannel(User user)
+        public async Task<string> GetMiscellaneousChannel(User user)
         {
-            return dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First().MiscelaneousChannel;
+            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+
+            return res.MiscelaneousChannel;
         }
     }
 }

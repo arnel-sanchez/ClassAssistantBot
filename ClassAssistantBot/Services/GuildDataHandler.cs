@@ -36,7 +36,6 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-
         public async Task<List<Guild>> DeleteGuild(User user)
         {
             user.Status = UserStatus.DeleteGuild;
@@ -61,7 +60,6 @@ namespace ClassAssistantBot.Services
 
             return (guild.Name, guild.Students);
         }
-
 
         public async Task<List<Guild>> AssignStudentAtGuild(User user)
         {
@@ -113,7 +111,6 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
             return (guild.Name, student.User.ChatId);
         }
-
 
         public async Task<List<Guild>> AssignCreditsAtGuild(User user)
         {
@@ -178,7 +175,6 @@ namespace ClassAssistantBot.Services
 
             return (guild.Students, creditsCount, explication);
         }
-
 
         public async Task<List<Guild>> DeleteStudentFromGuild(User user)
         {

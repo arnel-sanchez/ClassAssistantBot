@@ -249,13 +249,13 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public string GetCreditListOfUser(User user)
+        public async Task<string> GetCreditListOfUser(User user)
         {
-            var credits = dataAccess.Credits
+            var credits = await dataAccess.Credits
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
                 .OrderByDescending(x => x.DateTime.Date)
-                .ToList()
-                .GroupBy(x => x.UserId);
+                .GroupBy(x => x.UserId)
+                .ToListAsync();
 
             var tuple = new List<(long, long)>();
             foreach (var credit in credits)

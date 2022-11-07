@@ -65,15 +65,32 @@ namespace ClassAssistantBot.Services
             }
         }
 
-        public List<PracticClass> GetPracticClasses(User user)
+        public async Task<List<PracticClass>> GetPracticClasses(User user)
         {
-            return dataAccess.PracticClasses.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
+            return await dataAccess.PracticClasses.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToListAsync();
         }
 
-        public List<Excercise> GetExcercises(User user, string studentUserName, string practicaClassCode)
+        public async Task<List<PracticClass>> DeletePracticClasses(User user)
         {
-            var excersices = dataAccess.Excercises.Where(x => x.PracticClass.Code == practicaClassCode).ToList();
-            var credits = dataAccess.Credits.Where(x => x.User.Username == studentUserName && x.ClassRoomId == user.ClassRoomActiveId).ToList();
+            user.Status = UserStatus.DeletePracticalClass;
+            dataAccess.Users.Update(user);
+            await dataAccess.SaveChangesAsync();
+            return await dataAccess.PracticClasses.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToListAsync();
+        }
+
+        public async Task DeletePracticClasses(User user, string code)
+        {
+            var practicalClass = await dataAccess.PracticClasses.Where(x => x.Code == code).FirstAsync();
+            user.Status = UserStatus.Ready;
+            dataAccess.Users.Update(user);
+            dataAccess.PracticClasses.Remove(practicalClass);
+            await dataAccess.SaveChangesAsync();
+        }
+
+        public async Task<List<Excercise>> GetExcercises(User user, string studentUserName, string practicaClassCode)
+        {
+            var excersices = await dataAccess.Excercises.Where(x => x.PracticClass.Code == practicaClassCode).ToListAsync();
+            var credits = await dataAccess.Credits.Where(x => x.User.Username == studentUserName && x.ClassRoomId == user.ClassRoomActiveId).ToListAsync();
 
             var res = new List<Excercise>();
 

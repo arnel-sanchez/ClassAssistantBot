@@ -1,5 +1,5 @@
-﻿using System;
-using ClassAssistantBot.Models;
+﻿using ClassAssistantBot.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClassAssistantBot.Services
 {
@@ -49,9 +49,9 @@ namespace ClassAssistantBot.Services
             await dataAccess.SaveChangesAsync();
         }
 
-        public Miscellaneous GetMiscellaneous(string miscellaneousId)
+        public async Task<Miscellaneous> GetMiscellaneous(string miscellaneousId)
         {
-            return dataAccess.Miscellaneous.Where(x => x.Id == miscellaneousId).First();
+            return await dataAccess.Miscellaneous.Where(x => x.Id == miscellaneousId).FirstAsync();
         }
     }
 }
