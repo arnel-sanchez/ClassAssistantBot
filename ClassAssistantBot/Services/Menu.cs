@@ -79,7 +79,7 @@ namespace ClassAssistantBot.Services
                 for (int i = 1; i < count; i++)
                 {
                     await bot.SendMessageAsync(chatId: message.Chat.Id,
-                        text: text.Substring(4096 * i, 4096 * (i + 1)));
+                        text: text.Substring(4096 * i, 4096));
                 }
             }
             else
