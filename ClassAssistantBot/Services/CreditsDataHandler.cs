@@ -251,11 +251,12 @@ namespace ClassAssistantBot.Services
 
         public async Task<string> GetCreditListOfUser(User user)
         {
-            var credits = await dataAccess.Credits
+            var credits_data = await dataAccess.Credits
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
                 .OrderByDescending(x => x.DateTime.Date)
-                .GroupBy(x => x.UserId)
                 .ToListAsync();
+
+            var credits = credits_data.GroupBy(x => x.UserId);
 
             var tuple = new List<(long, long)>();
             foreach (var credit in credits)
