@@ -68,9 +68,26 @@ namespace ClassAssistantBot.Services
                 },
                 ResizeKeyboard = true
             }; ;
-            await bot.SendMessageAsync(chatId: message.Chat.Id,
-                            text: text,
-                            replyMarkup: keyboard);
+            if (text.Length > 4096)
+            {
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                        text: text.Substring(0, 4096),
+                        replyMarkup: keyboard);
+                int count = text.Length / 4096;
+                if (text.Length % 4096 > 0)
+                    count++;
+                for (int i = 1; i < count; i++)
+                {
+                    await bot.SendMessageAsync(chatId: message.Chat.Id,
+                        text: text.Substring(4096 * i, 4096 * (i + 1)));
+                }
+            }
+            else
+            {
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                        text: text,
+                        replyMarkup: keyboard);
+            }
         }
 
         public static async Task TeacherConfigurationMenu(BotClient bot, Message message, string text = "")
@@ -194,10 +211,27 @@ namespace ClassAssistantBot.Services
                     },
                 },
                 ResizeKeyboard = true
-            }; ;
-            await bot.SendMessageAsync(chatId: message.Chat.Id,
-                            text: text,
-                            replyMarkup: keyboard);
+            };
+            if (text.Length > 4096)
+            {
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                        text: text.Substring(0, 4096),
+                        replyMarkup: keyboard);
+                int count = text.Length / 4096;
+                if (text.Length % 4096 > 0)
+                    count++;
+                for (int i = 1; i < count; i++)
+                {
+                    await bot.SendMessageAsync(chatId: message.Chat.Id,
+                        text: text.Substring(4096 * i, 4096 * (i + 1)));
+                }
+            }
+            else
+            {
+                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                        text: text,
+                        replyMarkup: keyboard);
+            }
         }
 
         public static async Task StudentConfigurationMenu(BotClient bot, Message message, string text = "")
