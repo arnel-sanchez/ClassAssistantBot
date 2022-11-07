@@ -948,12 +948,15 @@ namespace ClassAssistantBot.Controllers
                 string file = "";
                 bool giveMeExplication = false;
                 var pending = await pendingDataHandler.GetPendingByCode(command, file, giveMeExplication);
-                var type = await pendingDataHandler.GetPending(command);
 
-                if (!string.IsNullOrEmpty(pending.Item1) && type.Type == InteractionType.Diary)
+                if (!string.IsNullOrEmpty(pending.Item1))
                 {
-                    await Menu.PendingDiaryCommands(bot, message, pending.Item1, pending.Item3, command, user);
-                    return;
+                    var type = await pendingDataHandler.GetPending(command);
+                    if (type.Type == InteractionType.Diary)
+                    {
+                        await Menu.PendingDiaryCommands(bot, message, pending.Item1, pending.Item3, command, user);
+                        return;
+                    }
                 }
 
                 var teachers = await teacherDataHandler.GetTeachers(user);
