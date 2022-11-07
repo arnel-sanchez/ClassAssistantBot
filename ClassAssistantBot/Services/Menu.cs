@@ -78,8 +78,11 @@ namespace ClassAssistantBot.Services
                     count++;
                 for (int i = 1; i < count; i++)
                 {
+                    int pass = 4096;
+                    if (text.Length - (4096 * i) < 4096)
+                        pass = text.Length - (4096 * i);
                     await bot.SendMessageAsync(chatId: message.Chat.Id,
-                        text: text.Substring(4096 * i, 4096));
+                        text: text.Substring(4096 * i, pass));
                 }
             }
             else
