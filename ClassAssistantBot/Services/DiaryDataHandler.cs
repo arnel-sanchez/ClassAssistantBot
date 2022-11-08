@@ -13,14 +13,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public async Task UpdateDiary(User user)
+        public void UpdateDiary(User user)
         {
             user.Status = UserStatus.Diary;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task UpdateDiary(long id, string message)
+        public void UpdateDiary(long id, string message)
         {
             var user = dataAccess.Users.First(x => x.Id == id);
             user.Status = UserStatus.Ready;
@@ -50,10 +50,10 @@ namespace ClassAssistantBot.Services
             };
             dataAccess.Pendings.Add(pending);
 
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task AcceptDiary(User user, long studentId, string diaryId)
+        public void AcceptDiary(User user, long studentId, string diaryId)
         {
             var dailies = dataAccess.Dailies.Where(x => x.UserId == studentId).OrderByDescending(x => x.DateTime).ToList();
             int count = 0;
@@ -88,12 +88,12 @@ namespace ClassAssistantBot.Services
 
             var pending = dataAccess.Pendings.Where(x => x.ObjectId == diaryId).First();
             dataAccess.Remove(pending);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<Diary> GetDiary(string diaryId)
+        public Diary GetDiary(string diaryId)
         {
-            return await dataAccess.Dailies.FirstAsync(x => x.Id == diaryId);
+            return  dataAccess.Dailies.First(x => x.Id == diaryId);
         }
     }
 }

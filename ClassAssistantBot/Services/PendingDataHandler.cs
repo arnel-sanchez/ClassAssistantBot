@@ -14,7 +14,7 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public async Task<(string, int)> GetPendings(User user, bool directPendings = false, InteractionType interactionType = InteractionType.None, int page = 1)
+        public (string, int) GetPendings(User user, bool directPendings = false, InteractionType interactionType = InteractionType.None, int page = 1)
         {
             var pendings = new List<Pending>();
             if (!directPendings)
@@ -61,7 +61,7 @@ namespace ClassAssistantBot.Services
 
             user.Status = UserStatus.Pending;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
             int count = pendings.Count/10;
             if (pendings.Count % 10 != 0)
                 count++;
@@ -123,22 +123,22 @@ namespace ClassAssistantBot.Services
             return (res.ToString(), count);
         }
 
-        public async Task<(string, string, bool)> GetPendingByCode(string code, string pend, bool giveMeExplication)
+        public (string, string, bool) GetPendingByCode(string code, string pend, bool giveMeExplication)
         {
             var res = new StringBuilder();
-            var pending = await dataAccess.Pendings
+            var pending =  dataAccess.Pendings
                 .Where(x => x.Code == code)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
             pend = "";
             giveMeExplication = false;
             if (pending == null)
                 return (pend, pend, giveMeExplication);
             if (pending.Type == InteractionType.ClassIntervention)
             {
-                var classIntervention = await dataAccess.ClassInterventions
+                var classIntervention =  dataAccess.ClassInterventions
                     .Include(x => x.User)
                     .Include(x => x.Class)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 res.Append($"Intervención en Clase de {classIntervention.User.Username}\n");
                 res.Append($"Clase: {classIntervention.Class.Title}\n");
                 res.Append($"Intevención: {classIntervention.Text}\n");
@@ -146,20 +146,20 @@ namespace ClassAssistantBot.Services
             }
             else if (pending.Type == InteractionType.Miscellaneous)
             {
-                var miscellaneous = await dataAccess.Miscellaneous
+                var miscellaneous =  dataAccess.Miscellaneous
                     .Include(x => x.User)
                     .Include(x => x.ClassRoom)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 res.Append($"Miscelánea de {miscellaneous.User.Username}\n");
                 res.Append($"Comentario: {miscellaneous.Text}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
             }
             else if (pending.Type == InteractionType.ClassTitle)
             {
-                var classTitle = await dataAccess.ClassTitles
+                var classTitle =  dataAccess.ClassTitles
                     .Include(x => x.Class)
                     .Include(x => x.User)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 res.Append($"Cambio de Título de la Clase {classTitle.User.Username}\n");
                 res.Append($"Clase: {classTitle.Class.Title}\n");
                 res.Append($"Título: {classTitle.Title}\n");
@@ -167,18 +167,18 @@ namespace ClassAssistantBot.Services
             }
             else if (pending.Type == InteractionType.Diary)
             {
-                var diary = await dataAccess.Dailies
+                var diary =  dataAccess.Dailies
                     .Include(x => x.User)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 res.Append($"Actualización de Diario de {diary.User.Username}\n");
                 res.Append($"Actualización: {diary.Text}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
             }
             else if (pending.Type == InteractionType.Joke)
             {
-                var joke = await dataAccess.Jokes
+                var joke =  dataAccess.Jokes
                     .Include(x => x.User)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 res.Append($"Chiste de {joke.User.Username}\n");
                 res.Append($"Texto: {joke.Text}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
@@ -186,9 +186,9 @@ namespace ClassAssistantBot.Services
             }
             else if (pending.Type == InteractionType.Meme)
             {
-                var meme = await dataAccess.Memes
+                var meme =  dataAccess.Memes
                     .Include(x => x.User)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 res.Append($"Meme de {meme.User.Username}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
                 pend = meme.FileId;
@@ -196,10 +196,10 @@ namespace ClassAssistantBot.Services
             }
             else if (pending.Type == InteractionType.RectificationToTheTeacher)
             {
-                var rectificationToTheTeacher = await dataAccess.RectificationToTheTeachers
+                var rectificationToTheTeacher =  dataAccess.RectificationToTheTeachers
                     .Include(x => x.Teacher.User)
                     .Include(x => x.User)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 res.Append($"Rectificación al Profesor de {rectificationToTheTeacher.User.Username}\n");
                 res.Append($"Profesor: {rectificationToTheTeacher.Teacher.User.Username}\n");
                 res.Append($"Texto: {rectificationToTheTeacher.Text}\n");
@@ -207,9 +207,9 @@ namespace ClassAssistantBot.Services
             }
             else
             {
-                var statusphrase = await dataAccess.StatusPhrases
+                var statusphrase =  dataAccess.StatusPhrases
                     .Include(x => x.User)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 res.Append($"Cambio de Frase de Estado de {statusphrase.User.Username}\n");
                 res.Append($"Frase: {statusphrase.Phrase}\n");
                 res.Append($"Código de Pendiente: /{pending.Code}\n");
@@ -218,27 +218,27 @@ namespace ClassAssistantBot.Services
             return (res.ToString(), pend, giveMeExplication);
         }
 
-        public async Task<Pending> GetPending(string code)
+        public Pending GetPending(string code)
         {
-            return await dataAccess.Pendings
+            return  dataAccess.Pendings
                 .Where(x => x.Code == code)
                 .Include(x => x.Student)
                 .Include(x => x.Student.User)
                 .Include(x => x.ClassRoom)
-                .FirstAsync();
+                .First();
         }
 
-        public async Task RemovePending(Pending pending)
+        public void RemovePending(Pending pending)
         {
-            var directPendings = await dataAccess.DirectPendings.Where(x => x.PendingId == pending.Id).ToListAsync();
+            var directPendings =  dataAccess.DirectPendings.Where(x => x.PendingId == pending.Id).ToList();
             dataAccess.Pendings.Remove(pending);
             dataAccess.DirectPendings.RemoveRange(directPendings);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<long> AddDirectPending(string username, string pendingId)
+        public long AddDirectPending(string username, string pendingId)
         {
-            var user = await dataAccess.Users.Where(x => x.Username == username || x.Username == username.Substring(1)).FirstAsync();
+            var user =  dataAccess.Users.Where(x => x.Username == username || x.Username == username.Substring(1)).First();
 
             var directPending = new DirectPending
             {
@@ -247,21 +247,21 @@ namespace ClassAssistantBot.Services
                 UserId = user.Id
             };
             dataAccess.DirectPendings.Add(directPending);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
             return user.ChatId;
         }
 
-        public async Task<string> GetAllClassRoomWithPendings(User user)
+        public string GetAllClassRoomWithPendings(User user)
         {
-            var classRooms = await dataAccess.TeachersByClassRooms
+            var classRooms =  dataAccess.TeachersByClassRooms
                             .Where(x => x.Teacher.UserId == user.Id)
                             .Include(x => x.ClassRoom)
-                            .ToListAsync();
+                            .ToList();
             StringBuilder res = new StringBuilder();
             int i = 0;
             foreach (var classRoom in classRooms)
             {
-                if (await dataAccess.Pendings.Where(x=>x.ClassRoomId==classRoom.ClassRoomId).CountAsync()!=0)
+                if ( dataAccess.Pendings.Where(x=>x.ClassRoomId==classRoom.ClassRoomId).Count()!=0)
                 {
                     res.Append(++i);
                     res.Append(": ");
@@ -273,68 +273,68 @@ namespace ClassAssistantBot.Services
             return res.ToString();
         }
 
-        public async Task<(string, string)> GetPendingExplicationData(Pending pending, string teacherUsername)
+        public (string, string) GetPendingExplicationData(Pending pending, string teacherUsername)
         {
             pending.GiveMeAnExplication = true;
             dataAccess.Pendings.Update(pending);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
             if (pending.Type == InteractionType.ClassIntervention)
             {
-                var classIntervention = await dataAccess.ClassInterventions
+                var classIntervention =  dataAccess.ClassInterventions
                     .Include(x => x.User)
                     .Include(x => x.Class)
                     .Include(x => x.Class.ClassRoom)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 return ($"El profesor @{teacherUsername} le está pidiendo una explicación sobre su intervención en clases({classIntervention.Text}) en la clase \"{classIntervention.Class.Title}\" del aula \"{classIntervention.Class.ClassRoom.Name}\" debido a que no entendió de qué iba.", "");
             }
             else if (pending.Type == InteractionType.Miscellaneous)
             {
-                var classIntervention = await dataAccess.Miscellaneous
+                var classIntervention =  dataAccess.Miscellaneous
                     .Include(x => x.User)
                     .Include(x => x.ClassRoom)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 return ($"El profesor @{teacherUsername} le está pidiendo una explicación sobre su miscelánea({classIntervention.Text}) en lel aula \"{classIntervention.ClassRoom.Name}\" debido a que no entendió de qué iba.", "");
             }
             else if (pending.Type == InteractionType.ClassTitle)
             {
-                var classTitle = await dataAccess.ClassTitles
+                var classTitle =  dataAccess.ClassTitles
                     .Include(x => x.Class)
                     .Include(x => x.Class.ClassRoom)
                     .Include(x => x.User)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 return ($"El profesor @{teacherUsername} le está pidiendo una explicación sobre su propuesta de cambio de título de la clase({classTitle.Title}) en la clase \"{classTitle.Class.Title}\" del aula \"{classTitle.Class.ClassRoom.Name}\" debido a que no entendió de qué iba.", "");
             }
             else if (pending.Type == InteractionType.Joke)
             {
-                var joke = await dataAccess.Jokes
+                var joke =  dataAccess.Jokes
                     .Include(x => x.User)
                     .Include(x => x.ClassRoom)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 return ($"El profesor @{teacherUsername} le está pidiendo una explicación sobre su chiste({joke.Text}) en el aula \"{joke.ClassRoom.Name}\" debido a que no entendió de qué iba.", "");
             }
             else if (pending.Type == InteractionType.Meme)
             {
-                var meme = await dataAccess.Memes
+                var meme =  dataAccess.Memes
                     .Include(x => x.User)
                     .Include(x => x.ClassRoom)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 return ($"El profesor @{teacherUsername} le está pidiendo una explicación sobre su meme en el aula \"{meme.ClassRoom.Name}\" debido a que no entendió de qué iba.", meme.FileId);
             }
             else if (pending.Type == InteractionType.RectificationToTheTeacher)
             {
-                var rectificationToTheTeacher = await dataAccess.RectificationToTheTeachers
+                var rectificationToTheTeacher =  dataAccess.RectificationToTheTeachers
                     .Include(x => x.Teacher.User)
                     .Include(x => x.ClassRoom)
                     .Include(x => x.User)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 return ($"El profesor @{teacherUsername} le está pidiendo una explicación sobre su rectificación al profesor {rectificationToTheTeacher.Teacher.User.Username}({rectificationToTheTeacher.Text}) en el aula \"{rectificationToTheTeacher.ClassRoom.Name}\" debido a que no entendió de qué iba.", "");
             }
             else
             {
-                var statusPhrase = await dataAccess.StatusPhrases
+                var statusPhrase =  dataAccess.StatusPhrases
                     .Include(x => x.User)
                     .Include(x => x.ClassRoom)
-                    .FirstAsync(x => x.Id == pending.ObjectId);
+                    .First(x => x.Id == pending.ObjectId);
                 return ($"El profesor @{teacherUsername} le está pidiendo una explicación sobre su frase de estado({statusPhrase.Phrase}) en el aula \"{statusPhrase.ClassRoom.Name}\" debido a que no entendió de qué iba.", "");
             }
         } 

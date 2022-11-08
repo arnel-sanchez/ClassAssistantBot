@@ -14,6 +14,6 @@ try
 }
 catch (Exception ex)
 {
-    await Logger.Error(ex.Message);
+     Logger.Error(ex.Message);
 }
 Console.Read();

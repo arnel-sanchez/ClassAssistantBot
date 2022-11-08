@@ -13,14 +13,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public async Task SendMeme(User user)
+        public void SendMeme(User user)
         {
             user.Status = UserStatus.Meme;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task SendMeme(long id, Telegram.BotAPI.AvailableTypes.Document document)
+        public void SendMeme(long id, Telegram.BotAPI.AvailableTypes.Document document)
         {
             var user = dataAccess.Users.First(x => x.Id == id);
             user.Status = UserStatus.Ready;
@@ -54,10 +54,10 @@ namespace ClassAssistantBot.Services
                 Code = code
             };
             dataAccess.Pendings.Add(pending);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task SendMeme(long id, Telegram.BotAPI.AvailableTypes.PhotoSize photo)
+        public void SendMeme(long id, Telegram.BotAPI.AvailableTypes.PhotoSize photo)
         {
             var user = dataAccess.Users.First(x => x.Id == id);
             user.Status = UserStatus.Ready;
@@ -92,12 +92,12 @@ namespace ClassAssistantBot.Services
                 Code = code
             };
             dataAccess.Pendings.Add(pending);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<Meme> GetMeme(string memeId)
+        public Meme GetMeme(string memeId)
         {
-            return await dataAccess.Memes.Where(x => x.Id == memeId).FirstAsync();
+            return  dataAccess.Memes.Where(x => x.Id == memeId).First();
         }
     }
 }

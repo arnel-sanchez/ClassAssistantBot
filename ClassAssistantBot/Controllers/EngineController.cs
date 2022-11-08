@@ -55,30 +55,30 @@ namespace ClassAssistantBot.Services
         {
             if (commandController == null)
             {
-                Logger.Error($"Error: Control de comandos nulo, problemas en el servidor").Wait();
+                Logger.Error($"Error: Control de comandos nulo, problemas en el servidor");
                 return;
             }
-            commandController.ProcessCommand(message).Wait();
+            commandController.ProcessCommand(message);
         }
 
         protected override void OnBotException(BotRequestException exp)
         {
-            Logger.Error(exp.Message).Wait();
+            Logger.Error(exp.Message);
         }
 
         protected override void OnException(Exception exp)
         {
-            Logger.Error(exp.Message).Wait();
+            Logger.Error(exp.Message);
         }
 
         protected override void OnCallbackQuery(CallbackQuery callbackQuery)
         {
             if (callBackController == null)
             {
-                Logger.Error($"Error: Control de comandos nulo, problemas en el servidor").Wait();
+                Logger.Error($"Error: Control de comandos nulo, problemas en el servidor");
                 return;
             }
-            callBackController.ProcessCallBackQuery(callbackQuery).Wait();
+            callBackController.ProcessCallBackQuery(callbackQuery);
         }
 
         protected override void OnChannelPost(Message message)

@@ -12,14 +12,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public async Task CreateIntervention(User user)
+        public void CreateIntervention(User user)
         {
             user.Status = UserStatus.ClassIntervention;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+            dataAccess.SaveChanges();
         }
 
-        public async Task CreateIntervention(User user, long classId)
+        public void CreateIntervention(User user, long classId)
         {
             user.Status = UserStatus.ClassInterventionSelect;
             dataAccess.Users.Update(user);
@@ -32,11 +32,11 @@ namespace ClassAssistantBot.Services
                 DateTime = DateTime.UtcNow,
                 Finished = false
             };
-            await dataAccess.ClassInterventions.AddAsync(classIntervention);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.ClassInterventions.Add(classIntervention);
+             dataAccess.SaveChanges();
         }
 
-        public async Task CreateIntervention(User user, string intervention)
+        public void CreateIntervention(User user, string intervention)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
@@ -59,13 +59,13 @@ namespace ClassAssistantBot.Services
                 StudentId = dataAccess.Students.Where(x => x.UserId == user.Id).First().Id,
                 Code = code
             };
-            await dataAccess.Pendings.AddAsync(pending);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.Pendings.Add(pending);
+             dataAccess.SaveChanges();
         }
 
-        public async Task<ClassIntervention> GetClassIntenvention(string id)
+        public ClassIntervention GetClassIntenvention(string id)
         {
-            return await dataAccess.ClassInterventions.Where(x => x.Id == id).FirstAsync();
+            return dataAccess.ClassInterventions.Where(x => x.Id == id).First();
         }
     }
 }

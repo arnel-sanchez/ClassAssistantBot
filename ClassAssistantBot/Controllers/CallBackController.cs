@@ -36,14 +36,14 @@ namespace ClassAssistantBot.Controllers
             this.guildDataHandler = new GuildDataHandler(dataAccess);
         }
 
-        public async Task ProcessCallBackQuery(CallbackQuery callbackQuery)
+        public void ProcessCallBackQuery(CallbackQuery callbackQuery)
         {
             this.callbackQuery = callbackQuery;
             this.message = callbackQuery.Message;
             if (callbackQuery.Message.From == null)
             {
-                await Logger.Error($"Error: Mensaje con usuario nulo, problemas en el servidor");
-                await bot.SendMessageAsync(chatId: message.Chat.Id,
+                 Logger.Error($"Error: Mensaje con usuario nulo, problemas en el servidor");
+                 bot.SendMessage(chatId: message.Chat.Id,
                                 text: "Lo siento, estoy teniendo problemas mentales y estoy en una consulta del psiquiátra.");
                 return;
             }
@@ -54,18 +54,18 @@ namespace ClassAssistantBot.Controllers
             }
             this.appUser = callbackQuery.From;
 
-            var user = await userDataHandler.GetUser(appUser);
+            var user =  userDataHandler.GetUser(appUser);
 
-            await Logger.Warning($"New message from chat id: {(string.IsNullOrEmpty(user.Username) ? user.ChatId : user.Username)}");
-            await Logger.Warning($"Message Text: {callbackQuery.Data}");
+             Logger.Warning($"New message from chat id: {(string.IsNullOrEmpty(user.Username) ? user.ChatId : user.Username)}");
+             Logger.Warning($"Message Text: {callbackQuery.Data}");
 
             if (callbackQuery.Data.Contains("NextPending//"))
             {
                 var data = callbackQuery.Data.Split("//");
                 int page = int.Parse(data[1]);
                 var interactionType = (Models.InteractionType)int.Parse(data[2]);
-                var pendings = await pendingDataHandler.GetPendings(user, false, interactionType, page);
-                await Menu.PendingsPaginators(bot, message, pendings.Item1, pendings.Item2, page, interactionType);
+                var pendings =  pendingDataHandler.GetPendings(user, false, interactionType, page);
+                 Menu.PendingsPaginators(bot, message, pendings.Item1, pendings.Item2, page, interactionType);
 
             }
             else if (callbackQuery.Data.Contains("BackPending//"))
@@ -73,8 +73,8 @@ namespace ClassAssistantBot.Controllers
                 var data = callbackQuery.Data.Split("//");
                 int page = int.Parse(data[1]);
                 var interactionType = (Models.InteractionType)int.Parse(data[2]);
-                var pendings = await pendingDataHandler.GetPendings(user, false, interactionType, page);
-                await Menu.PendingsPaginators(bot, message, pendings.Item1, pendings.Item2, page, interactionType);
+                var pendings =  pendingDataHandler.GetPendings(user, false, interactionType, page);
+                 Menu.PendingsPaginators(bot, message, pendings.Item1, pendings.Item2, page, interactionType);
             }
             else if (callbackQuery.Data == "AcceptDiaryUpdate")
             {
@@ -86,13 +86,13 @@ namespace ClassAssistantBot.Controllers
                 else
                     //Error
                     return;
-                var pending = await pendingDataHandler.GetPending(code);
-                var diary = await  diaryDataHandler.GetDiary(pending.ObjectId);
-                await bot.SendMessageAsync(chatId: pending.Student.User.ChatId,
+                var pending =  pendingDataHandler.GetPending(code);
+                var diary =   diaryDataHandler.GetDiary(pending.ObjectId);
+                 bot.SendMessage(chatId: pending.Student.User.ChatId,
                                     text: $"El profesor @{user.Username} ha Aceptado su solicitud de actualización de diario:\n\n{diary.Text}");
-                await diaryDataHandler.AcceptDiary(user, pending.Student.UserId, pending.ObjectId);
-                var pendings = await pendingDataHandler.GetPendings(user);
-                await Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
+                 diaryDataHandler.AcceptDiary(user, pending.Student.UserId, pending.ObjectId);
+                var pendings =  pendingDataHandler.GetPendings(user);
+                 Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
             else if(callbackQuery.Data == "DenialOfCreditApplications")
             {
@@ -110,20 +110,20 @@ namespace ClassAssistantBot.Controllers
                 else
                     //Error
                     return;
-                var pending = await pendingDataHandler.GetPending(code);
+                var pending =  pendingDataHandler.GetPending(code);
                 var imageID = "";
                 bool giveMeExplication = false;
-                var @object = await pendingDataHandler.GetPendingByCode(code, imageID, giveMeExplication);
-                await pendingDataHandler.RemovePending(pending);
+                var @object =  pendingDataHandler.GetPendingByCode(code, imageID, giveMeExplication);
+                 pendingDataHandler.RemovePending(pending);
                 if (isText)
-                    await bot.SendMessageAsync(chatId: pending.Student.User.ChatId,
+                     bot.SendMessage(chatId: pending.Student.User.ChatId,
                                     text: $"El profesor @{user.Username} ha denegado su solicitud de créditos \n\n{@object.Item1}\n si tienes algún problema pregúntele a él, no la cojas conmigo.");
                 else
-                    await bot.SendPhotoAsync(chatId: pending.Student.User.ChatId,
+                     bot.SendPhoto(chatId: pending.Student.User.ChatId,
                                   photo: @object.Item2,
                                   caption: $"El profesor @{user.Username} ha denegado su solicitud de créditos si tienes algún problema pregúntele a él, no la cojas conmigo.");
-                var pendings = await pendingDataHandler.GetPendings(user);
-                await Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
+                var pendings =  pendingDataHandler.GetPendings(user);
+                 Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
             else if(callbackQuery.Data.Contains("GiveMeExplication//"))
             {
@@ -132,100 +132,100 @@ namespace ClassAssistantBot.Controllers
                 var pendingCode = data[1];
                 var username = data[2];
 
-                var pending = await pendingDataHandler.GetPending(pendingCode);
+                var pending =  pendingDataHandler.GetPending(pendingCode);
 
-                var res = await pendingDataHandler.GetPendingExplicationData(pending, username);
+                var res =  pendingDataHandler.GetPendingExplicationData(pending, username);
 
                 if (string.IsNullOrEmpty(res.Item2))
                 {
-                    await bot.SendMessageAsync(chatId: pending.Student.User.ChatId,
+                     bot.SendMessage(chatId: pending.Student.User.ChatId,
                                     text: res.Item1);
                 }
                 else
                 {
-                    await bot.SendPhotoAsync(chatId: pending.Student.User.ChatId,
+                     bot.SendPhoto(chatId: pending.Student.User.ChatId,
                                   caption: res.Item1,
                                   photo: res.Item2);
                 }
-                var pendings = await pendingDataHandler.GetPendings(user);
-                await Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
+                var pendings =  pendingDataHandler.GetPendings(user);
+                 Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
             else if (callbackQuery.Data.Contains("AssignDirectPending//"))
             {
                 var data = callbackQuery.Data.Split("//");
                 var command = data[1];
                 var teacherUsername = data[2];
-                var pending = await pendingDataHandler.GetPending(command);
-                if (await teacherDataHandler.ExistTeacher(teacherUsername))
+                var pending =  pendingDataHandler.GetPending(command);
+                if ( teacherDataHandler.ExistTeacher(teacherUsername))
                 {
-                    var teacherChatId = await pendingDataHandler.AddDirectPending(teacherUsername, pending.Id);
-                    await bot.SendMessageAsync(chatId: teacherChatId,
+                    var teacherChatId =  pendingDataHandler.AddDirectPending(teacherUsername, pending.Id);
+                     bot.SendMessage(chatId: teacherChatId,
                         text: "Le han asignado un pendiente que tiene que revisar.");
                 }
                 else
                 {
-                    await bot.SendMessageAsync(chatId: user.ChatId,
+                     bot.SendMessage(chatId: user.ChatId,
                         text: $"No existe un usuario con el user name {teacherUsername}.");
                 }
-                var pendings = await pendingDataHandler.GetPendings(user);
-                await Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
+                var pendings =  pendingDataHandler.GetPendings(user);
+                 Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2);
             }
             else if (callbackQuery.Data.Contains("PracticalClassCode//"))
             {
                 var data = callbackQuery.Data.Split("//");
                 if (user.Status == UserStatus.DeletePracticalClass)
                 {
-                    await practicClassDataHandler.DeletePracticClasses(user, data[1]);
-                    await Menu.TeacherMenu(bot, message, "Se ha eliminado la Clase Práctica Satisfactoriamente");
+                     practicClassDataHandler.DeletePracticClasses(user, data[1]);
+                     Menu.TeacherMenu(bot, message, "Se ha eliminado la Clase Práctica Satisfactoriamente");
                 }
                 else
                 {
-                    var students = await studentDataHandler.GetStudents(user);
-                    await Menu.PracticalClassStudentsList(bot, message, students, data[1], "Seleccione el estudiante:");
+                    var students =  studentDataHandler.GetStudents(user);
+                     Menu.PracticalClassStudentsList(bot, message, students, data[1], "Seleccione el estudiante:");
                 }
             }
             else if (callbackQuery.Data.Contains("StudentUserName//"))
             {
                 var data = callbackQuery.Data.Split("//");
-                var excercises = await practicClassDataHandler.GetExcercises(user, data[1], data[2]);
+                var excercises =  practicClassDataHandler.GetExcercises(user, data[1], data[2]);
                 if (excercises.Count() == 0)
                 {
-                    var students = await studentDataHandler.GetStudents(user);
-                    await Menu.PracticalClassStudentsList(bot, message, students, data[2], "El estudiante que seleccionó no tiene ejercicios pendientes en esta clase. Seleccione un nuevo estudiante:");
+                    var students =  studentDataHandler.GetStudents(user);
+                     Menu.PracticalClassStudentsList(bot, message, students, data[2], "El estudiante que seleccionó no tiene ejercicios pendientes en esta clase. Seleccione un nuevo estudiante:");
                 }
                 else
                 {
-                    await Menu.PracticalClassExcersicesList(bot, message, excercises, data[2], data[1], "Seleccione el ejercicio:");
+                     Menu.PracticalClassExcersicesList(bot, message, excercises, data[2], data[1], "Seleccione el ejercicio:");
                 }
             }
             else if (callbackQuery.Data.Contains("ExcserciseCode//"))
             {
                 var data = callbackQuery.Data.Split("//");
-                await Menu.PracticalClassIsDouble(bot, message, data[1], data[3], data[2], "Entregó antes de la Clase Práctica?");
+                 Menu.PracticalClassIsDouble(bot, message, data[1], data[3], data[2], "Entregó antes de la Clase Práctica?");
             }
             else if (callbackQuery.Data.Contains("IsDouble//"))
             {
                 var data = callbackQuery.Data.Split("//");
-                var res = await practicClassDataHandler.ReviewPrecticalClass(user, data[1], data[2], data[3], bool.Parse(data[4]));
+                var res =  practicClassDataHandler.ReviewPrecticalClass(user, data[1], data[2], data[3], bool.Parse(data[4]));
                 if (res.Item1)
                 {
-                    await bot.SendMessageAsync(chatId: res.Item4,
+                     bot.SendMessage(chatId: res.Item4,
                         text: res.Item2);
-                    var excercises = await practicClassDataHandler.GetExcercises(user, data[2], data[3]);
+                    var excercises =  practicClassDataHandler.GetExcercises(user, data[2], data[3]);
                     if (excercises.Count() == 0)
                     {
-                        var students = await studentDataHandler.GetStudents(user);
-                        await Menu.PracticalClassStudentsList(bot, message, students, data[2], "El estudiante que seleccionó no tiene ejercicios pendientes en esta clase. Seleccione un nuevo estudiante:");
+                        var students =  studentDataHandler.GetStudents(user);
+                         Menu.PracticalClassStudentsList(bot, message, students, data[2], "El estudiante que seleccionó no tiene ejercicios pendientes en esta clase. Seleccione un nuevo estudiante:");
                     }
                     else
                     {
-                        await Menu.PracticalClassExcersicesList(bot, message, excercises, data[3], data[2], "Seleccione el ejercicio:");
+                         Menu.PracticalClassExcersicesList(bot, message, excercises, data[3], data[2], "Seleccione el ejercicio:");
                     }
                 }
                 else
                 {
-                    var students = await studentDataHandler.GetStudents(user);
-                    await Menu.PracticalClassStudentsList(bot, message, students, data[2], $"Ocurrió el siguiente error: {res.Item2}.\n\nVuelva a seleccionar el estudiante:");
+                    var students =  studentDataHandler.GetStudents(user);
+                     Menu.PracticalClassStudentsList(bot, message, students, data[2], $"Ocurrió el siguiente error: {res.Item2}.\n\nVuelva a seleccionar el estudiante:");
                 }
             }
             else if (callbackQuery.Data.Contains("SelectGuilds//"))
@@ -234,34 +234,34 @@ namespace ClassAssistantBot.Controllers
                 long guildId = long.Parse(data[1]);
                 if (user.Status == UserStatus.DeleteGuild)
                 {
-                    var students = await guildDataHandler.DeleteGuild(user, guildId);
-                    await Menu.GuildMenu(bot, message, "Gremio eliminado con éxito");
+                    var students =  guildDataHandler.DeleteGuild(user, guildId);
+                     Menu.GuildMenu(bot, message, "Gremio eliminado con éxito");
                     foreach (var student in students.Item2)
                     {
-                        await bot.SendMessageAsync(chatId: student.User.ChatId,
+                         bot.SendMessage(chatId: student.User.ChatId,
                         text: $"Ha sido eliminado del Gremio {students.Item1}");
                     }
                 }
                 else if(user.Status == UserStatus.DetailsGuild)
                 {
-                    var res = await guildDataHandler.DetailsGuild(user, guildId);
-                    await Menu.GuildMenu(bot, message, res);
+                    var res =  guildDataHandler.DetailsGuild(user, guildId);
+                     Menu.GuildMenu(bot, message, res);
                 }
                 else if(user.Status == UserStatus.AssignStudentAtGuild)
                 {
-                    var students = await guildDataHandler.AssignStudentAtGuild(user, guildId);
-                    await Menu.StudentGuildList(bot, message, students, guildId, "Seleccione el estudiante a agregar al Gremio");
+                    var students =  guildDataHandler.AssignStudentAtGuild(user, guildId);
+                     Menu.StudentGuildList(bot, message, students, guildId, "Seleccione el estudiante a agregar al Gremio");
                 }
                 else if (user.Status == UserStatus.DeleteStudentFromGuild)
                 {
-                    var students = await guildDataHandler.DeleteStudentFromGuild(user, guildId);
-                    await Menu.StudentGuildList(bot, message, students, guildId, "Seleccione el estudiante a eliminar del Gremio");
+                    var students =  guildDataHandler.DeleteStudentFromGuild(user, guildId);
+                     Menu.StudentGuildList(bot, message, students, guildId, "Seleccione el estudiante a eliminar del Gremio");
                 }
                 else if (user.Status == UserStatus.AssignCreditsAtGuild)
                 {
-                    await bot.SendMessageAsync(chatId: user.ChatId,
+                     bot.SendMessage(chatId: user.ChatId,
                         text: $"Envíe un mensaje en el siguiente formato:\n\n<Id del Gremio> <Cantidad de créditos> <Explicación de por qué son los créditos>");
-                    await bot.SendMessageAsync(chatId: user.ChatId,
+                     bot.SendMessage(chatId: user.ChatId,
                         text: $"Id del Gremio: {guildId}");
                 }
             }
@@ -272,16 +272,16 @@ namespace ClassAssistantBot.Controllers
                 string studentId = data[2];
                 if (user.Status == UserStatus.AssignStudentAtGuild)
                 {
-                    var res = await guildDataHandler.AssignStudentAtGuild(user, guildId, studentId);
-                    await Menu.GuildMenu(bot, message);
-                    await bot.SendMessageAsync(chatId: res.Item2,
+                    var res =  guildDataHandler.AssignStudentAtGuild(user, guildId, studentId);
+                     Menu.GuildMenu(bot, message);
+                     bot.SendMessage(chatId: res.Item2,
                         text: $"Ha sido agregado al Gremio {res.Item1}");
                 }
                 else if (user.Status == UserStatus.DeleteStudentFromGuild)
                 {
-                    var res = await guildDataHandler.DeleteStudentFromGuild(user, guildId, studentId);
-                    await Menu.GuildMenu(bot, message);
-                    await bot.SendMessageAsync(chatId: res.Item2,
+                    var res =  guildDataHandler.DeleteStudentFromGuild(user, guildId, studentId);
+                     Menu.GuildMenu(bot, message);
+                     bot.SendMessage(chatId: res.Item2,
                         text: $"Ha sido eliminado del Gremio {res.Item1}");
                 }
             }
@@ -304,8 +304,8 @@ namespace ClassAssistantBot.Controllers
                     interactionType = Models.InteractionType.Diary;
                 else if (callbackQuery.Data.Contains("RectificationToTheTeacher"))
                     interactionType = Models.InteractionType.RectificationToTheTeacher;
-                var pendings = await pendingDataHandler.GetPendings(user, false, interactionType);
-                await Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2, interactionType);
+                var pendings =  pendingDataHandler.GetPendings(user, false, interactionType);
+                 Menu.PendingsFilters(bot, message, pendings.Item1, pendings.Item2, interactionType);
             }
         }
     }

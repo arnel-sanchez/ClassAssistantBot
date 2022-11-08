@@ -14,14 +14,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public async Task CreatePracticClass(User user)
+        public void CreatePracticClass(User user)
         {
             user.Status = UserStatus.CreatePracticClass;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<bool> CreatePracticClass(User user, string cpFormat)
+        public bool CreatePracticClass(User user, string cpFormat)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace ClassAssistantBot.Services
                 }
                 cp.Excercises = exercises;
                 dataAccess.PracticClasses.Add(cp);
-                await dataAccess.SaveChangesAsync();
+                 dataAccess.SaveChanges();
                 return true;
             }
             catch (Exception ex)
@@ -65,32 +65,32 @@ namespace ClassAssistantBot.Services
             }
         }
 
-        public async Task<List<PracticClass>> GetPracticClasses(User user)
+        public List<PracticClass> GetPracticClasses(User user)
         {
-            return await dataAccess.PracticClasses.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToListAsync();
+            return  dataAccess.PracticClasses.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
         }
 
-        public async Task<List<PracticClass>> DeletePracticClasses(User user)
+        public List<PracticClass> DeletePracticClasses(User user)
         {
             user.Status = UserStatus.DeletePracticalClass;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
-            return await dataAccess.PracticClasses.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToListAsync();
+             dataAccess.SaveChanges();
+            return  dataAccess.PracticClasses.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
         }
 
-        public async Task DeletePracticClasses(User user, string code)
+        public void DeletePracticClasses(User user, string code)
         {
-            var practicalClass = await dataAccess.PracticClasses.Where(x => x.Code == code).FirstAsync();
+            var practicalClass =  dataAccess.PracticClasses.Where(x => x.Code == code).First();
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
             dataAccess.PracticClasses.Remove(practicalClass);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<List<Excercise>> GetExcercises(User user, string studentUserName, string practicaClassCode)
+        public List<Excercise> GetExcercises(User user, string studentUserName, string practicaClassCode)
         {
-            var excersices = await dataAccess.Excercises.Where(x => x.PracticClass.Code == practicaClassCode).ToListAsync();
-            var credits = await dataAccess.Credits.Where(x => x.User.Username == studentUserName && x.ClassRoomId == user.ClassRoomActiveId).ToListAsync();
+            var excersices =  dataAccess.Excercises.Where(x => x.PracticClass.Code == practicaClassCode).ToList();
+            var credits =  dataAccess.Credits.Where(x => x.User.Username == studentUserName && x.ClassRoomId == user.ClassRoomActiveId).ToList();
 
             var res = new List<Excercise>();
 
@@ -105,7 +105,7 @@ namespace ClassAssistantBot.Services
             return res;
         }
 
-        public async Task<string> EditPracticalClassName(User user)
+        public string EditPracticalClassName(User user)
         {
             user.Status = UserStatus.EditPracticalClasss;
             dataAccess.Users.Update(user);
@@ -125,11 +125,11 @@ namespace ClassAssistantBot.Services
             }
 
             res.Append("\n\n**Para editar el nombre de la Clase Práctica debe escribir el código entre paréntesis seguido de un espacio y luego el nuevo nombre**");
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
             return res.ToString();
         }
 
-        public async Task<string> EditPracticalClassName(User user, string text)
+        public string EditPracticalClassName(User user, string text)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
@@ -153,11 +153,11 @@ namespace ClassAssistantBot.Services
 
             practicalClass.Name = name;
             dataAccess.PracticClasses.Update(practicalClass);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
             return "Clase Práctica Editada Satisfactoriamente";
         }
 
-        public async Task<(bool, string, string, string)> ReviewPrecticalClass(User user, string excerciseCode, string studentUserName, string practicalClassCode, bool @double)
+        public (bool, string, string, string) ReviewPrecticalClass(User user, string excerciseCode, string studentUserName, string practicalClassCode, bool @double)
         {
             var student = dataAccess.Students.Where(x => x.User.Username == studentUserName).Include(x => x.User).FirstOrDefault();
             if (student == null)
@@ -199,7 +199,7 @@ namespace ClassAssistantBot.Services
                 user.Status = UserStatus.Ready;
                 dataAccess.Credits.Add(credit);
                 dataAccess.Users.Update(user);
-                await dataAccess.SaveChangesAsync();
+                 dataAccess.SaveChanges();
                 return (true, $"Le han revisado el ejercicio {excercise.Code} en la Clase Práctica {practicalClass.Name}.", practicalClass.Name, student.User.ChatId.ToString());
             }
             catch

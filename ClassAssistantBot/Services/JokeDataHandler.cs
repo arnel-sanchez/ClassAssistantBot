@@ -12,14 +12,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public async Task DoJoke(User user)
+        public void DoJoke(User user)
         {
             user.Status = UserStatus.Joke;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task DoJoke(long id, string message)
+        public void DoJoke(long id, string message)
         {
             var user = dataAccess.Users.First(x => x.Id == id);
             user.Status = UserStatus.Ready;
@@ -47,12 +47,12 @@ namespace ClassAssistantBot.Services
                 Code = code
             };
             dataAccess.Pendings.Add(pending);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<Joke> GetJoke(string id)
+        public Joke GetJoke(string id)
         {
-            return await dataAccess.Jokes.FirstAsync(x => x.Id == id);
+            return  dataAccess.Jokes.First(x => x.Id == id);
         }
     }
 }

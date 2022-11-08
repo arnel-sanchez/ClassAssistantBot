@@ -12,17 +12,17 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public async Task DoRectificationToTheTaecher(User user)
+        public void DoRectificationToTheTaecher(User user)
         {
             user.Status = UserStatus.RectificationAtTeacher;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task DoRectificationToTheTaecherUserName(User user, string teacherUserName)
+        public void DoRectificationToTheTaecherUserName(User user, string teacherUserName)
         {
             user.Status = UserStatus.RectificationToTheTeacherUserName;
-            var teacher = await dataAccess.Teachers.Where(x => x.User.Username == teacherUserName).FirstAsync();
+            var teacher =  dataAccess.Teachers.Where(x => x.User.Username == teacherUserName).First();
             var rectification = new RectificationToTheTeacher
             {
                 Id = Guid.NewGuid().ToString(),
@@ -37,20 +37,20 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Users.Update(user);
             dataAccess.RectificationToTheTeachers.Add(rectification);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<string> DoRectificationToTheTaecherText(User user, string text)
+        public string DoRectificationToTheTaecherText(User user, string text)
         {
             user.Status = UserStatus.Ready;
-            var rectification = await dataAccess.RectificationToTheTeachers.Where(x => x.UserId == user.Id).OrderByDescending(x => x.DateTime).FirstAsync();
+            var rectification =  dataAccess.RectificationToTheTeachers.Where(x => x.UserId == user.Id).OrderByDescending(x => x.DateTime).First();
             rectification.Text = text;
 
             var random = new Random();
             string code = random.Next(100000, 999999).ToString();
             while (dataAccess.Pendings.Where(x => x.Code == code).Count() != 0)
                 code = random.Next(100000, 999999).ToString();
-            var student = await dataAccess.Students.Where(x => x.UserId == user.Id).FirstAsync();
+            var student =  dataAccess.Students.Where(x => x.UserId == user.Id).First();
             var pending = new Pending
             {
                 Id = Guid.NewGuid().ToString(),
@@ -64,13 +64,13 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Users.Update(user);
             dataAccess.RectificationToTheTeachers.Update(rectification);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
             return "Rectificación al profesor hecha satisfactoriamente.";
         }
 
-        public async Task<RectificationToTheTeacher> GetRectificationToTheTeacher(string id)
+        public RectificationToTheTeacher GetRectificationToTheTeacher(string id)
         {
-            return await dataAccess.RectificationToTheTeachers.FirstAsync(x => x.Id == id);
+            return  dataAccess.RectificationToTheTeachers.First(x => x.Id == id);
         }
     }
 }

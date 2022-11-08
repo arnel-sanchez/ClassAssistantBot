@@ -14,14 +14,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public async Task CreateGuild(User user)
+        public void CreateGuild(User user)
         {
             user.Status = UserStatus.CreateGuild;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task CreateGuild(User user, string name)
+        public void CreateGuild(User user, string name)
         {
             user.Status = UserStatus.Ready;
 
@@ -33,54 +33,54 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Guilds.Add(guild);
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<List<Guild>> DeleteGuild(User user)
+        public List<Guild> DeleteGuild(User user)
         {
             user.Status = UserStatus.DeleteGuild;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
 
             return dataAccess.Guilds.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
         }
 
-        public async Task<(string,List<Student>)> DeleteGuild(User user, long id)
+        public (string,List<Student>) DeleteGuild(User user, long id)
         {
             user.Status = UserStatus.Ready;
 
-            var guild = await dataAccess.Guilds
+            var guild =  dataAccess.Guilds
                 .Include(x => x.Students)
                 .ThenInclude(x => x.User)
-                .FirstAsync(x => x.Id == id);
+                .First(x => x.Id == id);
 
             dataAccess.Guilds.Remove(guild);
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
 
             return (guild.Name, guild.Students);
         }
 
-        public async Task<List<Guild>> AssignStudentAtGuild(User user)
+        public List<Guild> AssignStudentAtGuild(User user)
         {
             user.Status = UserStatus.AssignStudentAtGuild;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
 
             return dataAccess.Guilds.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
         }
 
-        public async Task<List<Student>> AssignStudentAtGuild(User user, long guildId)
+        public List<Student> AssignStudentAtGuild(User user, long guildId)
         {
-            var studentsOnGuild = await dataAccess.Guilds
+            var studentsOnGuild =  dataAccess.Guilds
                 .Where(x => x.Id == guildId)
                 .Include(x => x.Students)
-                .FirstAsync();
-            var studentsOnClassRoom = await dataAccess.StudentsByClassRooms
+                .First();
+            var studentsOnClassRoom =  dataAccess.StudentsByClassRooms
                 .Include(x => x.Student)
                 .Include(x => x.Student.User)
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
-                .ToListAsync();
+                .ToList();
 
             var res = new List<Student>();
 
@@ -95,33 +95,33 @@ namespace ClassAssistantBot.Services
             return res;
         }
 
-        public async Task<(string, long)> AssignStudentAtGuild(User user, long guildId, string studentId)
+        public (string, long) AssignStudentAtGuild(User user, long guildId, string studentId)
         {
             user.Status = UserStatus.Ready;
 
-            var guild = await dataAccess.Guilds.Where(x => x.Id == guildId).FirstAsync();
-            var student = await dataAccess.Students
+            var guild =  dataAccess.Guilds.Where(x => x.Id == guildId).First();
+            var student =  dataAccess.Students
                 .Include(x => x.User)
                 .Where(x => x.Id == studentId)
-                .FirstAsync();
+                .First();
 
             guild.Students.Add(student);
             dataAccess.Users.Update(user);
 
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
             return (guild.Name, student.User.ChatId);
         }
 
-        public async Task<List<Guild>> AssignCreditsAtGuild(User user)
+        public List<Guild> AssignCreditsAtGuild(User user)
         {
             user.Status = UserStatus.AssignCreditsAtGuild;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
 
-            return await dataAccess.Guilds.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToListAsync();
+            return  dataAccess.Guilds.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
         }
 
-        public async Task<(List<Student>, long, string)> AssignCreditsAtGuild(User user, string text)
+        public (List<Student>, long, string) AssignCreditsAtGuild(User user, string text)
         {
             user.Status = UserStatus.Ready;
 
@@ -137,11 +137,11 @@ namespace ClassAssistantBot.Services
                 explication += data[i];
             }
 
-            var guild = await dataAccess.Guilds
+            var guild =  dataAccess.Guilds
                 .Include(x => x.Students)
                 .ThenInclude(x => x.User)
                 .Where(x => x.Id == guildId)
-                .FirstAsync();
+                .First();
 
             foreach (var student in guild.Students)
             {
@@ -171,68 +171,68 @@ namespace ClassAssistantBot.Services
             }
 
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
 
             return (guild.Students, creditsCount, explication);
         }
 
-        public async Task<List<Guild>> DeleteStudentFromGuild(User user)
+        public List<Guild> DeleteStudentFromGuild(User user)
         {
             user.Status = UserStatus.DeleteStudentFromGuild;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
 
             return dataAccess.Guilds.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
         }
 
-        public async Task<List<Student>> DeleteStudentFromGuild(User user, long guildId)
+        public List<Student> DeleteStudentFromGuild(User user, long guildId)
         {
-            var studentsOnGuild = await dataAccess.Guilds
+            var studentsOnGuild =  dataAccess.Guilds
                 .Where(x => x.Id == guildId)
                 .Include(x => x.Students)
                 .ThenInclude(x => x.User)
-                .FirstAsync();
+                .First();
 
             return studentsOnGuild.Students;
         }
 
-        public async Task<(string, long)> DeleteStudentFromGuild(User user, long guildId, string studentId)
+        public (string, long) DeleteStudentFromGuild(User user, long guildId, string studentId)
         {
             user.Status = UserStatus.Ready;
 
-            var guild = await dataAccess.Guilds.Where(x => x.Id == guildId).FirstAsync();
-            var student = await dataAccess.Students
+            var guild =  dataAccess.Guilds.Where(x => x.Id == guildId).First();
+            var student =  dataAccess.Students
                 .Include(x => x.User)
                 .Where(x => x.Id == studentId)
-                .FirstAsync();
+                .First();
 
             guild.Students.Remove(student);
             dataAccess.Users.Update(user);
 
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
             return (guild.Name, student.User.ChatId);
         }
 
-        public async Task<List<Guild>> DetailsGuild(User user)
+        public List<Guild> DetailsGuild(User user)
         {
             user.Status = UserStatus.DetailsGuild;
-            var guilds = await dataAccess.Guilds
-                .Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToListAsync();
+            var guilds =  dataAccess.Guilds
+                .Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
 
             dataAccess.Users.Update(user);
 
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
 
             return guilds;
         }
 
-        public async Task<string> DetailsGuild(User user, long guildId)
+        public string DetailsGuild(User user, long guildId)
         {
             user.Status = UserStatus.Ready;
-            var guild = await dataAccess.Guilds
+            var guild =  dataAccess.Guilds
                 .Include(x => x.Students)
                 .ThenInclude(x => x.User)
-                .Where(x => x.Id == guildId).FirstAsync();
+                .Where(x => x.Id == guildId).First();
 
             var res = new StringBuilder($"Nombre: {guild.Name}\n\nEstudiantes:\n");
 
@@ -245,7 +245,7 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Users.Update(user);
 
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
 
             return res.ToString();
         }

@@ -14,16 +14,16 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public async Task CreateClassRoom(User user)
+        public void CreateClassRoom(User user)
         {
             user.Status = UserStatus.TeacherCreatingClass;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<string> CreateClassRoom(long id, string name)
+        public string CreateClassRoom(long id, string name)
         {
-            var teacher = dataAccess.Teachers.Where(x => x.User.TelegramId == id).FirstOrDefault();
+            var teacher =  dataAccess.Teachers.Where(x => x.User.TelegramId == id).FirstOrDefault();
 
             var random = new Random();
             var studentAccessKey = random.Next(1000000, 9999999);
@@ -45,15 +45,22 @@ namespace ClassAssistantBot.Services
                 TeachersByClassRooms = new List<TeacherByClassRoom>(),
                 StudentAccessKey = studentAccessKey,
                 TeacherAccessKey = teacherAccessKey,
-                MemeChannel = ""
+                MemeChannel = "",
+                ClassInterventionChannel = "",
+                ClassTitleChannel = "",
+                DiaryChannel = "",
+                JokesChannel = "",
+                MiscelaneousChannel = "",
+                RectificationToTheTeacherChannel = "",
+                StatusPhraseChannel = ""
             };
 
-            await dataAccess.AddAsync(classRoom);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.Add(classRoom);
+             dataAccess.SaveChanges();
 
-            classRoom = dataAccess.ClassRooms.Where(x => x.TeacherAccessKey == teacherAccessKey && x.StudentAccessKey == studentAccessKey).FirstOrDefault();
+            classRoom =  dataAccess.ClassRooms.Where(x => x.TeacherAccessKey == teacherAccessKey && x.StudentAccessKey == studentAccessKey).First();
 
-            var user = dataAccess.Users.Where(x => x.TelegramId == id).FirstOrDefault();
+            var user =  dataAccess.Users.Where(x => x.TelegramId == id).FirstOrDefault();
 
             if (teacher == null)
             {
@@ -78,19 +85,19 @@ namespace ClassAssistantBot.Services
 
             dataAccess.Users.Update(user);
 
-            await dataAccess.AddAsync(teacherByClassRoom);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.Add(teacherByClassRoom);
+             dataAccess.SaveChanges();
 
             return $"El código de acceso para sus estudiantes {classRoom.StudentAccessKey}\n\nEl código de acceso para los demás profesores es {classRoom.TeacherAccessKey}";
         }
 
-        public async Task<string> ChangeClassRoom(long id)
+        public string ChangeClassRoom(long id)
         {
-            var user = dataAccess.Users.Where(x => x.Id == id).First();
+            var user =  dataAccess.Users.Where(x => x.Id == id).First();
             user.Status = UserStatus.ChangeClassRoom;
             dataAccess.Update(user);
-            await dataAccess.SaveChangesAsync();
-            var list = dataAccess.TeachersByClassRooms.Where(x => x.Teacher.UserId == id).Include(x => x.ClassRoom).ToList();
+             dataAccess.SaveChanges();
+            var list =  dataAccess.TeachersByClassRooms.Where(x => x.Teacher.UserId == id).Include(x => x.ClassRoom).ToList();
             var res = new StringBuilder();
             foreach (var item in list)
             {
@@ -102,28 +109,28 @@ namespace ClassAssistantBot.Services
             return res.ToString();
         }
 
-        public async Task ChangeClassRoom(long id, long classRoomID)
+        public void ChangeClassRoom(long id, long classRoomID)
         {
-            var user = dataAccess.Users.Where(x => x.Id == id).First();
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == classRoomID).FirstOrDefault();
+            var user =  dataAccess.Users.Where(x => x.Id == id).First();
+            var classRoom =  dataAccess.ClassRooms.Where(x => x.Id == classRoomID).FirstOrDefault();
             if (classRoom != null)
             {
                 user.ClassRoomActiveId = classRoom.Id;
                 user.Status = UserStatus.Ready;
                 dataAccess.Users.Update(user);
-                await dataAccess.SaveChangesAsync();
+                 dataAccess.SaveChanges();
             }
         }
 
-        public async Task<string> SeeClassRoomActive(User user)
+        public string SeeClassRoomActive(User user)
         {
-            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            var res =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             return res.Name;
         }
 
-        public async Task<string> GetClassesCreated(User user)
+        public string GetClassesCreated(User user)
         {
-            var classes = await dataAccess.Classes.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToListAsync();
+            var classes =  dataAccess.Classes.Where(x => x.ClassRoomId == user.ClassRoomActiveId).ToList();
 
             StringBuilder stringBuilder = new StringBuilder();
 
@@ -137,224 +144,224 @@ namespace ClassAssistantBot.Services
             return stringBuilder.ToString();
         }
 
-        public async Task AssignMemeChannel(User user)
+        public void AssignMemeChannel(User user)
         {
             user.Status = UserStatus.AssignMemeChannel;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task AssignMemeChannel(User user, string chanelName)
+        public void AssignMemeChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            var classRoom =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.MemeChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<string> GetMemeChannel(User user)
+        public string GetMemeChannel(User user)
         {
-            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            var res =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             return res.MemeChannel;
         }
 
-        public async Task AssignJokesChannel(User user)
+        public void AssignJokesChannel(User user)
         {
             user.Status = UserStatus.AssignJokeChannel;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task AssignJokesChannel(User user, string chanelName)
+        public void AssignJokesChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            var classRoom =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.JokesChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<string> GetJokesChannel(User user)
+        public string GetJokesChannel(User user)
         {
-            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            var res =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
 
             return res.JokesChannel;
         }
 
-        public async Task AssignClassInterventionChannel(User user)
+        public void AssignClassInterventionChannel(User user)
         {
             user.Status = UserStatus.AssignClassInterventionChannel;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task AssignClassInterventionChannel(User user, string chanelName)
+        public void AssignClassInterventionChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            var classRoom =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.ClassInterventionChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<string> GetClassInterventionChannel(User user)
+        public string GetClassInterventionChannel(User user)
         {
-            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            var res =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
 
             return res.ClassInterventionChannel;
         }
 
-        public async Task AssignDiaryChannel(User user)
+        public void AssignDiaryChannel(User user)
         {
             user.Status = UserStatus.AssignDiaryChannel;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task AssignDiaryChannel(User user, string chanelName)
+        public void AssignDiaryChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            var classRoom =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.DiaryChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<string> GetDiaryChannel(User user)
+        public string GetDiaryChannel(User user)
         {
-            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            var res =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
 
             return res.DiaryChannel;
         }
 
-        public async Task AssignStatusPhraseChannel(User user)
+        public void AssignStatusPhraseChannel(User user)
         {
             user.Status = UserStatus.AssignStatusPhraseChannel;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task AssignStatusPhraseChannel(User user, string chanelName)
+        public void AssignStatusPhraseChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            var classRoom =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.StatusPhraseChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<string> GetStatusPhraseChannel(User user)
+        public string GetStatusPhraseChannel(User user)
         {
-            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            var res =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
 
             return res.StatusPhraseChannel;
         }
 
-        public async Task AssignClassTitleChannel(User user)
+        public void AssignClassTitleChannel(User user)
         {
             user.Status = UserStatus.AssignClassTitleChannel;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task AssignClassTitleChannel(User user, string chanelName)
+        public void AssignClassTitleChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            var classRoom =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.ClassTitleChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<string> GetClassTitleChannel(User user)
+        public string GetClassTitleChannel(User user)
         {
-            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            var res =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
 
             return res.ClassTitleChannel;
         }
 
-        public async Task AssignRectificationToTheTeacherChannel(User user)
+        public void AssignRectificationToTheTeacherChannel(User user)
         {
             user.Status = UserStatus.AssignRectificationToTheTeacherChannel;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task AssignRectificationToTheTeacherChannel(User user, string chanelName)
+        public void AssignRectificationToTheTeacherChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            var classRoom =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.RectificationToTheTeacherChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<string> GetRectificationToTheTeacherChannel(User user)
+        public string GetRectificationToTheTeacherChannel(User user)
         {
-            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            var res =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
 
             return res.RectificationToTheTeacherChannel;
         }
 
-        public async Task SendInformationToTheStudents(User user)
+        public void SendInformationToTheStudents(User user)
         {
             user.Status = UserStatus.SendInformation;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<List<StudentByClassRoom>> GetStudentsOnClassRoom(User user)
+        public List<StudentByClassRoom> GetStudentsOnClassRoom(User user)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
-            return dataAccess.StudentsByClassRooms
+             dataAccess.SaveChanges();
+            return  dataAccess.StudentsByClassRooms
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId)
                 .Include(x => x.Student)
                 .Include(x => x.Student.User)
                 .ToList();
         }
 
-        public async Task<List<TeacherByClassRoom>> GetTeachersOnClassRoom(User user)
+        public List<TeacherByClassRoom> GetTeachersOnClassRoom(User user)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
-            return dataAccess.TeachersByClassRooms
+             dataAccess.SaveChanges();
+            return  dataAccess.TeachersByClassRooms
                 .Where(x => x.ClassRoomId == user.ClassRoomActiveId && x.Teacher.UserId != user.Id)
                 .Include(x => x.Teacher)
                 .Include(x => x.Teacher.User)
                 .ToList();
         }
 
-        public async Task AssignMiscellaneousChannel(User user)
+        public void AssignMiscellaneousChannel(User user)
         {
             user.Status = UserStatus.AssignMiscellaneousChannel;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task AssignMiscellaneousChannel(User user, string chanelName)
+        public void AssignMiscellaneousChannel(User user, string chanelName)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-            var classRoom = dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
+            var classRoom =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
             classRoom.MiscelaneousChannel = chanelName;
             dataAccess.ClassRooms.Update(classRoom);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<string> GetMiscellaneousChannel(User user)
+        public string GetMiscellaneousChannel(User user)
         {
-            var res = await dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).FirstAsync();
+            var res =  dataAccess.ClassRooms.Where(x => x.Id == user.ClassRoomActiveId).First();
 
             return res.MiscelaneousChannel;
         }

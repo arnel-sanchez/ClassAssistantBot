@@ -12,14 +12,14 @@ namespace ClassAssistantBot.Services
             this.dataAccess = dataAccess;
         }
 
-        public async Task CreateMiscellaneous(User user)
+        public void CreateMiscellaneous(User user)
         {
             user.Status = UserStatus.Miscellaneous;
             dataAccess.Users.Update(user);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task CreateMiscellaneous(User user, string message)
+        public void CreateMiscellaneous(User user, string message)
         {
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
@@ -46,12 +46,12 @@ namespace ClassAssistantBot.Services
                 Code = code
             };
             dataAccess.Pendings.Add(pending);
-            await dataAccess.SaveChangesAsync();
+             dataAccess.SaveChanges();
         }
 
-        public async Task<Miscellaneous> GetMiscellaneous(string miscellaneousId)
+        public Miscellaneous GetMiscellaneous(string miscellaneousId)
         {
-            return await dataAccess.Miscellaneous.Where(x => x.Id == miscellaneousId).FirstAsync();
+            return  dataAccess.Miscellaneous.Where(x => x.Id == miscellaneousId).First();
         }
     }
 }
