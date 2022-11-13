@@ -1,4 +1,4 @@
 ﻿{
   "TelegramApiKey": "5488223587:AAGbUYLfqybsxQPou8gzcCTXEux52yQeUJs",
-  "ConnectionString": "Host=db;Port=5432;Username=postgres;Password=biUrwej1obwok;Database=ClassAssitantBot;"
+  "ConnectionString": "Host=31.220.21.190;Port=5432;Username=postgres;Password=biUrwej1obwok;Database=ClassAssitantBot;"
 }
