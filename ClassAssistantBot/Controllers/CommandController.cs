@@ -459,6 +459,31 @@ namespace ClassAssistantBot.Controllers
                                 text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
                 }
             }
+            else if(message.Audio != null)
+            {
+                if(user.Status == UserStatus.SendInformation)
+                {
+                    var students = classRoomDataHandler.GetStudentsOnClassRoom(user);
+                    foreach (var student in students)
+                    {
+                        bot.SendAudio(
+                            chatId: student.Student.User.ChatId,
+                            caption: message.Caption,
+                            audio: message.Audio.FileId
+                        );
+                    }
+                    var teachers = classRoomDataHandler.GetTeachersOnClassRoom(user);
+                    foreach (var teacher in teachers)
+                    {
+                        bot.SendAudio(
+                            chatId: teacher.Teacher.User.ChatId,
+                            caption: message.Caption,
+                            audio: message.Audio.FileId
+                        );
+                    }
+                    Menu.TeacherMenu(bot, message);
+                }
+            }
             else
             {
                  Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
