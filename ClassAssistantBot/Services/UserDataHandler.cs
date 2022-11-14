@@ -82,7 +82,7 @@ namespace ClassAssistantBot.Services
             }
             user.Status = UserStatus.Ready;
             dataAccess.Users.Update(user);
-             dataAccess.SaveChanges();
+            dataAccess.SaveChanges();
         }
     }
 }
