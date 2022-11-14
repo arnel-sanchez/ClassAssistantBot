@@ -14,7 +14,7 @@ namespace ClassAssistantBot.Services
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseNpgsql(ConnectionString, opt => opt.EnableRetryOnFailure());
+            options.UseNpgsql(ConnectionString);
         }
 
         public DbSet<DirectPending> DirectPendings { get; set; }
