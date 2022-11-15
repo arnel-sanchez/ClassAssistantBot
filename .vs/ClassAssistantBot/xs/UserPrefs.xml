@@ -1,24 +1,18 @@
-﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default">
-  <MultiItemStartupConfigurations />
+﻿<Properties StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MultiItemStartupConfigurations />
   <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
-  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Program.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/environment.json">
     <Files>
       <File FileName="ClassAssistantBot/Program.cs" Line="1" Column="1" />
+      <File FileName="ClassAssistantBot/environment.json" Line="4" Column="2" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="ClassAssistantBot" expanded="True">
-            <Node name="ClassAssistantBot" expanded="True">
-              <Node name="Program.cs" selected="True" />
-            </Node>
+            <Node name="ClassAssistantBot" expanded="True" />
           </Node>
         </State>
       </Pad>
@@ -27,4 +21,9 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
 </Properties>

@@ -63,11 +63,13 @@ namespace ClassAssistantBot.Services
 
         protected override void OnBotException(BotRequestException exp)
         {
+            Console.WriteLine(exp);
             Logger.Error(exp.Message);
         }
 
         protected override void OnException(Exception exp)
         {
+            Console.WriteLine(exp);
             Logger.Error(exp.Message);
         }
 
