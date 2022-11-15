@@ -63,12 +63,12 @@ namespace ClassAssistantBot.Services
 
         protected override void OnBotException(BotRequestException exp)
         {
-            Logger.Error(exp.InnerException.Message);
+            Logger.Error(exp.Message);
         }
 
         protected override void OnException(Exception exp)
         {
-            Logger.Error(exp.InnerException.Message);
+            Logger.Error(exp.Message);
         }
 
         protected override void OnCallbackQuery(CallbackQuery callbackQuery)
