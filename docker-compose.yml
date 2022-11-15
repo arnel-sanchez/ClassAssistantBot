@@ -6,6 +6,7 @@ services:
       context: .
     image: class-assistant-api
     container_name: class-assistant-api
+    restart: always
     volumes:
       - .:/app
     ports:
@@ -25,6 +26,7 @@ services:
 
   db:
     image: postgres:12.4-alpine
+    container_name: class-assistant-db
     restart: always
     ports:
       - 5432:5432
