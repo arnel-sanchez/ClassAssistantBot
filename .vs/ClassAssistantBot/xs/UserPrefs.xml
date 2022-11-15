@@ -1,13 +1,10 @@
-﻿<Properties StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default" GitUserInfo="UsingGIT">
-  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
-  <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
+﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{7D6835E7-F8CD-4663-93E0-641DE133B1AC}|Default">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.Workbench ActiveDocument="ClassAssistantBot/Controllers/EngineController.cs">
+    <Files>
+      <File FileName="ClassAssistantBot/Controllers/EngineController.cs" Line="119" Column="86" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
@@ -21,5 +18,11 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.ItemProperties.ClassAssistantBot PreferredExecutionTarget="MonoDevelop.Default" />
+  <AuthorInfo Name="arnel-sanchez" Email="arnelsanchezrodriguez@gmail.com" Copyright="" Company="" Trademark="" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
 </Properties>
