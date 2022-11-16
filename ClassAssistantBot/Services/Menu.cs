@@ -225,8 +225,11 @@ namespace ClassAssistantBot.Services
                     count++;
                 for (int i = 1; i < count; i++)
                 {
-                     bot.SendMessage(chatId: message.Chat.Id,
-                        text: text.Substring(4096 * i, 4096 * (i + 1)));
+                    int pass = 4096;
+                    if (text.Length - (4096 * i) < 4096)
+                        pass = text.Length - (4096 * i);
+                    bot.SendMessage(chatId: message.Chat.Id,
+                       text: text.Substring(4096 * i, pass));
                 }
             }
             else
