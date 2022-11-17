@@ -1,0 +1,68 @@
+name: dockercompose2515478325382272558
+services:
+  api:
+    build:
+      context: /Users/arnel-macbook/Documents/Escuela/ClassAssitantBot
+      dockerfile: Dockerfile
+    container_name: class-assistant-api
+    depends_on:
+      db:
+        condition: service_started
+    environment:
+      PostgreSqlConnectionString: Host=db;Port=5432;Username=postgres;Password=biUrwej1obwok;Database=ClassAssitantBot;
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -f http://localhost:5000/ || exit 1
+      timeout: 5s
+      interval: 30s
+      retries: 5
+      start_period: 1m0s
+    image: class-assistant-api
+    links:
+    - db
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 5000
+      published: "5000"
+      protocol: tcp
+    restart: always
+    volumes:
+    - type: bind
+      source: /Users/arnel-macbook/Documents/Escuela/ClassAssitantBot
+      target: /app
+      bind:
+        create_host_path: true
+  db:
+    container_name: class-assistant-db
+    environment:
+      POSTGRES_DB: ClassAssitantBot
+      POSTGRES_PASSWORD: biUrwej1obwok
+      POSTGRES_USER: postgres
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U postgres
+      timeout: 5s
+      interval: 10s
+      retries: 5
+    image: postgres:12.4-alpine
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 5432
+      published: "5432"
+      protocol: tcp
+    restart: always
+    volumes:
+    - type: bind
+      source: /Users/arnel-macbook/Documents/Escuela/ClassAssitantBot/db-data
+      target: /var/lib/postgresql/data
+      bind:
+        create_host_path: true
+networks:
+  default:
+    name: dockercompose2515478325382272558_default

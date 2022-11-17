@@ -433,7 +433,29 @@ namespace ClassAssistantBot.Controllers
             }
             else if (message.Document != null)
             {
-                if (user.Status == UserStatus.Meme)
+                if (user.Status == UserStatus.SendInformation)
+                {
+                    var students = classRoomDataHandler.GetStudentsOnClassRoom(user);
+                    foreach (var student in students)
+                    {
+                        bot.SendDocument(
+                            chatId: student.Student.User.ChatId,
+                            caption: message.Caption,
+                            document: message.Document.FileId
+                        );
+                    }
+                    var teachers = classRoomDataHandler.GetTeachersOnClassRoom(user);
+                    foreach (var teacher in teachers)
+                    {
+                        bot.SendDocument(
+                            chatId: teacher.Teacher.User.ChatId,
+                            caption: message.Caption,
+                            document: message.Document.FileId
+                        );
+                    }
+                    Menu.TeacherMenu(bot, message);
+                }
+                else if (user.Status == UserStatus.Meme)
                 {
                      memeDataHandler.SendMeme(user.Id, message.Document);
                      Menu.StudentMenu(bot, message);
@@ -447,7 +469,29 @@ namespace ClassAssistantBot.Controllers
             }
             else if(message.Photo != null)
             {
-                if (user.Status == UserStatus.Meme )
+                if (user.Status == UserStatus.SendInformation)
+                {
+                    var students = classRoomDataHandler.GetStudentsOnClassRoom(user);
+                    foreach (var student in students)
+                    {
+                        bot.SendPhoto(
+                            chatId: student.Student.User.ChatId,
+                            caption: message.Caption,
+                            photo: message.Photo[0].FileId
+                        );
+                    }
+                    var teachers = classRoomDataHandler.GetTeachersOnClassRoom(user);
+                    foreach (var teacher in teachers)
+                    {
+                        bot.SendPhoto(
+                            chatId: teacher.Teacher.User.ChatId,
+                            caption: message.Caption,
+                            photo: message.Photo[0].FileId
+                        );
+                    }
+                    Menu.TeacherMenu(bot, message);
+                }
+                else if (user.Status == UserStatus.Meme )
                 {
                      memeDataHandler.SendMeme(user.Id, message.Photo[0]);
                      Menu.StudentMenu(bot, message);
@@ -482,6 +526,12 @@ namespace ClassAssistantBot.Controllers
                         );
                     }
                     Menu.TeacherMenu(bot, message);
+                }
+                else
+                {
+                    Logger.Error($"Error: El usuario {user.Username} está escribiendo cosas sin sentido");
+                    bot.SendMessage(chatId: message.Chat.Id,
+                               text: "Por favor, atienda lo que hace, no me haga perder tiempo.");
                 }
             }
             else
