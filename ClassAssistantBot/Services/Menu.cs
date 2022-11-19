@@ -584,6 +584,7 @@ namespace ClassAssistantBot.Services
 
         public static void PracticalClassList(BotClient bot, Message message, List<PracticClass> practicClasses, string text = "")
         {
+            practicClasses = practicClasses.OrderBy(x => x.Name).ToList();
             var buttonTeachers = new List<InlineKeyboardButton[]>();
             for (int i = 0; i < practicClasses.Count; i++)
             {
