@@ -2008,7 +2008,7 @@ namespace ClassAssistantBot.Controllers
         private void OnRectificationToTheTeacherAtTeacherUserName(Models.User user, string teacherUserName)
         {
              rectificationToTheTeacherDataHandler.DoRectificationToTheTaecherUserName(user, teacherUserName);
-             Menu.CancelMenu(bot, message, "Explique a grosso modo en qué se equivocó el profesor y su correción:");
+             Menu.CancelMenu(bot, message, "Explique grosso modo en qué se equivocó el profesor y su correción:");
         }
 
         private void OnRectificationToTheTeacherAtText(Models.User user, string text)
